@@ -1,49 +1,33 @@
 exports.handler = async (event) => {
-
-  // ── CORS Headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, X-App-Token',
+    'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Type': 'application/json'
   };
 
-  // ── Preflight
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' };
   }
 
-  // ── Only POST
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, headers, body: JSON.stringify({ error: 'Método não permitido.' }) };
   }
 
-  // ── Validate Token
-  const token = event.headers['x-app-token'] || event.headers['X-App-Token'];
-  if (!process.env.APP_SECRET_TOKEN || token !== process.env.APP_SECRET_TOKEN) {
-    return { statusCode: 401, headers, body: JSON.stringify({ error: 'Acesso não autorizado.' }) };
-  }
-
-  // ── Validate API Key configured
   if (!process.env.OPENAI_API_KEY) {
     return { statusCode: 500, headers, body: JSON.stringify({ error: 'API Key não configurada no servidor.' }) };
   }
 
-  // ── Parse body
   let body;
   try {
     body = JSON.parse(event.body);
-  } catch(e) {
+  } catch (e) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'Requisição inválida.' }) };
   }
 
   const { type } = body;
 
   try {
-
-    // ────────────────────────────────
-    // ANALYZE — GPT-4o Vision
-    // ────────────────────────────────
     if (type === 'analyze') {
       const { imageBase64, imageMime } = body;
 
@@ -89,18 +73,11 @@ exports.handler = async (event) => {
       };
     }
 
-    // ────────────────────────────────
-    // GENERATE — DALL-E 3
-    // ────────────────────────────────
     if (type === 'generate') {
       const { prompt } = body;
 
       if (!prompt || typeof prompt !== 'string' || prompt.length < 10) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Prompt inválido.' }) };
-      }
-
-      if (prompt.length > 4000) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Prompt muito longo.' }) };
       }
 
       const response = await fetch('https://api.openai.com/v1/images/generations', {
@@ -111,7 +88,7 @@ exports.handler = async (event) => {
         },
         body: JSON.stringify({
           model: 'dall-e-3',
-          prompt: prompt,
+          prompt,
           n: 1,
           size: '1024x1024',
           response_format: 'b64_json',
@@ -132,7 +109,6 @@ exports.handler = async (event) => {
       };
     }
 
-    // ── Unknown type
     return {
       statusCode: 400,
       headers,
@@ -146,5 +122,4 @@ exports.handler = async (event) => {
       body: JSON.stringify({ error: error.message || 'Erro interno do servidor.' })
     };
   }
-
 };
