@@ -5,28 +5,22 @@ exports.handler = async (event) => {
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Type': 'application/json'
   };
-
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' };
   }
-
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, headers, body: JSON.stringify({ error: 'Método não permitido.' }) };
   }
-
   if (!process.env.OPENAI_API_KEY) {
     return { statusCode: 500, headers, body: JSON.stringify({ error: 'API Key não configurada.' }) };
   }
-
   let body;
   try {
     body = JSON.parse(event.body);
   } catch {
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'JSON inválido.' }) };
   }
-
   const { type } = body;
-
   try {
     if (type === 'generate') {
       const { prompt } = body;
@@ -39,23 +33,18 @@ exports.handler = async (event) => {
         body: JSON.stringify({
           model: 'dall-e-3',
           prompt: prompt,
-          size: '1024x1024',
-          response_format: 'b64_json'
+          size: '1024x1024'
         })
       });
-
       const data = await response.json();
       if (data.error) throw new Error(data.error.message);
-
       return {
         statusCode: 200,
         headers,
         body: JSON.stringify({ b64_json: data.data[0].b64_json })
       };
     }
-
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'Tipo inválido.' }) };
-
   } catch (error) {
     return {
       statusCode: 500,
