@@ -12,6 +12,8 @@ export default async function handler(req, res) {
   if (type !== 'generate') return res.status(400).json({ error: 'Tipo inválido.' });
 
   try {
+    const fullPrompt = `Observe atentamente a joia na imagem fornecida. Reproduza EXATAMENTE este produto na foto gerada — mesmo design, mesmas pedras, mesma cor, mesmos detalhes, mesmo formato. Não invente outro produto. Agora aplique este estilo: ${prompt}`;
+
     const response = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
       headers: {
@@ -30,7 +32,7 @@ export default async function handler(req, res) {
               },
               {
                 type: 'input_text',
-                text: prompt
+                text: fullPrompt
               }
             ]
           }
