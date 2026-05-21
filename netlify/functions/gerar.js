@@ -31,7 +31,7 @@ exports.handler = async (event) => {
           'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
         },
         body: JSON.stringify({
-          model: 'dall-e-3',
+          model: 'gpt-image-1',
           prompt: prompt,
           size: '1024x1024'
         })
