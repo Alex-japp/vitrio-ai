@@ -7,13 +7,12 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido.' });
   if (!process.env.OPENAI_API_KEY) return res.status(500).json({ error: 'API Key não configurada.' });
 
-  const { type, prompt, imageBase64, obs } = req.body;
+  const { type, prompt, imageBase64 } = req.body;
 
   if (type !== 'generate') return res.status(400).json({ error: 'Tipo inválido.' });
 
   try {
-    // PASSO 1: GPT-4o analisa a foto e descreve o produto detalhadamente
-    const visionRes = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -21,49 +20,32 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'gpt-4o',
-        max_tokens: 500,
-        messages: [{
-          role: 'user',
-          content: [
-            {
-              type: 'image_url',
-              image_url: { url: `data:image/png;base64,${imageBase64}` }
-            },
-            {
-              type: 'text',
-              text: 'Descreva este produto de semijoias com todos os detalhes visuais: formato, cor, material, pedras, acabamento, detalhes únicos. Seja muito específico e detalhado. Responda apenas com a descrição, sem introdução.'
-            }
-          ]
-        }]
+        input: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'input_image',
+                image_url: `data:image/png;base64,${imageBase64}`
+              },
+              {
+                type: 'input_text',
+                text: prompt
+              }
+            ]
+          }
+        ],
+        tools: [{ type: 'image_generation' }]
       })
     });
 
-    const visionData = await visionRes.json();
-    if (visionData.error) throw new Error(visionData.error.message);
-    const description = visionData.choices[0].message.content;
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
 
-    // PASSO 2: gpt-image-1 gera a foto profissional usando a descrição
-    const fullPrompt = `${prompt}\n\nProduto: ${description}${obs ? '\nObservações: ' + obs : ''}`;
+    const imageOutput = data.output?.find(o => o.type === 'image_generation_call');
+    if (!imageOutput) throw new Error('Imagem não gerada.');
 
-    const imageBuffer = Buffer.from(imageBase64, 'base64');
-    const blob = new Blob([imageBuffer], { type: 'image/png' });
-
-    const formData = new FormData();
-    formData.append('model', 'gpt-image-1');
-    formData.append('prompt', fullPrompt);
-    formData.append('image', blob, 'produto.png');
-    formData.append('size', '1024x1024');
-
-    const imageRes = await fetch('https://api.openai.com/v1/images/edits', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` },
-      body: formData
-    });
-
-    const imageData = await imageRes.json();
-    if (imageData.error) throw new Error(imageData.error.message);
-
-    return res.status(200).json({ b64_json: imageData.data[0].b64_json });
+    return res.status(200).json({ b64_json: imageOutput.result });
 
   } catch (error) {
     return res.status(500).json({ error: error.message });
