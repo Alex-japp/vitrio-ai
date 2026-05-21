@@ -37,21 +37,30 @@ exports.handler = async (event) => {
           'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
         },
         body: JSON.stringify({
-          model: 'gpt-image-1',
+          model: 'dall-e-3',
           prompt: prompt,
-          size: '1024x1024'
+          size: '1024x1024',
+          response_format: 'b64_json'
         })
       });
 
       const data = await response.json();
       if (data.error) throw new Error(data.error.message);
 
-      return { statusCode: 200, headers, body: JSON.stringify({ image: data.data[0].b64_json }) };
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ b64_json: data.data[0].b64_json })
+      };
     }
 
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'Tipo inválido.' }) };
 
   } catch (error) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: error.message })
+    };
   }
 };
