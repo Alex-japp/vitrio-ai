@@ -1,2 +1,5 @@
 [build]
   functions = "netlify/functions"
+
+[functions."gerar"]
+  timeout = 30
