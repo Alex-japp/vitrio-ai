@@ -97,6 +97,27 @@ button,input,textarea{font-family:inherit}
 .bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,820px);height:76px;background:rgba(255,255,255,.95);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;z-index:25;box-shadow:0 -8px 26px rgba(17,18,39,.06)}.nav{flex:1;border:0;background:transparent;color:var(--ink);font-size:10px;font-weight:950;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer}.nav svg{width:23px;height:23px;stroke:var(--purple);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}.nav.logout svg{stroke:#D4AF37}.nav:hover svg{filter:drop-shadow(0 3px 8px rgba(123,63,242,.25))}
 .settings{display:none;min-height:100vh;background:#fff;color:var(--ink);padding-bottom:86px}.cfg-head{position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:30}.cfg-title{letter-spacing:.18em;color:var(--ink);font-weight:950}.dark-btn{width:45px;height:45px;border-radius:15px;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:20px;cursor:pointer}.tabs{display:flex;background:#fff;border-bottom:1px solid var(--line)}.tab{flex:1;background:transparent;border:0;color:#6B6B6B;height:58px;font-weight:900;cursor:pointer}.tab.on{color:var(--purple);border-bottom:3px solid var(--purple)}.cfg-body{padding:24px 28px;max-width:720px;margin:0 auto}.cfg-sub{color:var(--muted);font-size:13px;margin:6px 0 18px}.cat-row{background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:12px;box-shadow:0 8px 20px rgba(17,18,39,.04)}.cat-badge{width:44px;height:44px;border-radius:50%;background:var(--grad);display:grid;place-items:center;color:#fff}.cat-info{flex:1}.cat-info strong{display:block}.cat-info small{color:var(--muted)}.icon-btn{border:0;background:transparent;color:var(--ink);font-size:19px;padding:8px;cursor:pointer}.add{width:100%;height:58px;border-radius:18px;border:1.5px solid var(--purple);background:transparent;color:var(--purple);font-weight:950;margin-top:12px;cursor:pointer}.counter{display:grid;grid-template-columns:1fr 1fr;gap:12px}.count-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px;text-align:center;box-shadow:0 8px 20px rgba(17,18,39,.04)}.num{font-size:36px;font-weight:950;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}.cfg-link,.danger{width:100%;height:56px;border-radius:18px;margin-top:12px;font-weight:950;cursor:pointer}.cfg-link{background:transparent;border:1.5px solid var(--gold);color:#9C7410}.danger{background:transparent;border:1.5px solid rgba(255,80,80,.55);color:#ff4f4f}.modal{position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:80;display:none;align-items:flex-end;justify-content:center}.sheet{width:min(100%,520px);background:#fff;color:var(--ink);border-radius:28px 28px 0 0;padding:24px}.sheet h3{margin-bottom:16px}.sheet .input,.sheet .textarea{margin-bottom:10px}.sheet-actions{display:flex;gap:10px}.sheet-actions button{flex:1;height:54px;border-radius:16px;border:1px solid var(--line);font-weight:950;cursor:pointer}.save{background:var(--grad)!important;color:#fff!important;border:0!important}.hidden{display:none!important}.prm-preview{font-size:12px;color:var(--muted);line-height:1.55;margin-top:6px}.prm-line{margin-top:3px}.prompt-mini{display:block;font-size:12px;font-weight:950;letter-spacing:.12em;text-transform:uppercase;margin:12px 0 6px;color:var(--purple)}
 
+/* OPT TAG */
+.opt-tag{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:10px}
+
+/* SELETOR DE QUANTIDADE */
+.qty-selector{margin-top:18px}
+.qty-selector .label{margin-top:0;margin-bottom:10px}
+.qty-btns{display:flex;gap:8px}
+.qty-btn{flex:1;height:46px;border-radius:14px;border:1.5px solid var(--line);background:#fff;font-weight:900;font-size:16px;cursor:pointer;color:var(--muted);transition:.2s}
+.qty-btn:hover{border-color:var(--purple);color:var(--purple)}
+.qty-btn.active{border-color:var(--purple);color:var(--purple);background:rgba(123,63,242,.06);box-shadow:0 4px 12px rgba(123,63,242,.12)}
+
+/* GRID DINÂMICO POR QUANTIDADE */
+#grid[data-qty="1"]{grid-template-columns:1fr;max-width:280px}
+#grid[data-qty="2"]{grid-template-columns:1fr 1fr}
+#grid[data-qty="3"]{grid-template-columns:repeat(3,1fr)}
+
+/* BOTÕES REORDENAR */
+.reorder-btns{display:flex;flex-direction:column;gap:2px}
+.reorder-btns .icon-btn{padding:4px 6px;font-size:14px;line-height:1}
+.reorder-btns .icon-btn:disabled{opacity:.25;cursor:not-allowed}
+
 /* DESKTOP STATS - hidden on mobile */
 .desk-stats{display:none}
 
@@ -383,10 +404,19 @@ button,input,textarea{font-family:inherit}
         </div>
       </div>
       <div class="field">
-        <label class="label">Observações do produto</label>
+        <label class="label">Observações do produto <span class="opt-tag">(opcional)</span></label>
         <textarea id="obs" class="textarea" placeholder="Ex: anel com pedra verde, fundo claro..." oninput="state.obs=this.value.trim()"></textarea>
       </div>
     </section>
+    <!-- SELETOR DE QUANTIDADE -->
+    <div class="qty-selector">
+      <label class="label">Quantidade de fotos</label>
+      <div class="qty-btns">
+        <button class="qty-btn" onclick="setQty(1)">1</button>
+        <button class="qty-btn" onclick="setQty(2)">2</button>
+        <button class="qty-btn active" onclick="setQty(3)">3</button>
+      </div>
+    </div>
     <button id="genBtn" class="btn btn-main" disabled onclick="generate()">✦ Gerar fotos profissionais</button>
     <div class="secure">🛡 Suas imagens são geradas com IA de forma segura</div>
     <div id="progress" class="progress">
@@ -433,7 +463,7 @@ button,input,textarea{font-family:inherit}
 const PASS='vitrio@2025', ADMIN='admin@vitrio', FB='https://docs.google.com/forms/d/e/1FAIpQLScwQ1g4VlZUOz0mAQ2OSwRG0lVtxhEPE1mHg50DGkHPzO6gpA/viewform';
 const defaults=[['Anéis','💍'],['Brincos','💎'],['Colares','📿'],['Pulseiras','⌚'],['Pingentes','◇']].map((x,i)=>({id:'c'+i,name:x[0],icon:x[1],p1:'Foto profissional em fundo branco, estilo catálogo premium.',p2:'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:'Close detalhado mostrando brilho, textura e acabamento da peça.'}));
 let cats=JSON.parse(localStorage.getItem('vitrioCats')||'null')||defaults, editId=null, editMode='cat';
-let state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[]};
+let state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],qty:3};
 
 function init(){if(localStorage.getItem('vitrioAccess')==='1'){access.style.display='none';app.style.display='block'}render()}
 function login(){if(pass.value===PASS){localStorage.setItem('vitrioAccess','1');access.style.display='none';app.style.display='block'}else passErr.textContent='Senha incorreta.'}
@@ -442,7 +472,7 @@ function feedback(){window.open(FB,'_blank')}
 
 function render(){
   chips.innerHTML=cats.map(c=>`<button class="chip ${state.cat?.id===c.id?'active':''}" onclick="selectCat('${c.id}')"><div class="ico">${c.icon||'✦'}</div>${c.name}</button>`).join('');
-  catList.innerHTML=cats.map(c=>`<div class="cat-row"><div class="cat-badge">${c.icon||'✦'}</div><div class="cat-info"><strong>${c.name}</strong><small>Categoria cadastrada</small></div><button class="icon-btn" onclick="editCatInfo('${c.id}')">✎</button><button class="icon-btn" onclick="delCat('${c.id}')">🗑</button></div>`).join('');
+  catList.innerHTML=cats.map((c,idx)=>`<div class="cat-row"><div class="cat-badge">${c.icon||'✦'}</div><div class="cat-info"><strong>${c.name}</strong><small>Categoria cadastrada</small></div><div class="reorder-btns"><button class="icon-btn" onclick="moveCat('${c.id}',-1)" ${idx===0?'disabled':''}>↑</button><button class="icon-btn" onclick="moveCat('${c.id}',1)" ${idx===cats.length-1?'disabled':''}>↓</button></div><button class="icon-btn" onclick="editCatInfo('${c.id}')">✎</button><button class="icon-btn" onclick="delCat('${c.id}')">🗑</button></div>`).join('');
   promptList.innerHTML=cats.map(c=>`<div class="cat-row"><div class="cat-badge">${c.icon||'✦'}</div><div class="cat-info"><strong>${c.name}</strong><div class="prm-preview"><div class="prm-line"><b>Foto 1:</b> ${(c.p1||'').slice(0,54)}...</div><div class="prm-line"><b>Foto 2:</b> ${(c.p2||'').slice(0,54)}...</div><div class="prm-line"><b>Foto 3:</b> ${(c.p3||'').slice(0,54)}...</div></div></div><button class="icon-btn" onclick="editPrompt('${c.id}')">✎</button></div>`).join('');
   const p=localStorage.getItem('cntP')||0, im=localStorage.getItem('cntI')||0;
   cntP.textContent=p; cntI.textContent=im;
@@ -469,8 +499,8 @@ async function generate(){
   try{
     const pngB64=await toBase64PNG(state.b64,state.mime);
     state.imgs=[];
-    for(let i=1;i<=3;i++){
-      bar.style.width=(20+i*23)+'%';ptext.textContent=`Gerando foto ${i} de 3...`;
+    for(let i=1;i<=state.qty;i++){
+      bar.style.width=(10+i*(85/state.qty))+'%';ptext.textContent=`Gerando foto ${i} de ${state.qty}...`;
       let prompt=(state.cat['p'+i]||'Foto profissional de semijoia')+(state.obs?'\nObservações: '+state.obs:'');
       let g=await api('generate',{prompt,imageBase64:pngB64});
       state.imgs.push({b64:g.b64_json,name:`${state.code}-foto${i}.jpg`});
@@ -485,20 +515,27 @@ async function api(type,data){const res=await fetch('/api/gerar',{method:'POST',
 
 async function regenerate(i){
   const photoNum=i+1;
+  error.textContent='';
+  progress.style.display='block';
+  bar.style.width='20%';
+  ptext.textContent='Preparando imagem...';
   const cards=document.querySelectorAll('.res');
   if(cards[i]){const img=cards[i].querySelector('img');if(img)img.style.opacity='0.3';const btn=cards[i].querySelector('.regen-btn');if(btn){btn.disabled=true;btn.style.opacity='0.4';}}
   try{
     const pngB64=await toBase64PNG(state.b64,state.mime);
+    bar.style.width='60%';ptext.textContent='Gerando foto 1 de 1...';
     let prompt=(state.cat['p'+photoNum]||'Foto profissional de semijoia')+(state.obs?'\nObservações: '+state.obs:'');
     let g=await api('generate',{prompt,imageBase64:pngB64});
     state.imgs[i]={b64:g.b64_json,name:`${state.code}-foto${photoNum}.jpg`};
+    bar.style.width='100%';ptext.textContent='Pronto!';
     showResults();
   }catch(e){error.textContent='Erro ao gerar foto '+(i+1)+': '+e.message;showResults();}
+  finally{setTimeout(()=>progress.style.display='none',500)}
 }
 
 function showResults(){
-  // Esconde placeholder, mostra resultados
   if(resultsPlaceholder) resultsPlaceholder.style.display='none';
+  grid.setAttribute('data-qty', state.qty);
   const regenSvg=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>`;
   grid.innerHTML=state.imgs.map((im,i)=>`<div class="res"><img src="data:image/jpeg;base64,${im.b64}"><button class="regen-btn" onclick="regenerate(${i})" title="Gerar novamente">${regenSvg}</button><button class="dl-btn" onclick="download(${i})">Baixar</button></div>`).join('');
   results.style.display='block';
@@ -507,21 +544,19 @@ function showResults(){
 function download(i){const canvas=document.createElement('canvas');const img=new Image();img.onload=()=>{canvas.width=img.width;canvas.height=img.height;canvas.getContext('2d').drawImage(img,0,0);const a=document.createElement('a');a.href=canvas.toDataURL('image/jpeg',0.95);a.download=state.imgs[i].name;a.click()};img.src=`data:image/png;base64,${state.imgs[i].b64}`;}
 
 function resetForm(){
-  state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[]};
+  const savedQty=state.qty;
+  state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],qty:savedQty};
   code.value='';obs.value='';file.value='';
   preview.style.display='none';uEmpty.style.display='block';
   upload.classList.remove('has-img');
   results.style.display='none';
-  // Mostra placeholder novamente
-  if(resultsPlaceholder){
-    resultsPlaceholder.style.display='';
-  }
+  if(resultsPlaceholder) resultsPlaceholder.style.display='';
   render();
 }
 
 function addCount(){
   localStorage.setItem('cntP',Number(localStorage.getItem('cntP')||0)+1);
-  localStorage.setItem('cntI',Number(localStorage.getItem('cntI')||0)+3);
+  localStorage.setItem('cntI',Number(localStorage.getItem('cntI')||0)+state.qty);
   render();
 }
 
@@ -540,6 +575,21 @@ function editPrompt(id){editMode='prompt';editId=id;let c=cats.find(x=>x.id===id
 function saveCat(){let current=cats.find(c=>c.id===editId);if(editMode==='prompt'){if(!current)return;current.p1=p1.value.trim();current.p2=p2.value.trim();current.p3=p3.value.trim();if(!current.p1||!current.p2||!current.p3)return alert('Preencha os 3 prompts antes de salvar.');}else{let obj={id:editId||Date.now().toString(),name:catName.value.trim(),icon:catIcon.value.trim()||'✦',p1:current?.p1||p1.value.trim()||'Foto profissional em fundo branco, estilo catálogo premium.',p2:current?.p2||p2.value.trim()||'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:current?.p3||p3.value.trim()||'Close detalhado mostrando brilho, textura e acabamento da peça.'};if(!obj.name)return alert('Digite o nome.');if(editId)cats=cats.map(c=>c.id===editId?obj:c);else cats.push(obj);}localStorage.setItem('vitrioCats',JSON.stringify(cats));closeModal('catModal');catName.style.display='block';catIcon.style.display='block';promptFields.style.display='block';render()}
 function delCat(id){if(confirm('Excluir categoria?')){cats=cats.filter(c=>c.id!==id);localStorage.setItem('vitrioCats',JSON.stringify(cats));render()}}
 function scrollChips(dir){document.getElementById('chips').scrollBy({left:dir*260,behavior:'smooth'});}
+function setQty(n){
+  state.qty=n;
+  document.querySelectorAll('.qty-btn').forEach((b,i)=>{b.classList.toggle('active',i+1===n);});
+}
+
+function moveCat(id,dir){
+  const idx=cats.findIndex(c=>c.id===id);
+  if(idx<0)return;
+  const newIdx=idx+dir;
+  if(newIdx<0||newIdx>=cats.length)return;
+  const temp=cats[idx];cats[idx]=cats[newIdx];cats[newIdx]=temp;
+  localStorage.setItem('vitrioCats',JSON.stringify(cats));
+  render();
+}
+
 init();
 </script>
 </body>
