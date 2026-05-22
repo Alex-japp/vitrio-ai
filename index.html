@@ -66,7 +66,7 @@ button,input,textarea{font-family:inherit}
 .header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.86);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);padding:18px 28px;box-shadow:0 10px 30px rgba(17,18,39,.04)}
 .head-row{display:flex;align-items:center;justify-content:space-between;max-width:760px;margin:0 auto}.mini-logo{display:flex;align-items:center;gap:14px}.mini-mark{width:62px;height:62px;border-radius:20px;background:var(--grad);display:grid;place-items:center;color:#fff;box-shadow:0 10px 24px rgba(123,63,242,.30);font-size:30px}.name{font-family:Georgia,serif;font-size:32px;letter-spacing:.14em;line-height:1}.name span{color:var(--gold)}.caption{font-size:11px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);margin-top:4px}
 
-/* MENU BTN - sem círculo, só os 3 traços */
+/* MENU BTN */
 .menu-btn{border:0;background:transparent;color:var(--ink);cursor:pointer;padding:8px;display:grid;place-items:center;border-radius:12px;transition:.2s}
 .menu-btn:hover{color:var(--purple);background:rgba(123,63,242,.06)}
 
@@ -79,12 +79,14 @@ button,input,textarea{font-family:inherit}
 .menu-dropdown button.menu-danger:hover{background:#fff5f5;color:#ff4f4f}
 .menu-dropdown button:not(:last-child){border-bottom:1px solid var(--line)}
 
-.content{padding:28px 38px;max-width:760px;margin:0 auto}.label{display:block;font-size:12px;font-weight:950;letter-spacing:.17em;text-transform:uppercase;margin:22px 0 12px;color:#111227}
+/* CONTENT - mobile default */
+.content{padding:28px 38px;max-width:760px;margin:0 auto}
+.label{display:block;font-size:12px;font-weight:950;letter-spacing:.17em;text-transform:uppercase;margin:22px 0 12px;color:#111227}
 .chips-wrap{position:relative;margin:2px 0 24px;display:flex;align-items:center;justify-content:center}.chips{display:flex;gap:18px;overflow-x:auto;padding:6px 2px 18px;scrollbar-width:none;scroll-behavior:smooth;justify-content:center;max-width:100%}.chips::-webkit-scrollbar{display:none}.chip{min-width:106px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px 12px;box-shadow:0 10px 24px rgba(17,18,39,.06);text-align:center;font-weight:900;font-size:13px;color:var(--ink);cursor:pointer;transition:.2s}.chip .ico{width:50px;height:50px;margin:0 auto 10px;border-radius:15px;background:#FFF4CE;color:#B48705;display:grid;place-items:center;font-size:25px}.chip.active{background:var(--grad);color:#fff;border-color:var(--gold);box-shadow:var(--shadow2);transform:translateY(-2px)}.chip.active .ico{background:rgba(255,255,255,.18);color:#fff}.chip-arrow{position:absolute;top:42%;transform:translateY(-50%);z-index:5;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:#fff;color:#111227;font-size:30px;line-height:1;box-shadow:0 10px 28px rgba(17,18,39,.10);cursor:pointer}.chip-arrow.left{left:0}.chip-arrow.right{right:0}.chip-arrow:hover{border-color:var(--purple);color:var(--purple)}
 .card{background:#fff;border:1px solid var(--line);border-radius:32px;padding:28px;box-shadow:var(--shadow);margin-top:10px}.field{margin-bottom:24px}.field:last-child{margin-bottom:0}.inp-wrap{position:relative}.inp-ico{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:#B8B8C3;font-size:20px}.with-ico{padding-left:56px}.upload{position:relative;border:1.8px dashed rgba(123,63,242,.36);background:linear-gradient(180deg,#fff,#fffdf9);border-radius:26px;min-height:225px;display:flex;align-items:center;justify-content:center;text-align:center;padding:22px;overflow:hidden;transition:.2s}.upload:hover{border-color:var(--purple);background:#FCFAFF}.upload.has-img{padding:0;border-style:solid}.upload img{width:100%;height:100%;max-height:260px;object-fit:contain;display:block}.remove-photo{display:none;position:absolute;right:14px;top:14px;width:42px;height:42px;border:0;border-radius:50%;background:rgba(17,18,39,.82);color:#fff;font-size:22px;font-weight:900;cursor:pointer;box-shadow:0 8px 24px rgba(17,18,39,.22);z-index:3}.upload.has-img .remove-photo{display:grid;place-items:center}.remove-photo:hover{background:#ff4f4f}
 .camera-dot{width:82px;height:82px;margin:0 auto 14px;border-radius:50%;background:#F1E8FF;border:1px solid rgba(123,63,242,.18);display:grid;place-items:center;font-size:34px;box-shadow:inset 0 0 0 8px rgba(255,255,255,.48)}.upload strong{font-size:17px}.upload small{display:block;color:var(--muted);margin-top:8px}.row{display:flex;gap:18px}.outline{flex:1;background:#fff;border:1.6px solid #16172F;border-radius:18px;height:58px;font-weight:900;cursor:pointer;color:#111227;box-shadow:0 8px 18px rgba(17,18,39,.03);display:flex;align-items:center;justify-content:center;gap:8px}.outline:hover{border-color:var(--purple);color:var(--purple)}.secure{text-align:center;font-size:12px;color:var(--muted);margin-top:14px}.progress{display:none;background:#fff;border:1px solid var(--line);border-radius:26px;padding:22px;margin-top:18px;box-shadow:var(--shadow)}.ring{width:52px;height:52px;border-radius:50%;border:4px solid #eee;border-top-color:var(--purple);animation:spin .8s linear infinite;margin:0 auto 14px}@keyframes spin{to{transform:rotate(360deg)}}.bar{height:7px;background:#eee;border-radius:9px;overflow:hidden;margin-top:12px}.bar span{display:block;height:100%;width:0;background:var(--grad);transition:.4s}.results{display:none;margin-top:22px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 
-/* RES com botão Gerar novamente */
+/* RES */
 .res{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 12px 28px rgba(17,18,39,.06);position:relative}
 .res img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
 .res .dl-btn{width:100%;border:0;background:var(--grad);color:#fff;font-size:10px;font-weight:900;padding:10px 3px;cursor:pointer}
@@ -92,28 +94,226 @@ button,input,textarea{font-family:inherit}
 .res:hover .regen-btn{opacity:1}
 .regen-btn:hover{background:rgba(123,63,242,.85)}
 
-.bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,820px);height:76px;background:rgba(255,255,255,.95);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;z-index:25;box-shadow:0 -8px 26px rgba(17,18,39,.06)}.nav{flex:1;border:0;background:transparent;color:var(--ink);font-size:10px;font-weight:950;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer}.nav i{font-style:normal;font-size:24px;color:var(--purple)}.nav svg{width:23px;height:23px;stroke:var(--purple);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}.nav.logout svg{stroke:#D4AF37}.nav:hover svg{filter:drop-shadow(0 3px 8px rgba(123,63,242,.25))}
+.bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,820px);height:76px;background:rgba(255,255,255,.95);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;z-index:25;box-shadow:0 -8px 26px rgba(17,18,39,.06)}.nav{flex:1;border:0;background:transparent;color:var(--ink);font-size:10px;font-weight:950;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer}.nav svg{width:23px;height:23px;stroke:var(--purple);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}.nav.logout svg{stroke:#D4AF37}.nav:hover svg{filter:drop-shadow(0 3px 8px rgba(123,63,242,.25))}
 .settings{display:none;min-height:100vh;background:#fff;color:var(--ink);padding-bottom:86px}.cfg-head{position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:30}.cfg-title{letter-spacing:.18em;color:var(--ink);font-weight:950}.dark-btn{width:45px;height:45px;border-radius:15px;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:20px;cursor:pointer}.tabs{display:flex;background:#fff;border-bottom:1px solid var(--line)}.tab{flex:1;background:transparent;border:0;color:#6B6B6B;height:58px;font-weight:900;cursor:pointer}.tab.on{color:var(--purple);border-bottom:3px solid var(--purple)}.cfg-body{padding:24px 28px;max-width:720px;margin:0 auto}.cfg-sub{color:var(--muted);font-size:13px;margin:6px 0 18px}.cat-row{background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:12px;box-shadow:0 8px 20px rgba(17,18,39,.04)}.cat-badge{width:44px;height:44px;border-radius:50%;background:var(--grad);display:grid;place-items:center;color:#fff}.cat-info{flex:1}.cat-info strong{display:block}.cat-info small{color:var(--muted)}.icon-btn{border:0;background:transparent;color:var(--ink);font-size:19px;padding:8px;cursor:pointer}.add{width:100%;height:58px;border-radius:18px;border:1.5px solid var(--purple);background:transparent;color:var(--purple);font-weight:950;margin-top:12px;cursor:pointer}.counter{display:grid;grid-template-columns:1fr 1fr;gap:12px}.count-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px;text-align:center;box-shadow:0 8px 20px rgba(17,18,39,.04)}.num{font-size:36px;font-weight:950;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}.cfg-link,.danger{width:100%;height:56px;border-radius:18px;margin-top:12px;font-weight:950;cursor:pointer}.cfg-link{background:transparent;border:1.5px solid var(--gold);color:#9C7410}.danger{background:transparent;border:1.5px solid rgba(255,80,80,.55);color:#ff4f4f}.modal{position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:80;display:none;align-items:flex-end;justify-content:center}.sheet{width:min(100%,520px);background:#fff;color:var(--ink);border-radius:28px 28px 0 0;padding:24px}.sheet h3{margin-bottom:16px}.sheet .input,.sheet .textarea{margin-bottom:10px}.sheet-actions{display:flex;gap:10px}.sheet-actions button{flex:1;height:54px;border-radius:16px;border:1px solid var(--line);font-weight:950;cursor:pointer}.save{background:var(--grad)!important;color:#fff!important;border:0!important}.hidden{display:none!important}.prm-preview{font-size:12px;color:var(--muted);line-height:1.55;margin-top:6px}.prm-line{margin-top:3px}.prompt-mini{display:block;font-size:12px;font-weight:950;letter-spacing:.12em;text-transform:uppercase;margin:12px 0 6px;color:var(--purple)}
-@media(max-width:700px){
-  body{background:var(--bg)}.phone{width:100%;max-width:460px;background:rgba(250,247,242,.82);box-shadow:0 0 0 1px rgba(232,226,214,.7)}.header{padding:14px 18px}.head-row{max-width:460px}.mini-mark{width:54px;height:54px;border-radius:18px}.name{font-size:28px}.content{padding:22px 18px}.chip{min-width:86px;padding:14px 10px;font-size:12px}.chip .ico{width:42px;height:42px;font-size:21px}.chip-arrow{display:none}.chips{justify-content:flex-start}.card{padding:18px;border-radius:30px}.upload{min-height:170px}.row{gap:12px}.grid{gap:10px}.bottom{width:100%;max-width:460px}.cfg-body{padding:22px 18px}.settings{max-width:460px;margin:0 auto}.sheet{max-width:460px}.outline{height:55px}
-  .menu-dropdown{right:16px}
+
+/* DESKTOP STATS - hidden on mobile */
+.desk-stats{display:none}
+
+/* RESULTS PLACEHOLDER - hidden on mobile */
+.results-placeholder{display:none}
+
+/* ============================
+   DESKTOP LAYOUT (>= 900px)
+   ============================ */
+@media(min-width:900px){
+
+  /* Phone full width */
+  .phone{max-width:100%;width:100%}
+  .app{padding-bottom:24px}
+
+  /* Header full width */
+  .header{padding:16px 40px}
+  .head-row{max-width:100%}
+  .menu-dropdown{right:32px}
+
+  /* 3-column grid layout */
+  .content{
+    display:grid;
+    grid-template-columns:230px 1fr 310px;
+    grid-template-rows:auto;
+    gap:0 28px;
+    padding:32px 40px;
+    max-width:100%;
+    align-items:start;
+  }
+
+  /* Sidebar group - left column */
+  .sidebar-group{
+    grid-column:1;
+    grid-row:1;
+    position:sticky;
+    top:88px;
+    padding-right:20px;
+    border-right:1px solid var(--line);
+  }
+  .sidebar-group .label{margin-top:0}
+  .sidebar-group .chips-wrap{
+    position:static;
+    margin:0 0 8px;
+    display:block;
+    justify-content:flex-start;
+  }
+  .sidebar-group .chips{
+    flex-direction:column;
+    overflow:visible;
+    padding:0;
+    gap:6px;
+    justify-content:flex-start;
+  }
+  .sidebar-group .chip{
+    min-width:auto;
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 12px;
+    text-align:left;
+    border-radius:14px;
+    transform:none;
+  }
+  .sidebar-group .chip.active{transform:none}
+  .sidebar-group .chip .ico{
+    margin:0;
+    min-width:36px;
+    width:36px;
+    height:36px;
+    border-radius:10px;
+    font-size:18px;
+  }
+  .sidebar-group .chip-arrow{display:none}
+
+  /* Desktop stats in sidebar */
+  .desk-stats{
+    display:block;
+    margin-top:24px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+  }
+  .desk-stats .label{margin-top:0;margin-bottom:14px}
+  .desk-stat-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px 0;
+    font-size:13px;
+    color:var(--muted);
+    border-bottom:1px solid rgba(232,226,214,.5);
+  }
+  .desk-stat-row:last-child{border-bottom:none}
+  .desk-stat-num{
+    font-size:22px;
+    font-weight:950;
+    background:var(--grad);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  /* Form group - center column */
+  .form-group{
+    grid-column:2;
+    grid-row:1;
+  }
+  .form-group .card{margin-top:0}
+
+  /* Results group - right column */
+  .results-group{
+    grid-column:3;
+    grid-row:1;
+    position:sticky;
+    top:88px;
+    padding-left:20px;
+    border-left:1px solid var(--line);
+  }
+
+  /* Results always visible on desktop */
+  .results-group .results{
+    display:block!important;
+    margin-top:0;
+  }
+  .results-group .results .card{
+    box-shadow:none;
+    border:none;
+    padding:0;
+    margin-top:0;
+    background:transparent;
+  }
+  .results-group .grid{
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .results-group .btn-main{
+    margin-top:12px;
+    font-size:12px;
+    min-height:46px;
+  }
+  .results-group .label{margin-top:0}
+
+  /* Results placeholder on desktop */
+  .results-placeholder{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-height:280px;
+    color:var(--muted);
+    text-align:center;
+    gap:14px;
+  }
+  .results-placeholder .ph-icon{
+    width:72px;height:72px;
+    border-radius:22px;
+    background:linear-gradient(135deg,rgba(123,63,242,.08),rgba(77,123,255,.08));
+    border:1px solid rgba(123,63,242,.14);
+    display:grid;place-items:center;
+    font-size:32px;color:var(--purple);
+  }
+  .results-placeholder p{
+    font-size:13px;
+    line-height:1.7;
+    max-width:180px;
+  }
+
+  /* Hide bottom nav on desktop */
+  .bottom{display:none}
+
+  /* regen btn always visible on desktop */
   .regen-btn{opacity:1}
 }
+
+/* MOBILE */
+@media(max-width:899px){
+  body{background:var(--bg)}
+  .phone{width:100%;max-width:460px;background:rgba(250,247,242,.82);box-shadow:0 0 0 1px rgba(232,226,214,.7)}
+  .header{padding:14px 18px}
+  .head-row{max-width:460px}
+  .mini-mark{width:54px;height:54px;border-radius:18px}
+  .name{font-size:28px}
+  .content{padding:22px 18px}
+  .chip{min-width:86px;padding:14px 10px;font-size:12px}
+  .chip .ico{width:42px;height:42px;font-size:21px}
+  .chip-arrow{display:none}
+  .chips{justify-content:flex-start}
+  .card{padding:18px;border-radius:30px}
+  .upload{min-height:170px}
+  .row{gap:12px}
+  .grid{gap:10px}
+  .bottom{width:100%;max-width:460px}
+  .cfg-body{padding:22px 18px}
+  .settings{max-width:460px;margin:0 auto}
+  .sheet{max-width:460px}
+  .outline{height:55px}
+  .menu-dropdown{right:16px}
+  .regen-btn{opacity:1}
+  /* On mobile, sidebar/form/results groups are just normal divs */
+  .sidebar-group,.form-group,.results-group{display:block}
+}
+
 @media(max-width:380px){.name{font-size:23px}.chip{min-width:78px}.row{flex-direction:column}.content{padding:18px 14px}.card{padding:15px}}
 
 </style>
 </head>
 <body>
 <div id="access" class="access"><div class="access-card"><div class="logo-mark">◇</div><div class="brand">VITRIO <span>AI</span></div><div class="sub">Gerador de fotos profissionais</div><input id="pass" class="input" type="password" placeholder="Senha de acesso"><button class="btn btn-main" onclick="login()">✦ Entrar</button><div id="passErr" class="err"></div></div></div>
+
 <div id="app" class="app phone">
 <header class="header"><div class="head-row"><div class="mini-logo"><div class="mini-mark">◇</div><div><div class="name">VITRIO <span>AI</span></div><div class="caption">Gerador de fotos</div></div></div>
-<!-- HAMBURGUER SEM CÍRCULO -->
 <button class="menu-btn" onclick="toggleMenu(event)" aria-label="Menu">
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
 </button>
 </div></header>
 
-<!-- MENU DROPDOWN FIXO -->
 <div id="menuDropdown" class="menu-dropdown hidden">
   <button onclick="closeMenu();openAdmin()">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.04.04a2 2 0 1 1-2.83 2.83l-.04-.04A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 1 1-4 0v-.06A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H3a2 2 0 1 1 0-4h.06A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.04-.04A2 2 0 1 1 7.05 3.85l.04.04A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.08V3a2 2 0 1 1 4 0v.06A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04A1.7 1.7 0 0 0 19.4 9c.2.35.52.62.9.75.28.1.58.15.88.15H21a2 2 0 1 1 0 4h-.06c-.3 0-.6.05-.88.15-.38.13-.7.4-.9.75z"/></svg>
@@ -129,44 +329,160 @@ button,input,textarea{font-family:inherit}
   </button>
 </div>
 
-<main class="content"><label class="label">Categoria do produto</label><div class="chips-wrap"><button class="chip-arrow left" onclick="scrollChips(-1)" aria-label="Categorias anteriores">‹</button><div id="chips" class="chips"></div><button class="chip-arrow right" onclick="scrollChips(1)" aria-label="Próximas categorias">›</button></div><section class="card"><div class="field"><label class="label">Código do produto</label><div class="inp-wrap"><span class="inp-ico">⌑</span><input id="code" class="input with-ico" placeholder="Ex: 000012" oninput="state.code=this.value.trim();ready()"></div></div><div class="field"><label class="label">Foto do produto</label><div id="upload" class="upload" onclick="document.getElementById('file').click()"><button id="removePhoto" class="remove-photo" type="button" onclick="clearPhoto(event)" title="Remover foto">×</button><div id="uEmpty"><div class="camera-dot">📷</div><strong>Clique para selecionar</strong><small>ou arraste a foto aqui</small></div><img id="preview" style="display:none"></div><input id="file" type="file" accept="image/*" style="display:none" onchange="readFile(this.files[0])">
-<div class="row" style="margin-top:12px">
-  <!-- BOTÃO CÂMERA COM ÍCONE SVG -->
-  <button class="outline" onclick="openCamera(event)">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-    Tirar Foto
-  </button>
-  <!-- BOTÃO GALERIA COM ÍCONE SVG - corrigido para não abrir câmera -->
-  <button class="outline" onclick="openGallery(event)">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-    Arquivo
-  </button>
+<main class="content">
+
+  <!-- SIDEBAR: Categorias (left on desktop, top on mobile) -->
+  <div class="sidebar-group">
+    <label class="label">Categoria do produto</label>
+    <div class="chips-wrap">
+      <button class="chip-arrow left" onclick="scrollChips(-1)" aria-label="Categorias anteriores">‹</button>
+      <div id="chips" class="chips"></div>
+      <button class="chip-arrow right" onclick="scrollChips(1)" aria-label="Próximas categorias">›</button>
+    </div>
+    <!-- Stats - só visível no desktop -->
+    <div class="desk-stats">
+      <label class="label">Uso</label>
+      <div class="desk-stat-row">
+        <span>Produtos gerados</span>
+        <span id="deskCntP" class="desk-stat-num">0</span>
+      </div>
+      <div class="desk-stat-row">
+        <span>Imagens geradas</span>
+        <span id="deskCntI" class="desk-stat-num">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM GROUP: formulário central -->
+  <div class="form-group">
+    <section class="card">
+      <div class="field">
+        <label class="label">Código do produto</label>
+        <div class="inp-wrap">
+          <span class="inp-ico">⌑</span>
+          <input id="code" class="input with-ico" placeholder="Ex: 000012" oninput="state.code=this.value.trim();ready()">
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Foto do produto</label>
+        <div id="upload" class="upload" onclick="document.getElementById('file').click()">
+          <button id="removePhoto" class="remove-photo" type="button" onclick="clearPhoto(event)" title="Remover foto">×</button>
+          <div id="uEmpty"><div class="camera-dot">📷</div><strong>Clique para selecionar</strong><small>ou arraste a foto aqui</small></div>
+          <img id="preview" style="display:none">
+        </div>
+        <input id="file" type="file" accept="image/*" style="display:none" onchange="readFile(this.files[0])">
+        <div class="row" style="margin-top:12px">
+          <button class="outline" onclick="openCamera(event)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            Tirar Foto
+          </button>
+          <button class="outline" onclick="openGallery(event)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Arquivo
+          </button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Observações do produto</label>
+        <textarea id="obs" class="textarea" placeholder="Ex: anel com pedra verde, fundo claro..." oninput="state.obs=this.value.trim()"></textarea>
+      </div>
+    </section>
+    <button id="genBtn" class="btn btn-main" disabled onclick="generate()">✦ Gerar fotos profissionais</button>
+    <div class="secure">🛡 Suas imagens são geradas com IA de forma segura</div>
+    <div id="progress" class="progress">
+      <div class="ring"></div>
+      <p id="ptext" style="text-align:center;color:var(--muted);font-weight:800">Preparando...</p>
+      <div class="bar"><span id="bar"></span></div>
+    </div>
+    <div id="error" class="err" style="height:auto;text-align:center;margin-top:12px"></div>
+  </div>
+
+  <!-- RESULTS GROUP: direita no desktop, abaixo no mobile -->
+  <div class="results-group">
+    <label class="label">Fotos geradas</label>
+    <!-- Placeholder quando não há resultados (desktop) -->
+    <div id="resultsPlaceholder" class="results-placeholder">
+      <div class="ph-icon">✦</div>
+      <p>As fotos geradas<br>aparecerão aqui</p>
+    </div>
+    <!-- Resultados reais -->
+    <section id="results" class="results">
+      <div class="card">
+        <label class="label">Fotos geradas</label>
+        <div id="grid" class="grid"></div>
+        <button class="btn btn-main" onclick="resetForm()">+ Novo produto</button>
+      </div>
+    </section>
+  </div>
+
+</main>
+
+<nav class="bottom">
+  <button class="nav" onclick="toggleMenu(event)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.04.04a2 2 0 1 1-2.83 2.83l-.04-.04A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 1 1-4 0v-.06A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H3a2 2 0 1 1 0-4h.06A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.04-.04A2 2 0 1 1 7.05 3.85l.04.04A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.08V3a2 2 0 1 1 4 0v.06A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04A1.7 1.7 0 0 0 19.4 9c.2.35.52.62.9.75.28.1.58.15.88.15H21a2 2 0 1 1 0 4h-.06c-.3 0-.6.05-.88.15-.38.13-.7.4-.9.75z"></path></svg>Configurações</button>
+  <button class="nav" onclick="feedback()"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>Feedback</button>
+  <button class="nav logout" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sair</button>
+</nav>
 </div>
-</div><div class="field"><label class="label">Observações do produto</label><textarea id="obs" class="textarea" placeholder="Ex: anel com pedra verde, fundo claro..." oninput="state.obs=this.value.trim()"></textarea></div></section><button id="genBtn" class="btn btn-main" disabled onclick="generate()">✦ Gerar fotos profissionais</button><div class="secure">🛡 Suas imagens são geradas com IA de forma segura</div><div id="progress" class="progress"><div class="ring"></div><p id="ptext" style="text-align:center;color:var(--muted);font-weight:800">Preparando...</p><div class="bar"><span id="bar"></span></div></div><section id="results" class="results"><div class="card"><label class="label">Fotos geradas</label><div id="grid" class="grid"></div><button class="btn btn-main" onclick="resetForm()">+ Novo produto</button></div></section><div id="error" class="err" style="height:auto;text-align:center;margin-top:12px"></div></main><nav class="bottom"><button class="nav" onclick="toggleMenu(event)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.04.04a2 2 0 1 1-2.83 2.83l-.04-.04A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 1 1-4 0v-.06A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H3a2 2 0 1 1 0-4h.06A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.04-.04A2 2 0 1 1 7.05 3.85l.04.04A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.08V3a2 2 0 1 1 4 0v.06A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04A1.7 1.7 0 0 0 19.4 9c.2.35.52.62.9.75.28.1.58.15.88.15H21a2 2 0 1 1 0 4h-.06c-.3 0-.6.05-.88.15-.38.13-.7.4-.9.75z"></path></svg>Configurações</button><button class="nav" onclick="feedback()"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>Feedback</button><button class="nav logout" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sair</button></nav></div>
+
 <div id="settings" class="settings phone"><header class="cfg-head"><button class="dark-btn" onclick="closeSettings()">←</button><div class="cfg-title">CONFIGURAÇÕES</div><button class="dark-btn" onclick="closeSettings()">✓</button></header><div class="tabs"><button class="tab on" onclick="tab('cats',this)">Categorias</button><button class="tab" onclick="tab('prompts',this)">Prompts</button><button class="tab" onclick="tab('general',this)">Geral</button></div><main class="cfg-body"><section id="catsTab"><h3>Suas categorias</h3><p class="cfg-sub">Gerencie as categorias dos seus produtos</p><div id="catList"></div><button class="add" onclick="editCat()">+ Nova Categoria</button></section><section id="promptsTab" class="hidden"><h3>Prompts por categoria</h3><p class="cfg-sub">Edite os prompts que guiam cada tipo de foto.</p><div id="promptList"></div></section><section id="generalTab" class="hidden"><h3>Uso do app</h3><p class="cfg-sub">Controle simples para teste beta.</p><div class="counter"><div class="count-card"><div id="cntP" class="num">0</div><small>Produtos</small></div><div class="count-card"><div id="cntI" class="num">0</div><small>Imagens</small></div></div><button class="cfg-link" onclick="feedback()">💬 Enviar feedback</button><button class="danger" onclick="logout()">Sair com segurança</button></section></main><nav class="bottom" style="background:#0f1027;border-color:rgba(255,255,255,.08)"><button class="nav" onclick="tab('cats',document.querySelectorAll('.tab')[0])"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.04.04a2 2 0 1 1-2.83 2.83l-.04-.04A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 1 1-4 0v-.06A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H3a2 2 0 1 1 0-4h.06A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.04-.04A2 2 0 1 1 7.05 3.85l.04.04A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.08V3a2 2 0 1 1 4 0v.06A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04A1.7 1.7 0 0 0 19.4 9c.2.35.52.62.9.75.28.1.58.15.88.15H21a2 2 0 1 1 0 4h-.06c-.3 0-.6.05-.88.15-.38.13-.7.4-.9.75z"></path></svg>Configurações</button><button class="nav" onclick="feedback()"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>Feedback</button><button class="nav logout" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sair</button></nav></div>
+
 <div id="admin" class="modal"><div class="sheet"><h3>Área restrita</h3><input id="adminPass" type="password" class="input" placeholder="Senha admin"><div class="sheet-actions"><button onclick="closeModal('admin')">Cancelar</button><button class="save" onclick="checkAdmin()">Entrar</button></div><div id="adminErr" class="err"></div></div></div>
 <div id="catModal" class="modal"><div class="sheet"><h3 id="catTitle">Categoria</h3><input id="catName" class="input" placeholder="Nome da categoria"><input id="catIcon" class="input" placeholder="Ícone / emoji. Ex: 💍"><div id="promptFields"><span class="prompt-mini">Foto 1</span><textarea id="p1" class="textarea" placeholder="Prompt da foto 1"></textarea><span class="prompt-mini">Foto 2</span><textarea id="p2" class="textarea" placeholder="Prompt da foto 2"></textarea><span class="prompt-mini">Foto 3</span><textarea id="p3" class="textarea" placeholder="Prompt da foto 3"></textarea></div><div class="sheet-actions"><button onclick="closeModal('catModal')">Cancelar</button><button class="save" onclick="saveCat()">Salvar</button></div></div></div>
+
 <script>
 const PASS='vitrio@2025', ADMIN='admin@vitrio', FB='https://docs.google.com/forms/d/e/1FAIpQLScwQ1g4VlZUOz0mAQ2OSwRG0lVtxhEPE1mHg50DGkHPzO6gpA/viewform';
 const defaults=[['Anéis','💍'],['Brincos','💎'],['Colares','📿'],['Pulseiras','⌚'],['Pingentes','◇']].map((x,i)=>({id:'c'+i,name:x[0],icon:x[1],p1:'Foto profissional em fundo branco, estilo catálogo premium.',p2:'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:'Close detalhado mostrando brilho, textura e acabamento da peça.'}));
-let cats=JSON.parse(localStorage.getItem('vitrioCats')||'null')||defaults, editId=null, editMode='cat';let state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[]};
-function init(){if(localStorage.getItem('vitrioAccess')==='1'){access.style.display='none';app.style.display='block'}render()}function login(){if(pass.value===PASS){localStorage.setItem('vitrioAccess','1');access.style.display='none';app.style.display='block'}else passErr.textContent='Senha incorreta.'}function logout(){localStorage.removeItem('vitrioAccess');settings.style.display='none';app.style.display='none';access.style.display='flex';pass.value='';passErr.textContent='';window.scrollTo(0,0)}function feedback(){window.open(FB,'_blank')}function render(){chips.innerHTML=cats.map(c=>`<button class="chip ${state.cat?.id===c.id?'active':''}" onclick="selectCat('${c.id}')"><div class="ico">${c.icon||'✦'}</div>${c.name}</button>`).join('');catList.innerHTML=cats.map(c=>`<div class="cat-row"><div class="cat-badge">${c.icon||'✦'}</div><div class="cat-info"><strong>${c.name}</strong><small>Categoria cadastrada</small></div><button class="icon-btn" onclick="editCatInfo('${c.id}')">✎</button><button class="icon-btn" onclick="delCat('${c.id}')">🗑</button></div>`).join('');promptList.innerHTML=cats.map(c=>`<div class="cat-row"><div class="cat-badge">${c.icon||'✦'}</div><div class="cat-info"><strong>${c.name}</strong><div class="prm-preview"><div class="prm-line"><b>Foto 1:</b> ${(c.p1||'').slice(0,54)}...</div><div class="prm-line"><b>Foto 2:</b> ${(c.p2||'').slice(0,54)}...</div><div class="prm-line"><b>Foto 3:</b> ${(c.p3||'').slice(0,54)}...</div></div></div><button class="icon-btn" onclick="editPrompt('${c.id}')">✎</button></div>`).join('');cntP.textContent=localStorage.getItem('cntP')||0;cntI.textContent=localStorage.getItem('cntI')||0;ready()}function selectCat(id){state.cat=cats.find(c=>c.id===id);render()}function ready(){genBtn.disabled=!(state.cat&&state.code&&state.b64)}function readFile(f){if(!f)return;state.mime=f.type||'image/jpeg';const r=new FileReader();r.onload=e=>{state.b64=e.target.result.split(',')[1];preview.src=e.target.result;preview.style.display='block';uEmpty.style.display='none';upload.classList.add('has-img');ready()};r.readAsDataURL(f)}function clearPhoto(e){e?.stopPropagation();state.b64='';state.mime='image/jpeg';file.value='';preview.removeAttribute('src');preview.style.display='none';uEmpty.style.display='block';upload.classList.remove('has-img');ready()}
+let cats=JSON.parse(localStorage.getItem('vitrioCats')||'null')||defaults, editId=null, editMode='cat';
+let state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[]};
 
-// CÂMERA - abre câmera
+function init(){if(localStorage.getItem('vitrioAccess')==='1'){access.style.display='none';app.style.display='block'}render()}
+function login(){if(pass.value===PASS){localStorage.setItem('vitrioAccess','1');access.style.display='none';app.style.display='block'}else passErr.textContent='Senha incorreta.'}
+function logout(){localStorage.removeItem('vitrioAccess');settings.style.display='none';app.style.display='none';access.style.display='flex';pass.value='';passErr.textContent='';window.scrollTo(0,0)}
+function feedback(){window.open(FB,'_blank')}
+
+function render(){
+  chips.innerHTML=cats.map(c=>`<button class="chip ${state.cat?.id===c.id?'active':''}" onclick="selectCat('${c.id}')"><div class="ico">${c.icon||'✦'}</div>${c.name}</button>`).join('');
+  catList.innerHTML=cats.map(c=>`<div class="cat-row"><div class="cat-badge">${c.icon||'✦'}</div><div class="cat-info"><strong>${c.name}</strong><small>Categoria cadastrada</small></div><button class="icon-btn" onclick="editCatInfo('${c.id}')">✎</button><button class="icon-btn" onclick="delCat('${c.id}')">🗑</button></div>`).join('');
+  promptList.innerHTML=cats.map(c=>`<div class="cat-row"><div class="cat-badge">${c.icon||'✦'}</div><div class="cat-info"><strong>${c.name}</strong><div class="prm-preview"><div class="prm-line"><b>Foto 1:</b> ${(c.p1||'').slice(0,54)}...</div><div class="prm-line"><b>Foto 2:</b> ${(c.p2||'').slice(0,54)}...</div><div class="prm-line"><b>Foto 3:</b> ${(c.p3||'').slice(0,54)}...</div></div></div><button class="icon-btn" onclick="editPrompt('${c.id}')">✎</button></div>`).join('');
+  const p=localStorage.getItem('cntP')||0, im=localStorage.getItem('cntI')||0;
+  cntP.textContent=p; cntI.textContent=im;
+  if(deskCntP) deskCntP.textContent=p;
+  if(deskCntI) deskCntI.textContent=im;
+  ready();
+}
+
+function selectCat(id){state.cat=cats.find(c=>c.id===id);render()}
+function ready(){genBtn.disabled=!(state.cat&&state.code&&state.b64)}
+function readFile(f){if(!f)return;state.mime=f.type||'image/jpeg';const r=new FileReader();r.onload=e=>{state.b64=e.target.result.split(',')[1];preview.src=e.target.result;preview.style.display='block';uEmpty.style.display='none';upload.classList.add('has-img');ready()};r.readAsDataURL(f)}
+function clearPhoto(e){e?.stopPropagation();state.b64='';state.mime='image/jpeg';file.value='';preview.removeAttribute('src');preview.style.display='none';uEmpty.style.display='block';upload.classList.remove('has-img');ready()}
 function openCamera(e){e.stopPropagation();file.setAttribute('capture','environment');file.click()}
-
-// GALERIA - corrigido: remove atributo capture antes de abrir
 function openGallery(e){e.stopPropagation();file.removeAttribute('capture');file.click()}
-
-upload?.addEventListener('dragover',e=>e.preventDefault());upload?.addEventListener('drop',e=>{e.preventDefault();readFile(e.dataTransfer.files[0])});
+upload?.addEventListener('dragover',e=>e.preventDefault());
+upload?.addEventListener('drop',e=>{e.preventDefault();readFile(e.dataTransfer.files[0])});
 
 async function toBase64PNG(b64,mime){return new Promise(resolve=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.getContext('2d').drawImage(img,0,0);resolve(c.toDataURL('image/png').split(',')[1])};img.src=`data:${mime};base64,${b64}`});}
 
-async function generate(){error.textContent='';progress.style.display='block';results.style.display='none';genBtn.disabled=true;bar.style.width='10%';ptext.textContent='Preparando imagem...';try{const pngB64=await toBase64PNG(state.b64,state.mime);state.imgs=[];for(let i=1;i<=3;i++){bar.style.width=(20+i*23)+'%';ptext.textContent=`Gerando foto ${i} de 3...`;let prompt=(state.cat['p'+i]||'Foto profissional de semijoia')+(state.obs?'\nObservações: '+state.obs:'');let g=await api('generate',{prompt,imageBase64:pngB64});state.imgs.push({b64:g.b64_json,name:`${state.code}-foto${i}.jpg`})}bar.style.width='100%';ptext.textContent='Pronto!';addCount();showResults()}catch(e){error.textContent='Erro: '+e.message;genBtn.disabled=false}finally{setTimeout(()=>progress.style.display='none',500)}}
+async function generate(){
+  error.textContent='';progress.style.display='block';
+  if(window.innerWidth<900)results.style.display='none';
+  genBtn.disabled=true;bar.style.width='10%';ptext.textContent='Preparando imagem...';
+  try{
+    const pngB64=await toBase64PNG(state.b64,state.mime);
+    state.imgs=[];
+    for(let i=1;i<=3;i++){
+      bar.style.width=(20+i*23)+'%';ptext.textContent=`Gerando foto ${i} de 3...`;
+      let prompt=(state.cat['p'+i]||'Foto profissional de semijoia')+(state.obs?'\nObservações: '+state.obs:'');
+      let g=await api('generate',{prompt,imageBase64:pngB64});
+      state.imgs.push({b64:g.b64_json,name:`${state.code}-foto${i}.jpg`});
+    }
+    bar.style.width='100%';ptext.textContent='Pronto!';
+    addCount();showResults();
+  }catch(e){error.textContent='Erro: '+e.message;genBtn.disabled=false}
+  finally{setTimeout(()=>progress.style.display='none',500)}
+}
 
 async function api(type,data){const res=await fetch('/api/gerar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,...data})});if(!res.ok)throw new Error('Falha na função');const j=await res.json();if(j.error)throw new Error(j.error);return j}
 
-// GERAR NOVAMENTE - regenera só uma foto
 async function regenerate(i){
   const photoNum=i+1;
   const cards=document.querySelectorAll('.res');
@@ -177,28 +493,54 @@ async function regenerate(i){
     let g=await api('generate',{prompt,imageBase64:pngB64});
     state.imgs[i]={b64:g.b64_json,name:`${state.code}-foto${photoNum}.jpg`};
     showResults();
-  }catch(e){
-    error.textContent='Erro ao gerar foto '+(i+1)+': '+e.message;
-    showResults();
-  }
+  }catch(e){error.textContent='Erro ao gerar foto '+(i+1)+': '+e.message;showResults();}
 }
 
 function showResults(){
+  // Esconde placeholder, mostra resultados
+  if(resultsPlaceholder) resultsPlaceholder.style.display='none';
   const regenSvg=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>`;
   grid.innerHTML=state.imgs.map((im,i)=>`<div class="res"><img src="data:image/jpeg;base64,${im.b64}"><button class="regen-btn" onclick="regenerate(${i})" title="Gerar novamente">${regenSvg}</button><button class="dl-btn" onclick="download(${i})">Baixar</button></div>`).join('');
-  results.style.display='block'
+  results.style.display='block';
 }
 
 function download(i){const canvas=document.createElement('canvas');const img=new Image();img.onload=()=>{canvas.width=img.width;canvas.height=img.height;canvas.getContext('2d').drawImage(img,0,0);const a=document.createElement('a');a.href=canvas.toDataURL('image/jpeg',0.95);a.download=state.imgs[i].name;a.click()};img.src=`data:image/png;base64,${state.imgs[i].b64}`;}
 
-function resetForm(){state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[]};code.value='';obs.value='';file.value='';preview.style.display='none';uEmpty.style.display='block';upload.classList.remove('has-img');results.style.display='none';render()}function addCount(){localStorage.setItem('cntP',Number(localStorage.getItem('cntP')||0)+1);localStorage.setItem('cntI',Number(localStorage.getItem('cntI')||0)+3);render()}
+function resetForm(){
+  state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[]};
+  code.value='';obs.value='';file.value='';
+  preview.style.display='none';uEmpty.style.display='block';
+  upload.classList.remove('has-img');
+  results.style.display='none';
+  // Mostra placeholder novamente
+  if(resultsPlaceholder){
+    resultsPlaceholder.style.display='';
+  }
+  render();
+}
 
-// MENU DROPDOWN
+function addCount(){
+  localStorage.setItem('cntP',Number(localStorage.getItem('cntP')||0)+1);
+  localStorage.setItem('cntI',Number(localStorage.getItem('cntI')||0)+3);
+  render();
+}
+
 function toggleMenu(e){e.stopPropagation();menuDropdown.classList.toggle('hidden')}
 function closeMenu(){menuDropdown.classList.add('hidden')}
 document.addEventListener('click',function(){closeMenu()});
 
-function openAdmin(){admin.style.display='flex'}function checkAdmin(){if(adminPass.value===ADMIN){closeModal('admin');app.style.display='none';settings.style.display='block'}else adminErr.textContent='Senha incorreta.'}function closeSettings(){settings.style.display='none';app.style.display='block'}function closeModal(id){document.getElementById(id).style.display='none'; if(id==='catModal'){catName.style.display='block';catIcon.style.display='block';promptFields.style.display='block';editMode='cat';}}function tab(name,btn){['cats','prompts','general'].forEach(n=>document.getElementById(n+'Tab').classList.add('hidden'));document.getElementById(name+'Tab').classList.remove('hidden');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn?.classList.add('on')}function editCat(id){editCatInfo(id)}function editCatInfo(id){editMode='cat';editId=id||null;let c=cats.find(x=>x.id===id)||{name:'',icon:'',p1:'Foto profissional em fundo branco, estilo catálogo premium.',p2:'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:'Close detalhado mostrando brilho, textura e acabamento da peça.'};catTitle.textContent=editId?'Editar categoria':'Nova categoria';catName.value=c.name;catIcon.value=c.icon;p1.value=c.p1;p2.value=c.p2;p3.value=c.p3;promptFields.style.display='none';catModal.style.display='flex'}function editPrompt(id){editMode='prompt';editId=id;let c=cats.find(x=>x.id===id);if(!c)return;catTitle.textContent='Prompts — '+c.name;catName.value=c.name;catIcon.value=c.icon;catName.style.display='none';catIcon.style.display='none';p1.value=c.p1||'';p2.value=c.p2||'';p3.value=c.p3||'';promptFields.style.display='block';catModal.style.display='flex'}function saveCat(){let current=cats.find(c=>c.id===editId);if(editMode==='prompt'){if(!current)return;current.p1=p1.value.trim();current.p2=p2.value.trim();current.p3=p3.value.trim();if(!current.p1||!current.p2||!current.p3)return alert('Preencha os 3 prompts antes de salvar.');}else{let obj={id:editId||Date.now().toString(),name:catName.value.trim(),icon:catIcon.value.trim()||'✦',p1:current?.p1||p1.value.trim()||'Foto profissional em fundo branco, estilo catálogo premium.',p2:current?.p2||p2.value.trim()||'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:current?.p3||p3.value.trim()||'Close detalhado mostrando brilho, textura e acabamento da peça.'};if(!obj.name)return alert('Digite o nome.');if(editId)cats=cats.map(c=>c.id===editId?obj:c);else cats.push(obj);}localStorage.setItem('vitrioCats',JSON.stringify(cats));closeModal('catModal');catName.style.display='block';catIcon.style.display='block';promptFields.style.display='block';render()}function delCat(id){if(confirm('Excluir categoria?')){cats=cats.filter(c=>c.id!==id);localStorage.setItem('vitrioCats',JSON.stringify(cats));render()}}function scrollChips(dir){document.getElementById('chips').scrollBy({left:dir*260,behavior:'smooth'});}init();
+function openAdmin(){admin.style.display='flex'}
+function checkAdmin(){if(adminPass.value===ADMIN){closeModal('admin');app.style.display='none';settings.style.display='block'}else adminErr.textContent='Senha incorreta.'}
+function closeSettings(){settings.style.display='none';app.style.display='block'}
+function closeModal(id){document.getElementById(id).style.display='none';if(id==='catModal'){catName.style.display='block';catIcon.style.display='block';promptFields.style.display='block';editMode='cat';}}
+function tab(name,btn){['cats','prompts','general'].forEach(n=>document.getElementById(n+'Tab').classList.add('hidden'));document.getElementById(name+'Tab').classList.remove('hidden');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn?.classList.add('on')}
+function editCat(id){editCatInfo(id)}
+function editCatInfo(id){editMode='cat';editId=id||null;let c=cats.find(x=>x.id===id)||{name:'',icon:'',p1:'Foto profissional em fundo branco, estilo catálogo premium.',p2:'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:'Close detalhado mostrando brilho, textura e acabamento da peça.'};catTitle.textContent=editId?'Editar categoria':'Nova categoria';catName.value=c.name;catIcon.value=c.icon;p1.value=c.p1;p2.value=c.p2;p3.value=c.p3;promptFields.style.display='none';catModal.style.display='flex'}
+function editPrompt(id){editMode='prompt';editId=id;let c=cats.find(x=>x.id===id);if(!c)return;catTitle.textContent='Prompts — '+c.name;catName.value=c.name;catIcon.value=c.icon;catName.style.display='none';catIcon.style.display='none';p1.value=c.p1||'';p2.value=c.p2||'';p3.value=c.p3||'';promptFields.style.display='block';catModal.style.display='flex'}
+function saveCat(){let current=cats.find(c=>c.id===editId);if(editMode==='prompt'){if(!current)return;current.p1=p1.value.trim();current.p2=p2.value.trim();current.p3=p3.value.trim();if(!current.p1||!current.p2||!current.p3)return alert('Preencha os 3 prompts antes de salvar.');}else{let obj={id:editId||Date.now().toString(),name:catName.value.trim(),icon:catIcon.value.trim()||'✦',p1:current?.p1||p1.value.trim()||'Foto profissional em fundo branco, estilo catálogo premium.',p2:current?.p2||p2.value.trim()||'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:current?.p3||p3.value.trim()||'Close detalhado mostrando brilho, textura e acabamento da peça.'};if(!obj.name)return alert('Digite o nome.');if(editId)cats=cats.map(c=>c.id===editId?obj:c);else cats.push(obj);}localStorage.setItem('vitrioCats',JSON.stringify(cats));closeModal('catModal');catName.style.display='block';catIcon.style.display='block';promptFields.style.display='block';render()}
+function delCat(id){if(confirm('Excluir categoria?')){cats=cats.filter(c=>c.id!==id);localStorage.setItem('vitrioCats',JSON.stringify(cats));render()}}
+function scrollChips(dir){document.getElementById('chips').scrollBy({left:dir*260,behavior:'smooth'});}
+init();
 </script>
 </body>
 </html>
