@@ -11,8 +11,7 @@ export default async function handler(req, res) {
   if (type !== 'generate') return res.status(400).json({ error: 'Tipo inválido.' });
 
   try {
-    // GPT-4o analisa a foto e descreve o produto
-    const visionRes = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -20,48 +19,32 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'gpt-4o',
-        max_tokens: 800,
-        messages: [{
-          role: 'user',
-          content: [
-            {
-              type: 'image_url',
-              image_url: { url: `data:image/png;base64,${imageBase64}` }
-            },
-            {
-              type: 'text',
-              text: 'Descreva esta joia com máximo detalhe visual: tipo exato da peça, formato, cor do metal, pedras (cor, formato, quantidade, cravação), acabamento, proporções, detalhes únicos. Seja extremamente específico. Responda apenas com a descrição.'
-            }
-          ]
-        }]
+        input: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'input_image',
+                image_url: `data:image/png;base64,${imageBase64}`
+              },
+              {
+                type: 'input_text',
+                text: `Observe atentamente a joia na imagem. Reproduza EXATAMENTE este produto — mesmo design, mesmas pedras, mesma cor, mesmos detalhes, mesmo formato. Não invente outro produto. Aplique este estilo: ${prompt}`
+              }
+            ]
+          }
+        ],
+        tools: [{ type: 'image_generation' }]
       })
     });
 
-    const visionData = await visionRes.json();
-    if (visionData.error) throw new Error(visionData.error.message);
-    const description = visionData.choices[0].message.content;
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
 
-    // gpt-image-1 gera a foto profissional
-    const fullPrompt = `${prompt}\n\nDescrição detalhada do produto que deve ser reproduzido FIELMENTE: ${description}`;
+    const imageOutput = data.output?.find(o => o.type === 'image_generation_call');
+    if (!imageOutput) throw new Error('Imagem não gerada.');
 
-    const imageRes = await fetch('https://api.openai.com/v1/images/generations', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-image-1',
-        prompt: fullPrompt,
-        size: '1024x1024',
-        n: 1
-      })
-    });
-
-    const imageData = await imageRes.json();
-    if (imageData.error) throw new Error(imageData.error.message);
-
-    return res.status(200).json({ b64_json: imageData.data[0].b64_json });
+    return res.status(200).json({ b64_json: imageOutput.result });
 
   } catch (error) {
     return res.status(500).json({ error: error.message });
