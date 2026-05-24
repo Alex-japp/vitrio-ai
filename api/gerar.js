@@ -5,19 +5,14 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido.' });
   if (!process.env.OPENAI_API_KEY) return res.status(500).json({ error: 'API Key não configurada.' });
-
   const { type, prompt, imageBase64, appPass } = req.body;
-
-  // Verifica senha pelo backend
   if (type === 'auth') {
     const validPass = appPass === process.env.APP_PASS;
     const isAdmin = appPass === process.env.ADMIN_PASS;
     if (!validPass && !isAdmin) return res.status(401).json({ error: 'Senha incorreta.' });
     return res.status(200).json({ ok: true, admin: isAdmin });
   }
-
   if (type !== 'generate') return res.status(400).json({ error: 'Tipo inválido.' });
-
   try {
     const response = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
@@ -42,7 +37,7 @@ export default async function handler(req, res) {
             ]
           }
         ],
-        tools: [{ type: 'image_generation' }]
+        tools: [{ type: 'image_generation', size: '1024x1024' }]
       })
     });
     const data = await response.json();
