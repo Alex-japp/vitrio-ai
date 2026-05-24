@@ -2,12 +2,20 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido.' });
   if (!process.env.OPENAI_API_KEY) return res.status(500).json({ error: 'API Key não configurada.' });
 
-  const { type, prompt, imageBase64 } = req.body;
+  const { type, prompt, imageBase64, appPass } = req.body;
+
+  // Verifica senha pelo backend
+  if (type === 'auth') {
+    const validPass = appPass === process.env.APP_PASS;
+    const isAdmin = appPass === process.env.ADMIN_PASS;
+    if (!validPass && !isAdmin) return res.status(401).json({ error: 'Senha incorreta.' });
+    return res.status(200).json({ ok: true, admin: isAdmin });
+  }
+
   if (type !== 'generate') return res.status(400).json({ error: 'Tipo inválido.' });
 
   try {
@@ -37,15 +45,11 @@ export default async function handler(req, res) {
         tools: [{ type: 'image_generation' }]
       })
     });
-
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
-
     const imageOutput = data.output?.find(o => o.type === 'image_generation_call');
     if (!imageOutput) throw new Error('Imagem não gerada.');
-
     return res.status(200).json({ b64_json: imageOutput.result });
-
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
