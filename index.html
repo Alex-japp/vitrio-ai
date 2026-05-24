@@ -324,7 +324,7 @@ async function saveCountToFirebase(){
 // ============================
 // APP
 // ============================
-const PASS='vitrio@2025', ADMIN='admin@vitrio', FB='https://docs.google.com/forms/d/e/1FAIpQLScwQ1g4VlZUOz0mAQ2OSwRG0lVtxhEPE1mHg50DGkHPzO6gpA/viewform';
+const FB='https://docs.google.com/forms/d/e/1FAIpQLScwQ1g4VlZUOz0mAQ2OSwRG0lVtxhEPE1mHg50DGkHPzO6gpA/viewform';
 const defaults=[['Anéis','💍'],['Brincos','💎'],['Colares','📿'],['Pulseiras','⌚'],['Pingentes','◇']].map((x,i)=>({id:'c'+i,name:x[0],icon:x[1],p1:'Foto profissional em fundo branco, estilo catálogo premium.',p2:'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:'Close detalhado mostrando brilho, textura e acabamento da peça.'}));
 let cats=JSON.parse(localStorage.getItem('vitrioCats')||'null')||defaults, editId=null, editMode='cat';
 let state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],qty:3};
@@ -338,8 +338,18 @@ async function init(){
   render();
 }
 
-function login(){if(pass.value===PASS){localStorage.setItem('vitrioAccess','1');access.style.display='none';app.style.display='block'}else passErr.textContent='Senha incorreta.'}
-function logout(){localStorage.removeItem('vitrioAccess');settings.style.display='none';app.style.display='none';access.style.display='flex';pass.value='';passErr.textContent='';window.scrollTo(0,0)}
+async function login(){
+  passErr.textContent='';
+  try{
+    const r=await fetch('/api/gerar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'auth',appPass:pass.value})});
+    const j=await r.json();
+    if(!r.ok||!j.ok){passErr.textContent='Senha incorreta.';return;}
+    localStorage.setItem('vitrioAccess','1');
+    localStorage.setItem('vitrioAdmin', j.admin?'1':'0');
+    access.style.display='none';app.style.display='block';
+  }catch(e){passErr.textContent='Erro de conexão.';}
+}
+function logout(){localStorage.removeItem('vitrioAccess');localStorage.removeItem('vitrioAdmin');settings.style.display='none';app.style.display='none';access.style.display='flex';pass.value='';passErr.textContent='';window.scrollTo(0,0)}
 function feedback(){window.open(FB,'_blank')}
 
 function render(){
@@ -434,7 +444,16 @@ function toggleMenu(e){e.stopPropagation();menuDropdown.classList.toggle('hidden
 function closeMenu(){menuDropdown.classList.add('hidden')}
 document.addEventListener('click',function(){closeMenu()});
 function openAdmin(){admin.style.display='flex'}
-function checkAdmin(){if(adminPass.value===ADMIN){closeModal('admin');app.style.display='none';settings.style.display='block'}else adminErr.textContent='Senha incorreta.'}
+async function checkAdmin(){
+  adminErr.textContent='';
+  try{
+    const r=await fetch('/api/gerar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'auth',appPass:adminPass.value})});
+    const j=await r.json();
+    if(!r.ok||!j.ok||!j.admin){adminErr.textContent='Senha incorreta.';return;}
+    localStorage.setItem('vitrioAdmin','1');
+    closeModal('admin');app.style.display='none';settings.style.display='block';
+  }catch(e){adminErr.textContent='Erro de conexão.';}
+}
 function closeSettings(){settings.style.display='none';app.style.display='block'}
 function closeModal(id){document.getElementById(id).style.display='none';if(id==='catModal'){catName.style.display='block';catIcon.style.display='block';promptFields.style.display='block';editMode='cat';}}
 function tab(name,btn){['cats','prompts','general'].forEach(n=>document.getElementById(n+'Tab').classList.add('hidden'));document.getElementById(name+'Tab').classList.remove('hidden');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn?.classList.add('on')}
