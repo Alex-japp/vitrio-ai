@@ -5,15 +5,19 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido.' });
   if (!process.env.OPENAI_API_KEY) return res.status(500).json({ error: 'API Key não configurada.' });
+
   const { type, prompt, imageBase64, appPass } = req.body;
+
   if (type === 'auth') {
     const validPass = appPass === process.env.APP_PASS;
     const isAdmin = appPass === process.env.ADMIN_PASS;
     if (!validPass && !isAdmin) return res.status(401).json({ error: 'Senha incorreta.' });
     return res.status(200).json({ ok: true, admin: isAdmin });
   }
+
   if (type !== 'generate') return res.status(400).json({ error: 'Tipo inválido.' });
-  try {
+
+  async function callOpenAI(retries = 3, delay = 10000) {
     const response = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
       headers: {
@@ -40,6 +44,17 @@ export default async function handler(req, res) {
         tools: [{ type: 'image_generation', size: '1024x1024' }]
       })
     });
+
+    if (response.status === 429 && retries > 0) {
+      await new Promise(r => setTimeout(r, delay));
+      return callOpenAI(retries - 1, delay + 10000);
+    }
+
+    return response;
+  }
+
+  try {
+    const response = await callOpenAI();
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
     const imageOutput = data.output?.find(o => o.type === 'image_generation_call');
