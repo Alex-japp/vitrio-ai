@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Vitrio AI</title>
 <meta name="color-scheme" content="only light">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%237B3FF2'/><stop offset='100%25' stop-color='%234D7BFF'/></linearGradient></defs><rect width='32' height='32' rx='8' fill='url(%23g)'/><path d='M16 6 L26 14 L16 26 L6 14 Z' fill='white'/><circle cx='26' cy='6' r='3.5' fill='%23D4AF37'/></svg>">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%237B3FF2'/><stop offset='100%25' stop-color='%234D7BFF'/></linearGradient></defs><rect width='32' height='32' rx='8' fill='url(%23g)'/><text x='16' y='22' font-size='22' fill='white' text-anchor='middle' font-family='Arial,sans-serif'>◇</text></svg>">
 <link rel="manifest" href="/manifest.json">
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}</script>
 <style>
@@ -92,12 +92,16 @@ button,input,textarea{font-family:inherit}
 .settings{display:none;min-height:100vh;background:#fff;color:var(--ink);padding-bottom:86px}.cfg-head{position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:30}.cfg-title{letter-spacing:.18em;color:var(--ink);font-weight:950}.dark-btn{width:45px;height:45px;border-radius:15px;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:20px;cursor:pointer}.tabs{display:flex;background:#fff;border-bottom:1px solid var(--line)}.tab{flex:1;background:transparent;border:0;color:#6B6B6B;height:58px;font-weight:900;cursor:pointer}.tab.on{color:var(--purple);border-bottom:3px solid var(--purple)}.cfg-body{padding:24px 28px;max-width:720px;margin:0 auto}.cfg-sub{color:var(--muted);font-size:13px;margin:6px 0 18px}.cat-row{background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:12px;box-shadow:0 8px 20px rgba(17,18,39,.04)}.cat-badge{width:44px;height:44px;border-radius:50%;background:var(--grad);display:grid;place-items:center;color:#fff}.cat-info{flex:1}.cat-info strong{display:block}.cat-info small{color:var(--muted)}.icon-btn{border:0;background:transparent;color:var(--ink);font-size:19px;padding:8px;cursor:pointer}.add{width:100%;height:58px;border-radius:18px;border:1.5px solid var(--purple);background:transparent;color:var(--purple);font-weight:950;margin-top:12px;cursor:pointer}.counter{display:grid;grid-template-columns:1fr 1fr;gap:12px}.count-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px;text-align:center;box-shadow:0 8px 20px rgba(17,18,39,.04)}.num{font-size:36px;font-weight:950;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}.cfg-link,.danger{width:100%;height:56px;border-radius:18px;margin-top:12px;font-weight:950;cursor:pointer}.cfg-link{background:transparent;border:1.5px solid var(--gold);color:#9C7410}.danger{background:transparent;border:1.5px solid rgba(255,80,80,.55);color:#ff4f4f}.modal{position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:80;display:none;align-items:flex-end;justify-content:center}.sheet{width:min(100%,520px);background:#fff;color:var(--ink);border-radius:28px 28px 0 0;padding:24px}
 @media(min-width:900px){.modal{align-items:center}.sheet{border-radius:28px;max-width:420px}}.sheet h3{margin-bottom:16px}.sheet .input,.sheet .textarea{margin-bottom:10px}.sheet-actions{display:flex;gap:10px}.sheet-actions button{flex:1;height:54px;border-radius:16px;border:1px solid var(--line);font-weight:950;cursor:pointer}.save{background:var(--grad)!important;color:#fff!important;border:0!important}.hidden{display:none!important}.prm-preview{font-size:12px;color:var(--muted);line-height:1.55;margin-top:6px}.prm-line{margin-top:3px}.prompt-mini{display:block;font-size:12px;font-weight:950;letter-spacing:.12em;text-transform:uppercase;margin:12px 0 6px;color:var(--purple)}
 .opt-tag{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:10px}
-.qty-selector{margin-top:18px}
-.qty-selector .label{margin-top:0;margin-bottom:10px}
-.qty-btns{display:flex;gap:8px}
-.qty-btn{flex:1;height:46px;border-radius:14px;border:1.5px solid var(--line);background:#fff;font-weight:900;font-size:16px;cursor:pointer;color:var(--muted);transition:.2s}
-.qty-btn:hover{border-color:var(--purple);color:var(--purple)}
-.qty-btn.active{border-color:var(--purple);color:var(--purple);background:rgba(123,63,242,.06);box-shadow:0 4px 12px rgba(123,63,242,.12)}
+/* SELETOR DE FOTOS COM CHECKBOXES */
+.photo-selector{margin-top:18px}
+.photo-selector .label{margin-bottom:10px}
+.check-all-wrap{margin-bottom:8px}
+.check-label{display:flex;align-items:center;gap:10px;cursor:pointer;padding:11px 14px;border-radius:14px;border:1.5px solid var(--line);background:#fff;margin-bottom:6px;font-weight:700;font-size:14px;transition:.2s;user-select:none}
+.check-label:hover{border-color:var(--purple);color:var(--purple)}
+.check-label input[type="checkbox"]{width:18px;height:18px;accent-color:var(--purple);cursor:pointer;flex-shrink:0}
+.check-label.checked{border-color:var(--purple);color:var(--purple);background:rgba(123,63,242,.06)}
+.individual-checks{padding-left:8px}
+.individual-checks .check-label{font-weight:600;font-size:13px;padding:8px 14px}
 #grid[data-qty="1"]{grid-template-columns:1fr;max-width:280px}
 #grid[data-qty="2"]{grid-template-columns:1fr 1fr}
 #grid[data-qty="3"]{grid-template-columns:repeat(3,1fr)}
@@ -222,12 +226,28 @@ button,input,textarea{font-family:inherit}
         <div style="text-align:right;font-size:11px;color:var(--muted);margin-top:4px"><span id="obsCount">0</span>/25 caracteres</div>
       </div>
     </section>
-    <div class="qty-selector">
-      <label class="label">Quantidade de fotos</label>
-      <div class="qty-btns">
-        <button class="qty-btn" onclick="setQty(1)">1</button>
-        <button class="qty-btn" onclick="setQty(2)">2</button>
-        <button class="qty-btn active" onclick="setQty(3)">3</button>
+    <!-- SELETOR DE FOTOS -->
+    <div class="photo-selector">
+      <label class="label">Selecionar fotos</label>
+      <div class="check-all-wrap">
+        <label class="check-label checked" id="labelAll">
+          <input type="checkbox" id="checkAll" checked onchange="toggleAll(this)">
+          <span>Gerar todas as fotos</span>
+        </label>
+      </div>
+      <div id="individualChecks" class="individual-checks hidden">
+        <label class="check-label checked" id="label1">
+          <input type="checkbox" id="check1" checked onchange="updateSelection()">
+          <span>Foto 1 — Fundo branco</span>
+        </label>
+        <label class="check-label checked" id="label2">
+          <input type="checkbox" id="check2" checked onchange="updateSelection()">
+          <span>Foto 2 — No modelo</span>
+        </label>
+        <label class="check-label checked" id="label3">
+          <input type="checkbox" id="check3" checked onchange="updateSelection()">
+          <span>Foto 3 — Close detalhe</span>
+        </label>
       </div>
     </div>
     <button id="genBtn" class="btn btn-main" disabled onclick="generate()">✦ Gerar fotos profissionais</button>
@@ -333,7 +353,7 @@ async function saveCountToFirebase(){
 const FB='https://docs.google.com/forms/d/e/1FAIpQLScwQ1g4VlZUOz0mAQ2OSwRG0lVtxhEPE1mHg50DGkHPzO6gpA/viewform';
 const defaults=[['Anéis'],['Brincos'],['Colares'],['Pulseiras'],['Pingentes']].map((x,i)=>({id:'c'+i,name:x[0],icon:'',p1:'Foto profissional em fundo branco, estilo catálogo premium.',p2:'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:'Close detalhado mostrando brilho, textura e acabamento da peça.'}));
 let cats=defaults, editId=null, editMode='cat';
-let state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],qty:3};
+let state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],selectedPhotos:[1,2,3]};
 
 async function init(){
   // Oculta aba Prompts se não for admin
@@ -374,7 +394,7 @@ function render(){
 }
 
 function selectCat(id){state.cat=cats.find(c=>c.id===id);render()}
-function ready(){genBtn.disabled=!(state.cat&&state.code&&state.b64)}
+function ready(){genBtn.disabled=!(state.cat&&state.code&&state.b64&&state.selectedPhotos.length>0)}
 function readFile(f){if(!f)return;state.mime=f.type||'image/jpeg';const r=new FileReader();r.onload=e=>{state.b64=e.target.result.split(',')[1];preview.src=e.target.result;preview.style.display='block';uEmpty.style.display='none';upload.classList.add('has-img');ready()};r.readAsDataURL(f)}
 function clearPhoto(e){e?.stopPropagation();state.b64='';state.mime='image/jpeg';file.value='';preview.removeAttribute('src');preview.style.display='none';uEmpty.style.display='block';upload.classList.remove('has-img');ready()}
 function openCamera(e){e.stopPropagation();file.setAttribute('capture','environment');file.click()}
@@ -391,11 +411,18 @@ async function generate(){
   try{
     const pngB64=await toBase64PNG(state.b64,state.mime);
     state.imgs=[];
-    for(let i=1;i<=state.qty;i++){
-      bar.style.width=(10+i*(85/state.qty))+'%';ptext.textContent=`Gerando foto ${i} de ${state.qty}...`;
-      let prompt=(state.cat['p'+i]||'Foto profissional de semijoia')+(state.obs?'\nObservações: '+state.obs:'');
-      let g=await api('generate',{prompt,imageBase64:pngB64});
-      state.imgs.push({b64:g.b64_json,name:`${state.code}-foto${i}.jpg`});
+    const photos=state.selectedPhotos;
+    let photo1Result=null; // Foto 1 gerada para usar como referência nas fotos 2 e 3
+    for(let idx=0;idx<photos.length;idx++){
+      const photoNum=photos[idx];
+      bar.style.width=(10+(idx+1)*(85/photos.length))+'%';
+      ptext.textContent=`Gerando foto ${idx+1} de ${photos.length}...`;
+      let prompt=(state.cat['p'+photoNum]||'Foto profissional de semijoia')+(state.obs?'\nObservações: '+state.obs:'');
+      // Fotos 2 e 3 usam a Foto 1 gerada como referência (se disponível)
+      const imageToUse = (photoNum>1 && photo1Result) ? photo1Result : pngB64;
+      let g=await api('generate',{prompt,imageBase64:imageToUse});
+      if(photoNum===1) photo1Result=g.b64_json; // Salva foto 1 para as próximas
+      state.imgs.push({b64:g.b64_json,name:`${state.code}-foto${photoNum}.jpg`});
     }
     bar.style.width='100%';ptext.textContent='Pronto!';
     addCount();showResults();
@@ -424,7 +451,7 @@ async function regenerate(i){
 
 function showResults(){
   if(resultsPlaceholder) resultsPlaceholder.style.display='none';
-  grid.setAttribute('data-qty',state.qty);
+  grid.setAttribute('data-qty', state.selectedPhotos.length);
   const regenSvg=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>`;
   grid.innerHTML=state.imgs.map((im,i)=>`<div class="res"><img src="data:image/jpeg;base64,${im.b64}"><button class="regen-btn" onclick="regenerate(${i})" title="Gerar novamente">${regenSvg}</button><button class="dl-btn" onclick="download(${i})">Baixar</button></div>`).join('');
   results.style.display='block';
@@ -433,23 +460,57 @@ function showResults(){
 function download(i){const canvas=document.createElement('canvas');const img=new Image();img.onload=()=>{canvas.width=img.width;canvas.height=img.height;canvas.getContext('2d').drawImage(img,0,0);const a=document.createElement('a');a.href=canvas.toDataURL('image/jpeg',0.95);a.download=state.imgs[i].name;a.click()};img.src=`data:image/png;base64,${state.imgs[i].b64}`;}
 
 function resetForm(){
-  const savedQty=state.qty;
-  state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],qty:savedQty};
+  state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],selectedPhotos:[1,2,3]};
   code.value='';obs.value='';file.value='';
   preview.style.display='none';uEmpty.style.display='block';
   upload.classList.remove('has-img');
   results.style.display='none';
   if(resultsPlaceholder) resultsPlaceholder.style.display='';
+  // Reset checkboxes
+  const ca=document.getElementById('checkAll');if(ca){ca.checked=true;document.getElementById('labelAll')?.classList.add('checked');}
+  document.getElementById('individualChecks')?.classList.add('hidden');
+  [1,2,3].forEach(n=>{const c=document.getElementById('check'+n);if(c){c.checked=true;document.getElementById('label'+n)?.classList.add('checked');}});
   render();
 }
 
 function addCount(){
   localStorage.setItem('cntP',Number(localStorage.getItem('cntP')||0)+1);
-  localStorage.setItem('cntI',Number(localStorage.getItem('cntI')||0)+state.qty);
+  localStorage.setItem('cntI',Number(localStorage.getItem('cntI')||0)+state.selectedPhotos.length);
   render();
-  saveCountToFirebase(); // Salva no Firebase
+  saveCountToFirebase();
 }
 
+function toggleAll(cb){
+  const individual=document.getElementById('individualChecks');
+  document.getElementById('labelAll')?.classList.toggle('checked',cb.checked);
+  if(cb.checked){
+    individual.classList.add('hidden');
+    state.selectedPhotos=[1,2,3];
+    [1,2,3].forEach(n=>{
+      const c=document.getElementById('check'+n);
+      if(c){c.checked=true;document.getElementById('label'+n)?.classList.add('checked');}
+    });
+  }else{
+    individual.classList.remove('hidden');
+    updateSelection();
+  }
+  ready();
+}
+
+function updateSelection(){
+  state.selectedPhotos=[1,2,3].filter(n=>{
+    const c=document.getElementById('check'+n);
+    document.getElementById('label'+n)?.classList.toggle('checked', c&&c.checked);
+    return c&&c.checked;
+  });
+  // Se todas marcadas, marca "Gerar todas"
+  const ca=document.getElementById('checkAll');
+  if(ca){
+    ca.checked=state.selectedPhotos.length===3;
+    document.getElementById('labelAll')?.classList.toggle('checked',ca.checked);
+  }
+  ready();
+}
 function toggleMenu(e){e.stopPropagation();menuDropdown.classList.toggle('hidden')}
 function closeMenu(){menuDropdown.classList.add('hidden')}
 document.addEventListener('click',function(){closeMenu()});
@@ -506,11 +567,6 @@ function moveCat(id,dir){
   const temp=cats[idx];cats[idx]=cats[newIdx];cats[newIdx]=temp;
   saveCatsToFirebase(); // Salva no Firebase
   render();
-}
-
-function setQty(n){
-  state.qty=n;
-  document.querySelectorAll('.qty-btn').forEach((b,i)=>{b.classList.toggle('active',i+1===n);});
 }
 
 function updateObsCounter(el){
