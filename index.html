@@ -4,7 +4,10 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Vitrio AI</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%237B3FF2'/><stop offset='100%25' stop-color='%234D7BFF'/></linearGradient></defs><rect width='32' height='32' rx='8' fill='url(%23g)'/><text x='16' y='23' font-family='Georgia,serif' font-size='20' font-weight='bold' fill='white' text-anchor='middle'>V</text><circle cx='26' cy='6' r='3.5' fill='%23D4AF37'/></svg>">
+<meta name="color-scheme" content="only light">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%237B3FF2'/><stop offset='100%25' stop-color='%234D7BFF'/></linearGradient></defs><rect width='32' height='32' rx='8' fill='url(%23g)'/><path d='M16 6 L26 14 L16 26 L6 14 Z' fill='white'/><circle cx='26' cy='6' r='3.5' fill='%23D4AF37'/></svg>">
+<link rel="manifest" href="/manifest.json">
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}</script>
 <style>
 :root{
   --bg:#FAF7F2;
@@ -215,7 +218,8 @@ button,input,textarea{font-family:inherit}
       </div>
       <div class="field">
         <label class="label">Observações do produto <span class="opt-tag">(opcional)</span></label>
-        <textarea id="obs" class="textarea" placeholder="Ex: anel com pedra verde, fundo claro..." oninput="state.obs=this.value.trim()"></textarea>
+        <textarea id="obs" class="textarea" maxlength="25" placeholder="Ex: pedra verde, fundo escuro..." oninput="state.obs=this.value.trim();updateObsCounter(this)"></textarea>
+        <div style="text-align:right;font-size:11px;color:var(--muted);margin-top:4px"><span id="obsCount">0</span>/25 caracteres</div>
       </div>
     </section>
     <div class="qty-selector">
@@ -328,7 +332,7 @@ async function saveCountToFirebase(){
 // ============================
 const FB='https://docs.google.com/forms/d/e/1FAIpQLScwQ1g4VlZUOz0mAQ2OSwRG0lVtxhEPE1mHg50DGkHPzO6gpA/viewform';
 const defaults=[['Anéis'],['Brincos'],['Colares'],['Pulseiras'],['Pingentes']].map((x,i)=>({id:'c'+i,name:x[0],icon:'',p1:'Foto profissional em fundo branco, estilo catálogo premium.',p2:'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:'Close detalhado mostrando brilho, textura e acabamento da peça.'}));
-let cats=JSON.parse(localStorage.getItem('vitrioCats')||'null')||defaults, editId=null, editMode='cat';
+let cats=defaults, editId=null, editMode='cat';
 let state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],qty:3};
 
 async function init(){
@@ -480,7 +484,6 @@ function saveCat(){
     if(!obj.name)return alert('Digite o nome.');
     if(editId)cats=cats.map(c=>c.id===editId?obj:c);else cats.push(obj);
   }
-  localStorage.setItem('vitrioCats',JSON.stringify(cats));
   saveCatsToFirebase(); // Salva no Firebase
   closeModal('catModal');
   catName.style.display='block';catIcon.style.display='block';promptFields.style.display='block';
@@ -490,7 +493,6 @@ function saveCat(){
 function delCat(id){
   if(confirm('Excluir categoria?')){
     cats=cats.filter(c=>c.id!==id);
-    localStorage.setItem('vitrioCats',JSON.stringify(cats));
     saveCatsToFirebase(); // Salva no Firebase
     render();
   }
@@ -502,7 +504,6 @@ function moveCat(id,dir){
   const newIdx=idx+dir;
   if(newIdx<0||newIdx>=cats.length)return;
   const temp=cats[idx];cats[idx]=cats[newIdx];cats[newIdx]=temp;
-  localStorage.setItem('vitrioCats',JSON.stringify(cats));
   saveCatsToFirebase(); // Salva no Firebase
   render();
 }
@@ -510,6 +511,22 @@ function moveCat(id,dir){
 function setQty(n){
   state.qty=n;
   document.querySelectorAll('.qty-btn').forEach((b,i)=>{b.classList.toggle('active',i+1===n);});
+}
+
+function updateObsCounter(el){
+  const count=el.value.length;
+  const counter=document.getElementById('obsCount');
+  if(counter){
+    counter.textContent=count;
+    counter.style.color=count>=20?'#c23':'var(--muted)';
+  }
+}
+
+// Service Worker — notifica atualização
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    window.location.reload();
+  });
 }
 
 function scrollChips(dir){document.getElementById('chips').scrollBy({left:dir*260,behavior:'smooth'});}
