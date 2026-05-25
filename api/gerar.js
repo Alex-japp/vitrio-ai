@@ -50,6 +50,12 @@ export default async function handler(req, res) {
       return callOpenAI(retries - 1, delay + 10000);
     }
 
+    // Log do erro real da OpenAI
+    if (!response.ok) {
+      const errData = await response.json();
+      throw new Error(`OpenAI ${response.status}: ${JSON.stringify(errData)}`);
+    }
+
     return response;
   }
 
