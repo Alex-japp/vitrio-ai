@@ -29,6 +29,7 @@ html{scroll-behavior:smooth}
 body{
   font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
   background:
+    radial-gradient(circle at top right,#f3f0ff,transparent 40%),
     radial-gradient(circle at 8% 6%,rgba(212,175,55,.22),transparent 23%),
     radial-gradient(circle at 92% 4%,rgba(123,63,242,.16),transparent 28%),
     linear-gradient(90deg,#FBF7ED 0%,#FFF 47%,#F8F1FF 100%);
@@ -62,7 +63,7 @@ button,input,textarea{font-family:inherit}
 .input{height:58px;padding:0 18px}.textarea{min-height:92px;padding:16px;resize:vertical;line-height:1.55}
 .input:focus,.textarea:focus{border-color:var(--purple);box-shadow:0 0 0 4px rgba(123,63,242,.09);background:#fff}
 .btn{border:0;border-radius:18px;min-height:58px;padding:0 22px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:.2s}
-.btn-main{width:100%;margin-top:18px;color:#fff;background:var(--grad);border:1.5px solid var(--gold);box-shadow:var(--shadow2)}
+.btn-main{width:100%;margin-top:18px;color:#fff;background:linear-gradient(135deg,#6C3BFF 0%,#4A1FCC 100%);border:1.5px solid var(--gold);box-shadow:0 10px 25px rgba(108,59,255,.25)}
 .btn-main:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 16px 38px rgba(123,63,242,.32)}
 .btn-main:disabled{background:#D3CEC4;border-color:#D3CEC4;box-shadow:none;cursor:not-allowed;transform:none}.err{height:18px;font-size:12px;color:#c23;margin-top:10px}
 .app{display:none;padding-bottom:88px}
@@ -117,6 +118,14 @@ button,input,textarea{font-family:inherit}
 .add-credits-wrap{display:flex;gap:8px;align-items:center;margin-top:8px;width:100%}
 .add-credits-wrap input{flex:1;height:38px;border-radius:10px;border:1.5px solid var(--line);padding:0 12px;font-size:13px;outline:none}
 .add-credits-wrap button{height:38px;padding:0 14px;border-radius:10px;border:0;background:var(--grad);color:#fff;font-weight:700;cursor:pointer;font-size:13px}
+/* MENSAGEM CRÉDITOS ESGOTADOS */
+.credits-empty-msg{background:linear-gradient(135deg,rgba(108,59,255,.06),rgba(77,123,255,.06));border:1px solid rgba(108,59,255,.2);border-radius:18px;padding:16px 20px;text-align:center;margin-top:14px;display:none}
+.credits-empty-msg.show{display:block}
+.credits-empty-msg p{font-size:14px;font-weight:700;color:var(--purple);margin-bottom:4px}
+.credits-empty-msg small{font-size:12px;color:var(--muted)}
+/* ÍCONES SVG CATEGORIAS */
+.chip-svg{width:22px;height:22px;stroke:var(--purple);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:.2s}
+.chip.active .chip-svg{stroke:#fff}
 .opt-tag{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:10px}
 /* SELETOR DE FOTOS COM CHECKBOXES */
 .photo-selector{margin-top:18px}
@@ -153,7 +162,7 @@ button,input,textarea{font-family:inherit}
   .sidebar-group .chips-wrap{position:static;margin:0 0 8px;display:block;justify-content:flex-start;}
   .sidebar-group .chips{flex-direction:column;overflow:visible;padding:0;gap:6px;justify-content:flex-start;}
   .sidebar-group .chip{min-width:auto;width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;text-align:left;border-radius:14px;transform:none;}
-  .sidebar-group .chip.active{transform:none}
+  .sidebar-group .chip.active{transform:none;background:rgba(108,59,255,.08);color:var(--purple);border-color:var(--purple);border-left:3px solid #6C3BFF;box-shadow:none}
   .sidebar-group .chip .ico{margin:0;min-width:36px;width:36px;height:36px;border-radius:10px;font-size:18px;}
   .sidebar-group .chip-arrow{display:none}
   .desk-stats{display:block;margin-top:24px;padding-top:20px;border-top:1px solid var(--line);}
@@ -169,8 +178,9 @@ button,input,textarea{font-family:inherit}
   .results-group .grid{grid-template-columns:1fr 1fr;gap:10px;}
   .results-group .btn-main{margin-top:12px;font-size:12px;min-height:46px;}
   .results-group .label{margin-top:0}
-  .results-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px;color:var(--muted);text-align:center;gap:14px;}
-  .results-placeholder .ph-icon{width:72px;height:72px;border-radius:22px;background:linear-gradient(135deg,rgba(123,63,242,.08),rgba(77,123,255,.08));border:1px solid rgba(123,63,242,.14);display:grid;place-items:center;font-size:32px;color:var(--purple);}
+  .results-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px;color:var(--muted);text-align:center;gap:14px;background:linear-gradient(180deg,#FFFFFF 0%,#F6F1FF 100%);border-radius:24px;border:1px solid #E8DDFF;}
+  .results-placeholder .ph-icon{font-size:52px;color:var(--purple);animation:float 3s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
   .results-placeholder p{font-size:13px;line-height:1.7;max-width:180px;}
   .bottom{display:none}
   .regen-btn{opacity:1}
@@ -274,7 +284,13 @@ button,input,textarea{font-family:inherit}
         <label class="label">Foto do produto</label>
         <div id="upload" class="upload" onclick="document.getElementById('file').click()">
           <button id="removePhoto" class="remove-photo" type="button" onclick="clearPhoto(event)" title="Remover foto">×</button>
-          <div id="uEmpty"><div class="camera-dot">📷</div><strong>Clique para selecionar</strong><small>ou arraste a foto aqui</small></div>
+          <div id="uEmpty">
+            <div class="camera-dot">
+              <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#7B3FF2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </div>
+            <strong>Clique para selecionar</strong>
+            <small>ou arraste a foto aqui</small>
+          </div>
           <img id="preview" style="display:none">
         </div>
         <input id="file" type="file" accept="image/*" style="display:none" onchange="readFile(this.files[0])">
@@ -321,6 +337,10 @@ button,input,textarea{font-family:inherit}
     </div>
     <button id="genBtn" class="btn btn-main" disabled onclick="generate()">✦ Gerar fotos profissionais</button>
     <div class="secure">🛡 Suas imagens são geradas com IA de forma segura</div>
+    <div id="creditsEmptyMsg" class="credits-empty-msg">
+      <p>✦ Suas fotos acabaram!</p>
+      <small>Entre em contato para adquirir mais fotos e continuar gerando.</small>
+    </div>
     <div id="progress" class="progress">
       <div class="ring"></div>
       <p id="ptext" style="text-align:center;color:var(--muted);font-weight:800">Preparando...</p>
@@ -331,7 +351,7 @@ button,input,textarea{font-family:inherit}
   <div class="results-group">
     <label class="label">Fotos geradas</label>
     <div id="resultsPlaceholder" class="results-placeholder">
-      <div class="ph-icon">✦</div>
+      <div class="ph-icon">◇</div>
       <p>As fotos geradas<br>aparecerão aqui</p>
     </div>
     <section id="results" class="results">
@@ -580,8 +600,32 @@ async function init(){
 
 function feedback(){window.open(FB,'_blank')}
 
+const catIcons = {
+  'Anéis': `<svg class="chip-svg" viewBox="0 0 24 24"><circle cx="12" cy="14" r="6"/><path d="M9 6l3-3 3 3"/></svg>`,
+  'Brincos': `<svg class="chip-svg" viewBox="0 0 24 24"><circle cx="7" cy="5" r="2"/><path d="M7 7v4c0 2 2 4 2 6"/><circle cx="17" cy="5" r="2"/><path d="M17 7v4c0 2-2 4-2 6"/></svg>`,
+  'Colares': `<svg class="chip-svg" viewBox="0 0 24 24"><path d="M4 6c2 4 6 6 8 6s6-2 8-6"/><circle cx="12" cy="14" r="2"/></svg>`,
+  'Pulseiras': `<svg class="chip-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>`,
+  'Pulseiras Feminina': `<svg class="chip-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>`,
+  'Pingentes': `<svg class="chip-svg" viewBox="0 0 24 24"><path d="M12 3v4"/><path d="M6 10l6 8 6-8-6-4-6 4z"/></svg>`,
+  'Argolas': `<svg class="chip-svg" viewBox="0 0 24 24"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg>`,
+  'Conjunto': `<svg class="chip-svg" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 10c2 2 6 2 8 0"/></svg>`,
+  'Corrente': `<svg class="chip-svg" viewBox="0 0 24 24"><path d="M8 12a4 4 0 0 1 4-4h2"/><path d="M16 12a4 4 0 0 1-4 4h-2"/></svg>`,
+  'Tornozeleira': `<svg class="chip-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="18" cy="12" r="1"/></svg>`,
+};
+
+function getCatIcon(cat){
+  // Tenta encontrar por nome exato ou parcial
+  for(const key of Object.keys(catIcons)){
+    if(cat.name.toLowerCase().includes(key.toLowerCase())) return catIcons[key];
+  }
+  // Se tem ícone emoji, mostra ele
+  if(cat.icon && cat.icon !== '✦') return `<span style="font-size:20px">${cat.icon}</span>`;
+  // Padrão: losango
+  return `<svg class="chip-svg" viewBox="0 0 24 24"><path d="M12 2L22 12L12 22L2 12Z"/></svg>`;
+}
+
 function render(){
-  chips.innerHTML=cats.map(c=>`<button class="chip ${state.cat?.id===c.id?'active':''}" onclick="selectCat('${c.id}')"><div class="ico">${c.icon||'✦'}</div>${c.name}</button>`).join('');
+  chips.innerHTML=cats.map(c=>`<button class="chip ${state.cat?.id===c.id?'active':''}" onclick="selectCat('${c.id}')"><div class="ico">${getCatIcon(c)}</div>${c.name}</button>`).join('');
   catList.innerHTML=cats.map((c,idx)=>`<div class="cat-row"><div class="cat-badge">${c.icon||'✦'}</div><div class="cat-info"><strong>${c.name}</strong><small>Categoria cadastrada</small></div><div class="reorder-btns"><button class="icon-btn" onclick="moveCat('${c.id}',-1)" ${idx===0?'disabled':''}>↑</button><button class="icon-btn" onclick="moveCat('${c.id}',1)" ${idx===cats.length-1?'disabled':''}>↓</button></div><button class="icon-btn" onclick="editCatInfo('${c.id}')">✎</button><button class="icon-btn" onclick="delCat('${c.id}')">🗑</button></div>`).join('');
   promptList.innerHTML=cats.map(c=>`<div class="cat-row"><div class="cat-badge">${c.icon||'✦'}</div><div class="cat-info"><strong>${c.name}</strong><div class="prm-preview"><div class="prm-line"><b>Foto 1:</b> ${(c.p1||'').slice(0,54)}...</div><div class="prm-line"><b>Foto 2:</b> ${(c.p2||'').slice(0,54)}...</div><div class="prm-line"><b>Foto 3:</b> ${(c.p3||'').slice(0,54)}...</div></div></div><button class="icon-btn" onclick="editPrompt('${c.id}')">✎</button></div>`).join('');
   const p=localStorage.getItem('cntP')||0, im=localStorage.getItem('cntI')||0;
@@ -595,9 +639,9 @@ function selectCat(id){state.cat=cats.find(c=>c.id===id);render()}
 function ready(){
   const hasCredits = (currentUserData?.credits||0) > 0;
   genBtn.disabled=!(state.cat&&state.code&&state.b64&&state.selectedPhotos.length>0&&hasCredits);
-  if((currentUserData?.credits||0)===0){
-    error.textContent='⚠️ Seus créditos acabaram! Entre em contato para adquirir mais fotos.';
-  }
+  const msg = document.getElementById('creditsEmptyMsg');
+  if(msg) msg.classList.toggle('show', (currentUserData?.credits||0)===0 && !!currentUser);
+  if(error && (currentUserData?.credits||0)===0 && currentUser) error.textContent='';
 }
 function readFile(f){if(!f)return;state.mime=f.type||'image/jpeg';const r=new FileReader();r.onload=e=>{state.b64=e.target.result.split(',')[1];preview.src=e.target.result;preview.style.display='block';uEmpty.style.display='none';upload.classList.add('has-img');ready()};r.readAsDataURL(f)}
 function clearPhoto(e){e?.stopPropagation();state.b64='';state.mime='image/jpeg';file.value='';preview.removeAttribute('src');preview.style.display='none';uEmpty.style.display='block';upload.classList.remove('has-img');ready()}
