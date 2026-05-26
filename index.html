@@ -503,7 +503,6 @@ async function loadUserData(uid){
     return currentUserData;
   }catch(e){
     console.error('❌ Erro loadUserData:', e.code, e.message);
-    alert('Erro ao carregar dados: ' + e.code + ' - ' + e.message);
   }
 }
 
@@ -741,14 +740,16 @@ function toggleMenu(e){e.stopPropagation();menuDropdown.classList.toggle('hidden
 function closeMenu(){menuDropdown.classList.add('hidden')}
 document.addEventListener('click',function(){closeMenu()});
 
+// Emails admin — fallback de segurança
+const ADMIN_EMAILS = ['starnelsemijoias@gmail.com'];
+
 // Settings - só admin acessa
 async function openAdmin(){
   if(currentUser && !currentUserData?.isAdmin){
     await loadUserData(currentUser.uid);
   }
-  // DEBUG TEMPORÁRIO
-  alert('Email: ' + currentUser?.email + '\nisAdmin: ' + currentUserData?.isAdmin + '\nUID: ' + currentUser?.uid);
-  if(currentUserData?.isAdmin){
+  const isAdmin = currentUserData?.isAdmin === true || ADMIN_EMAILS.includes(currentUser?.email?.toLowerCase());
+  if(isAdmin){
     app.style.display='none';
     settings.style.display='block';
     if(promptsTabBtn) promptsTabBtn.style.display='';
