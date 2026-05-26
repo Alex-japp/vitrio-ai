@@ -486,8 +486,9 @@ async function loadUserData(uid){
     const snap = await db.collection('users').doc(uid).get();
     if(snap.exists){
       currentUserData = snap.data();
+      console.log('✅ Dados carregados:', currentUserData);
     } else {
-      // Cria documento se não existir (ex: login Google pela 1ª vez)
+      console.log('⚠️ Documento não existe, criando...');
       const user = auth.currentUser;
       currentUserData = {
         name: user.displayName||'Usuário',
@@ -501,7 +502,8 @@ async function loadUserData(uid){
     updateCreditsUI();
     return currentUserData;
   }catch(e){
-    console.log('Erro ao carregar dados do usuário:', e);
+    console.error('❌ Erro loadUserData:', e.code, e.message);
+    alert('Erro ao carregar dados: ' + e.code + ' - ' + e.message);
   }
 }
 
