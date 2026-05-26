@@ -740,15 +740,20 @@ function toggleMenu(e){e.stopPropagation();menuDropdown.classList.toggle('hidden
 function closeMenu(){menuDropdown.classList.add('hidden')}
 document.addEventListener('click',function(){closeMenu()});
 
-// Emails admin — fallback de segurança
-const ADMIN_EMAILS = ['starnelsemijoias@gmail.com'];
-
 // Settings - só admin acessa
 async function openAdmin(){
   if(currentUser && !currentUserData?.isAdmin){
     await loadUserData(currentUser.uid);
   }
-  const isAdmin = currentUserData?.isAdmin === true || ADMIN_EMAILS.includes(currentUser?.email?.toLowerCase());
+  // Verifica admin pelo Firestore ou backend
+  let isAdmin = currentUserData?.isAdmin === true;
+  if(!isAdmin && currentUser?.email){
+    try{
+      const r = await fetch('/api/gerar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'checkAdmin',email:currentUser.email})});
+      const j = await r.json();
+      isAdmin = j.isAdmin === true;
+    }catch(e){console.log('Erro ao verificar admin:',e);}
+  }
   if(isAdmin){
     app.style.display='none';
     settings.style.display='block';
