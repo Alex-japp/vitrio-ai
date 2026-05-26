@@ -6,13 +6,13 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido.' });
   if (!process.env.OPENAI_API_KEY) return res.status(500).json({ error: 'API Key não configurada.' });
 
-  const { type, prompt, imageBase64, appPass } = req.body;
+  const { type, prompt, imageBase64, email } = req.body;
 
-  if (type === 'auth') {
-    const validPass = appPass === process.env.APP_PASS;
-    const isAdmin = appPass === process.env.ADMIN_PASS;
-    if (!validPass && !isAdmin) return res.status(401).json({ error: 'Senha incorreta.' });
-    return res.status(200).json({ ok: true, admin: isAdmin });
+  // Verifica se email é admin
+  if (type === 'checkAdmin') {
+    const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase());
+    const isAdmin = adminEmails.includes((email || '').toLowerCase());
+    return res.status(200).json({ isAdmin });
   }
 
   if (type !== 'generate') return res.status(400).json({ error: 'Tipo inválido.' });
@@ -44,18 +44,14 @@ export default async function handler(req, res) {
         tools: [{ type: 'image_generation', size: '1024x1024' }]
       })
     });
-
     if (response.status === 429 && retries > 0) {
       await new Promise(r => setTimeout(r, delay));
       return callOpenAI(retries - 1, delay + 10000);
     }
-
-    // Log do erro real da OpenAI
     if (!response.ok) {
       const errData = await response.json();
       throw new Error(`OpenAI ${response.status}: ${JSON.stringify(errData)}`);
     }
-
     return response;
   }
 
