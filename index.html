@@ -740,7 +740,11 @@ function closeMenu(){menuDropdown.classList.add('hidden')}
 document.addEventListener('click',function(){closeMenu()});
 
 // Settings - só admin acessa
-function openAdmin(){
+async function openAdmin(){
+  // Recarrega dados do usuário para garantir isAdmin atualizado
+  if(currentUser && !currentUserData?.isAdmin){
+    await loadUserData(currentUser.uid);
+  }
   if(currentUserData?.isAdmin){
     app.style.display='none';
     settings.style.display='block';
