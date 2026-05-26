@@ -91,6 +91,32 @@ button,input,textarea{font-family:inherit}
 .bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,820px);height:76px;background:rgba(255,255,255,.95);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;z-index:25;box-shadow:0 -8px 26px rgba(17,18,39,.06)}.nav{flex:1;border:0;background:transparent;color:var(--ink);font-size:10px;font-weight:950;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer}.nav svg{width:23px;height:23px;stroke:var(--purple);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}.nav.logout svg{stroke:#D4AF37}.nav:hover svg{filter:drop-shadow(0 3px 8px rgba(123,63,242,.25))}
 .settings{display:none;min-height:100vh;background:#fff;color:var(--ink);padding-bottom:86px}.cfg-head{position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:30}.cfg-title{letter-spacing:.18em;color:var(--ink);font-weight:950}.dark-btn{width:45px;height:45px;border-radius:15px;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:20px;cursor:pointer}.tabs{display:flex;background:#fff;border-bottom:1px solid var(--line)}.tab{flex:1;background:transparent;border:0;color:#6B6B6B;height:58px;font-weight:900;cursor:pointer}.tab.on{color:var(--purple);border-bottom:3px solid var(--purple)}.cfg-body{padding:24px 28px;max-width:720px;margin:0 auto}.cfg-sub{color:var(--muted);font-size:13px;margin:6px 0 18px}.cat-row{background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:12px;box-shadow:0 8px 20px rgba(17,18,39,.04)}.cat-badge{width:44px;height:44px;border-radius:50%;background:var(--grad);display:grid;place-items:center;color:#fff}.cat-info{flex:1}.cat-info strong{display:block}.cat-info small{color:var(--muted)}.icon-btn{border:0;background:transparent;color:var(--ink);font-size:19px;padding:8px;cursor:pointer}.add{width:100%;height:58px;border-radius:18px;border:1.5px solid var(--purple);background:transparent;color:var(--purple);font-weight:950;margin-top:12px;cursor:pointer}.counter{display:grid;grid-template-columns:1fr 1fr;gap:12px}.count-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px;text-align:center;box-shadow:0 8px 20px rgba(17,18,39,.04)}.num{font-size:36px;font-weight:950;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}.cfg-link,.danger{width:100%;height:56px;border-radius:18px;margin-top:12px;font-weight:950;cursor:pointer}.cfg-link{background:transparent;border:1.5px solid var(--gold);color:#9C7410}.danger{background:transparent;border:1.5px solid rgba(255,80,80,.55);color:#ff4f4f}.modal{position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:80;display:none;align-items:flex-end;justify-content:center}.sheet{width:min(100%,520px);background:#fff;color:var(--ink);border-radius:28px 28px 0 0;padding:24px}
 @media(min-width:900px){.modal{align-items:center}.sheet{border-radius:28px;max-width:420px}}.sheet h3{margin-bottom:16px}.sheet .input,.sheet .textarea{margin-bottom:10px}.sheet-actions{display:flex;gap:10px}.sheet-actions button{flex:1;height:54px;border-radius:16px;border:1px solid var(--line);font-weight:950;cursor:pointer}.save{background:var(--grad)!important;color:#fff!important;border:0!important}.hidden{display:none!important}.prm-preview{font-size:12px;color:var(--muted);line-height:1.55;margin-top:6px}.prm-line{margin-top:3px}.prompt-mini{display:block;font-size:12px;font-weight:950;letter-spacing:.12em;text-transform:uppercase;margin:12px 0 6px;color:var(--purple)}
+/* AUTH SCREENS */
+.auth-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 28% 15%,rgba(212,175,55,.20),transparent 28%),radial-gradient(circle at 78% 5%,rgba(123,63,242,.18),transparent 34%),var(--bg);z-index:50;padding:22px;overflow-y:auto}
+.auth-card{width:min(100%,430px);background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:34px;padding:38px 28px;box-shadow:var(--shadow);text-align:center}
+.auth-tabs{display:flex;background:#F5F3EF;border-radius:16px;padding:4px;margin-bottom:28px;gap:4px}
+.auth-tab{flex:1;height:42px;border:0;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;background:transparent;color:var(--muted);transition:.2s}
+.auth-tab.on{background:#fff;color:var(--purple);box-shadow:0 2px 8px rgba(17,18,39,.08)}
+.auth-screen{display:none}
+.auth-screen.on{display:block}
+.google-btn{width:100%;height:52px;border-radius:16px;border:1.5px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:16px;transition:.2s}
+.google-btn:hover{border-color:var(--purple);color:var(--purple)}
+.divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--muted);font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--line)}
+.forgot-link{font-size:12px;color:var(--purple);cursor:pointer;text-decoration:underline;margin-top:8px;display:inline-block}
+.credits-badge{display:flex;align-items:center;gap:6px;background:#F1E8FF;border:1px solid rgba(123,63,242,.2);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;color:var(--purple)}
+.credits-badge.low{background:#FFF0F0;border-color:rgba(255,80,80,.2);color:#ff4f4f}
+.credits-badge.empty{background:#FFE8E8;border-color:#ff4f4f;color:#ff4f4f}
+/* USERS ADMIN */
+.user-row{background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:12px;box-shadow:0 8px 20px rgba(17,18,39,.04);flex-wrap:wrap}
+.user-info{flex:1;min-width:150px}
+.user-info strong{display:block;font-size:14px}
+.user-info small{color:var(--muted);font-size:12px}
+.user-credits{font-size:22px;font-weight:950;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;min-width:40px;text-align:center}
+.plan-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;background:#F1E8FF;color:var(--purple)}
+.add-credits-wrap{display:flex;gap:8px;align-items:center;margin-top:8px;width:100%}
+.add-credits-wrap input{flex:1;height:38px;border-radius:10px;border:1.5px solid var(--line);padding:0 12px;font-size:13px;outline:none}
+.add-credits-wrap button{height:38px;padding:0 14px;border-radius:10px;border:0;background:var(--grad);color:#fff;font-weight:700;cursor:pointer;font-size:13px}
 .opt-tag{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:10px}
 /* SELETOR DE FOTOS COM CHECKBOXES */
 .photo-selector{margin-top:18px}
@@ -160,12 +186,55 @@ button,input,textarea{font-family:inherit}
 <!-- Sync indicator -->
 <div id="syncBadge" class="sync-badge"><div class="sync-dot"></div><span>Sincronizando...</span></div>
 
-<div id="access" class="access"><div class="access-card"><div class="logo-mark">◇</div><div class="brand">VITRIO <span>AI</span></div><div class="sub">Gerador de fotos profissionais</div><input id="pass" class="input" type="password" placeholder="Senha de acesso"><button class="btn btn-main" onclick="login()">✦ Entrar</button><div id="passErr" class="err"></div></div></div>
+<div id="authWrap" class="auth-wrap">
+  <div class="auth-card">
+    <div class="logo-mark">◇</div>
+    <div class="brand">VITRIO <span>AI</span></div>
+    <div class="sub">Gerador de fotos profissionais</div>
+    <div class="auth-tabs">
+      <button class="auth-tab on" onclick="authTab('login',this)">Entrar</button>
+      <button class="auth-tab" onclick="authTab('register',this)">Cadastrar</button>
+    </div>
+    <!-- LOGIN -->
+    <div id="loginScreen" class="auth-screen on">
+      <button class="google-btn" onclick="loginGoogle()">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Continuar com Google
+      </button>
+      <div class="divider">ou</div>
+      <input id="loginEmail" class="input" type="email" placeholder="Email" style="margin-bottom:10px">
+      <input id="loginPass" class="input" type="password" placeholder="Senha">
+      <span class="forgot-link" onclick="forgotPassword()">Esqueci minha senha</span>
+      <button class="btn btn-main" onclick="loginEmail()">✦ Entrar</button>
+      <div id="loginErr" class="err"></div>
+    </div>
+    <!-- CADASTRO -->
+    <div id="registerScreen" class="auth-screen">
+      <button class="google-btn" onclick="loginGoogle()">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Cadastrar com Google
+      </button>
+      <div class="divider">ou</div>
+      <input id="regName" class="input" type="text" placeholder="Seu nome" style="margin-bottom:10px">
+      <input id="regEmail" class="input" type="email" placeholder="Email" style="margin-bottom:10px">
+      <input id="regPass" class="input" type="password" placeholder="Senha (mínimo 6 caracteres)">
+      <button class="btn btn-main" onclick="register()">✦ Criar conta grátis</button>
+      <div style="font-size:11px;color:var(--muted);margin-top:10px">🎁 Ganhe 15 fotos grátis para testar!</div>
+      <div id="regErr" class="err"></div>
+    </div>
+  </div>
+</div>
 <div id="app" class="app phone">
 <header class="header"><div class="head-row"><div class="mini-logo"><div class="mini-mark">◇</div><div><div class="name">VITRIO <span>AI</span></div><div class="caption">Gerador de fotos</div></div></div>
-<button class="menu-btn" onclick="toggleMenu(event)" aria-label="Menu">
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-</button>
+<div style="display:flex;align-items:center;gap:10px">
+  <div id="creditsBadge" class="credits-badge">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    <span id="creditsCount">15</span> fotos
+  </div>
+  <button class="menu-btn" onclick="toggleMenu(event)" aria-label="Menu">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+</div>
 </div></header>
 <div id="menuDropdown" class="menu-dropdown hidden">
   <button onclick="closeMenu();openAdmin()">
@@ -280,11 +349,12 @@ button,input,textarea{font-family:inherit}
   <button class="nav logout" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sair</button>
 </nav>
 </div>
-<div id="settings" class="settings phone"><header class="cfg-head"><button class="dark-btn" onclick="closeSettings()">←</button><div class="cfg-title">CONFIGURAÇÕES</div><button class="dark-btn" onclick="closeSettings()">✓</button></header><div class="tabs"><button class="tab on" onclick="tab('cats',this)">Categorias</button><button id="promptsTabBtn" class="tab" onclick="tab('prompts',this)">Prompts</button><button class="tab" onclick="tab('general',this)">Geral</button></div><main class="cfg-body"><section id="catsTab"><h3>Suas categorias</h3><p class="cfg-sub">Gerencie as categorias dos seus produtos</p><div id="catList"></div><button class="add" onclick="editCat()">+ Nova Categoria</button></section><section id="promptsTab" class="hidden"><h3>Prompts por categoria</h3><p class="cfg-sub">Edite os prompts que guiam cada tipo de foto.</p><div id="promptList"></div></section><section id="generalTab" class="hidden"><h3>Uso do app</h3><p class="cfg-sub">Controle simples para teste beta.</p><div class="counter"><div class="count-card"><div id="cntP" class="num">0</div><small>Produtos</small></div><div class="count-card"><div id="cntI" class="num">0</div><small>Imagens</small></div></div><button class="cfg-link" onclick="feedback()">💬 Enviar feedback</button><button class="danger" onclick="logout()">Sair com segurança</button></section></main><nav class="bottom" style="background:#0f1027;border-color:rgba(255,255,255,.08)"><button class="nav" onclick="tab('cats',document.querySelectorAll('.tab')[0])"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.04.04a2 2 0 1 1-2.83 2.83l-.04-.04A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 1 1-4 0v-.06A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H3a2 2 0 1 1 0-4h.06A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.04-.04A2 2 0 1 1 7.05 3.85l.04.04A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.08V3a2 2 0 1 1 4 0v.06A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04A1.7 1.7 0 0 0 19.4 9c.2.35.52.62.9.75.28.1.58.15.88.15H21a2 2 0 1 1 0 4h-.06c-.3 0-.6.05-.88.15-.38.13-.7.4-.9.75z"></path></svg>Configurações</button><button class="nav" onclick="feedback()"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>Feedback</button><button class="nav logout" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sair</button></nav></div>
+<div id="settings" class="settings phone"><header class="cfg-head"><button class="dark-btn" onclick="closeSettings()">←</button><div class="cfg-title">CONFIGURAÇÕES</div><button class="dark-btn" onclick="closeSettings()">✓</button></header><div class="tabs"><button class="tab on" onclick="tab('cats',this)">Categorias</button><button id="promptsTabBtn" class="tab" onclick="tab('prompts',this)">Prompts</button><button class="tab" onclick="tab('general',this)">Geral</button><button id="usersTabBtn" class="tab hidden" onclick="tab('users',this)">Usuários</button></div><main class="cfg-body"><section id="catsTab"><h3>Suas categorias</h3><p class="cfg-sub">Gerencie as categorias dos seus produtos</p><div id="catList"></div><button class="add" onclick="editCat()">+ Nova Categoria</button></section><section id="promptsTab" class="hidden"><h3>Prompts por categoria</h3><p class="cfg-sub">Edite os prompts que guiam cada tipo de foto.</p><div id="promptList"></div></section><section id="generalTab" class="hidden"><h3>Uso do app</h3><p class="cfg-sub">Controle simples para teste beta.</p><div class="counter"><div class="count-card"><div id="cntP" class="num">0</div><small>Produtos</small></div><div class="count-card"><div id="cntI" class="num">0</div><small>Imagens</small></div></div><button class="cfg-link" onclick="feedback()">💬 Enviar feedback</button><button class="danger" onclick="logout()">Sair com segurança</button></section><section id="usersTab" class="hidden"><h3>Gerenciar usuários</h3><p class="cfg-sub">Gerencie clientes, créditos e planos.</p><div id="userList"><p style="color:var(--muted);font-size:13px">Carregando usuários...</p></div></section></main><nav class="bottom" style="background:#0f1027;border-color:rgba(255,255,255,.08)"><button class="nav" onclick="tab('cats',document.querySelectorAll('.tab')[0])"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.04.04a2 2 0 1 1-2.83 2.83l-.04-.04A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 1 1-4 0v-.06A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H3a2 2 0 1 1 0-4h.06A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.04-.04A2 2 0 1 1 7.05 3.85l.04.04A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.08V3a2 2 0 1 1 4 0v.06A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04A1.7 1.7 0 0 0 19.4 9c.2.35.52.62.9.75.28.1.58.15.88.15H21a2 2 0 1 1 0 4h-.06c-.3 0-.6.05-.88.15-.38.13-.7.4-.9.75z"></path></svg>Configurações</button><button class="nav" onclick="feedback()"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>Feedback</button><button class="nav logout" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sair</button></nav></div>
 <div id="admin" class="modal"><div class="sheet"><h3>Área restrita</h3><input id="adminPass" type="password" class="input" placeholder="Senha admin"><div class="sheet-actions"><button onclick="closeModal('admin')">Cancelar</button><button class="save" onclick="checkAdmin()">Entrar</button></div><div id="adminErr" class="err"></div></div></div>
 <div id="catModal" class="modal"><div class="sheet"><h3 id="catTitle">Categoria</h3><input id="catName" class="input" placeholder="Nome da categoria"><input id="catIcon" class="input" placeholder="Ícone / emoji. Ex: 💍"><div id="promptFields"><span class="prompt-mini">Foto 1</span><textarea id="p1" class="textarea" placeholder="Prompt da foto 1"></textarea><span class="prompt-mini">Foto 2</span><textarea id="p2" class="textarea" placeholder="Prompt da foto 2"></textarea><span class="prompt-mini">Foto 3</span><textarea id="p3" class="textarea" placeholder="Prompt da foto 3"></textarea></div><div class="sheet-actions"><button onclick="closeModal('catModal')">Cancelar</button><button class="save" onclick="saveCat()">Salvar</button></div></div></div>
 <!-- Firebase SDK - carregado antes do app -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script>
 // ============================
@@ -301,12 +371,169 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
-// Mostra/esconde badge de sincronização
+// Sync badge
 function showSync(show){syncBadge.classList.toggle('show',show)}
 
-// Carrega dados do Firebase
+// ============================
+// AUTH FUNCTIONS
+// ============================
+let currentUser = null;
+let currentUserData = null;
+
+// Tabs de login/cadastro
+function authTab(name, btn){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.auth-screen').forEach(s=>s.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById(name==='login'?'loginScreen':'registerScreen').classList.add('on');
+}
+
+// Login com Google
+async function loginGoogle(){
+  try{
+    const provider = new firebase.auth.GoogleAuthProvider();
+    await auth.signInWithPopup(provider);
+  }catch(e){
+    document.getElementById('loginErr').textContent = 'Erro: ' + e.message;
+  }
+}
+
+// Login com email/senha
+async function loginEmail(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginErr');
+  err.textContent = '';
+  if(!email||!pass){err.textContent='Preencha email e senha.';return;}
+  try{
+    await auth.signInWithEmailAndPassword(email, pass);
+  }catch(e){
+    err.textContent = e.code==='auth/wrong-password'||e.code==='auth/user-not-found' ? 'Email ou senha incorretos.' : 'Erro: '+e.message;
+  }
+}
+
+// Cadastro
+async function register(){
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value;
+  const err = document.getElementById('regErr');
+  err.textContent = '';
+  if(!name){err.textContent='Digite seu nome.';return;}
+  if(!email){err.textContent='Digite seu email.';return;}
+  if(pass.length<6){err.textContent='Senha deve ter mínimo 6 caracteres.';return;}
+  try{
+    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+    await cred.user.updateProfile({displayName: name});
+    // Cria documento do usuário no Firestore
+    await db.collection('users').doc(cred.user.uid).set({
+      name, email, plan:'teste', credits:15, totalCredits:15,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      isAdmin: false
+    });
+  }catch(e){
+    err.textContent = e.code==='auth/email-already-in-use' ? 'Email já cadastrado.' : 'Erro: '+e.message;
+  }
+}
+
+// Esqueci a senha
+async function forgotPassword(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const err = document.getElementById('loginErr');
+  if(!email){err.textContent='Digite seu email primeiro.';return;}
+  try{
+    await auth.sendPasswordResetEmail(email);
+    err.style.color='#1A6B3A';
+    err.textContent='Email de recuperação enviado! Verifique sua caixa de entrada.';
+  }catch(e){
+    err.style.color='#c23';
+    err.textContent='Email não encontrado.';
+  }
+}
+
+// Logout
+function logout(){
+  auth.signOut();
+  settings.style.display='none';
+}
+
+// Carrega dados do usuário
+async function loadUserData(uid){
+  try{
+    const snap = await db.collection('users').doc(uid).get();
+    if(snap.exists){
+      currentUserData = snap.data();
+    } else {
+      // Cria documento se não existir (ex: login Google pela 1ª vez)
+      const user = auth.currentUser;
+      currentUserData = {
+        name: user.displayName||'Usuário',
+        email: user.email,
+        plan:'teste', credits:15, totalCredits:15,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        isAdmin: false
+      };
+      await db.collection('users').doc(uid).set(currentUserData);
+    }
+    updateCreditsUI();
+    return currentUserData;
+  }catch(e){
+    console.log('Erro ao carregar dados do usuário:', e);
+  }
+}
+
+// Atualiza UI de créditos
+function updateCreditsUI(){
+  if(!currentUserData) return;
+  const credits = currentUserData.credits || 0;
+  const badge = document.getElementById('creditsBadge');
+  const count = document.getElementById('creditsCount');
+  if(count) count.textContent = credits;
+  if(badge){
+    badge.classList.remove('low','empty');
+    if(credits === 0) badge.classList.add('empty');
+    else if(credits <= 5) badge.classList.add('low');
+  }
+}
+
+// Decrementa créditos após geração
+async function decrementCredits(qty){
+  if(!currentUser || !currentUserData) return;
+  const newCredits = Math.max(0, (currentUserData.credits||0) - qty);
+  currentUserData.credits = newCredits;
+  updateCreditsUI();
+  await db.collection('users').doc(currentUser.uid).update({credits: newCredits});
+}
+
+// Auth state listener
+auth.onAuthStateChanged(async (user) => {
+  if(user){
+    currentUser = user;
+    authWrap.style.display = 'none';
+    app.style.display = 'block';
+    await loadUserData(user.uid);
+    await loadFromFirebase();
+    render();
+    // Mostra painel admin se for admin
+    if(currentUserData?.isAdmin){
+      if(promptsTabBtn) promptsTabBtn.style.display='';
+      if(usersTabBtn) usersTabBtn.classList.remove('hidden');
+    }
+  } else {
+    currentUser = null;
+    currentUserData = null;
+    authWrap.style.display = 'flex';
+    app.style.display = 'none';
+    settings.style.display = 'none';
+  }
+});
+
+// ============================
+// FIREBASE DATA
+// ============================
 async function loadFromFirebase(){
   try{
     showSync(true);
@@ -318,33 +545,24 @@ async function loadFromFirebase(){
       if(data.cntI !== undefined) localStorage.setItem('cntI', data.cntI);
     }
   }catch(e){
-    console.log('Firebase offline, usando dados locais');
+    console.log('Firebase offline');
   }finally{
     showSync(false);
   }
 }
 
-// Salva categorias no Firebase
 async function saveCatsToFirebase(){
-  try{
-    showSync(true);
-    await CONFIG_REF.set({cats}, {merge:true});
-  }catch(e){
-    console.log('Erro ao salvar categorias:', e);
-  }finally{
-    showSync(false);
-  }
+  try{showSync(true);await CONFIG_REF.set({cats},{merge:true});}
+  catch(e){console.log('Erro ao salvar:',e);}
+  finally{showSync(false);}
 }
 
-// Salva contadores no Firebase
 async function saveCountToFirebase(){
   try{
-    const p = Number(localStorage.getItem('cntP')||0);
-    const i = Number(localStorage.getItem('cntI')||0);
-    await CONFIG_REF.set({cntP:p, cntI:i}, {merge:true});
-  }catch(e){
-    console.log('Erro ao salvar contadores:', e);
-  }
+    const p=Number(localStorage.getItem('cntP')||0);
+    const i=Number(localStorage.getItem('cntI')||0);
+    await CONFIG_REF.set({cntP:p,cntI:i},{merge:true});
+  }catch(e){console.log('Erro contador:',e);}
 }
 
 // ============================
@@ -356,30 +574,10 @@ let cats=defaults, editId=null, editMode='cat';
 let state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],selectedPhotos:[1,2,3]};
 
 async function init(){
-  // Oculta aba Prompts se não for admin
-  if(localStorage.getItem('vitrioAdmin')!=='1'){
-    if(promptsTabBtn) promptsTabBtn.style.display='none';
-  }
-  // Mostra app imediatamente com dados locais
-  if(localStorage.getItem('vitrioAccess')==='1'){access.style.display='none';app.style.display='block'}
-  render();
-  // Depois carrega do Firebase e atualiza
-  await loadFromFirebase();
+  if(promptsTabBtn) promptsTabBtn.style.display='none';
   render();
 }
 
-async function login(){
-  passErr.textContent='';
-  try{
-    const r=await fetch('/api/gerar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'auth',appPass:pass.value})});
-    const j=await r.json();
-    if(!r.ok||!j.ok){passErr.textContent='Senha incorreta.';return;}
-    localStorage.setItem('vitrioAccess','1');
-    localStorage.setItem('vitrioAdmin', j.admin?'1':'0');
-    access.style.display='none';app.style.display='block';
-  }catch(e){passErr.textContent='Erro de conexão.';}
-}
-function logout(){localStorage.removeItem('vitrioAccess');localStorage.removeItem('vitrioAdmin');settings.style.display='none';app.style.display='none';access.style.display='flex';pass.value='';passErr.textContent='';window.scrollTo(0,0)}
 function feedback(){window.open(FB,'_blank')}
 
 function render(){
@@ -394,7 +592,13 @@ function render(){
 }
 
 function selectCat(id){state.cat=cats.find(c=>c.id===id);render()}
-function ready(){genBtn.disabled=!(state.cat&&state.code&&state.b64&&state.selectedPhotos.length>0)}
+function ready(){
+  const hasCredits = (currentUserData?.credits||0) > 0;
+  genBtn.disabled=!(state.cat&&state.code&&state.b64&&state.selectedPhotos.length>0&&hasCredits);
+  if((currentUserData?.credits||0)===0){
+    error.textContent='⚠️ Seus créditos acabaram! Entre em contato para adquirir mais fotos.';
+  }
+}
 function readFile(f){if(!f)return;state.mime=f.type||'image/jpeg';const r=new FileReader();r.onload=e=>{state.b64=e.target.result.split(',')[1];preview.src=e.target.result;preview.style.display='block';uEmpty.style.display='none';upload.classList.add('has-img');ready()};r.readAsDataURL(f)}
 function clearPhoto(e){e?.stopPropagation();state.b64='';state.mime='image/jpeg';file.value='';preview.removeAttribute('src');preview.style.display='none';uEmpty.style.display='block';upload.classList.remove('has-img');ready()}
 function openCamera(e){e.stopPropagation();file.setAttribute('capture','environment');file.click()}
@@ -405,6 +609,10 @@ upload?.addEventListener('drop',e=>{e.preventDefault();readFile(e.dataTransfer.f
 async function toBase64PNG(b64,mime){return new Promise(resolve=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.getContext('2d').drawImage(img,0,0);resolve(c.toDataURL('image/png').split(',')[1])};img.src=`data:${mime};base64,${b64}`});}
 
 async function generate(){
+  if((currentUserData?.credits||0) < state.selectedPhotos.length){
+    error.textContent='⚠️ Créditos insuficientes! Você tem '+(currentUserData?.credits||0)+' foto(s) disponível(is).';
+    return;
+  }
   error.textContent='';progress.style.display='block';
   if(window.innerWidth<900)results.style.display='none';
   genBtn.disabled=true;bar.style.width='10%';ptext.textContent='Preparando imagem...';
@@ -412,19 +620,19 @@ async function generate(){
     const pngB64=await toBase64PNG(state.b64,state.mime);
     state.imgs=[];
     const photos=state.selectedPhotos;
-    let photo1Result=null; // Foto 1 gerada para usar como referência nas fotos 2 e 3
+    let photo1Result=null;
     for(let idx=0;idx<photos.length;idx++){
       const photoNum=photos[idx];
       bar.style.width=(10+(idx+1)*(85/photos.length))+'%';
       ptext.textContent=`Gerando foto ${idx+1} de ${photos.length}...`;
       let prompt=(state.cat['p'+photoNum]||'Foto profissional de semijoia')+(state.obs?'\nObservações: '+state.obs:'');
-      // Fotos 2 e 3 usam a Foto 1 gerada como referência (se disponível)
-      const imageToUse = (photoNum>1 && photo1Result) ? photo1Result : pngB64;
+      const imageToUse=(photoNum>1&&photo1Result)?photo1Result:pngB64;
       let g=await api('generate',{prompt,imageBase64:imageToUse});
-      if(photoNum===1) photo1Result=g.b64_json; // Salva foto 1 para as próximas
+      if(photoNum===1) photo1Result=g.b64_json;
       state.imgs.push({b64:g.b64_json,name:`${state.code}-foto${photoNum}.jpg`});
     }
     bar.style.width='100%';ptext.textContent='Pronto!';
+    await decrementCredits(photos.length);
     addCount();showResults();
   }catch(e){error.textContent='Erro: '+e.message;genBtn.disabled=false}
   finally{setTimeout(()=>progress.style.display='none',500)}
@@ -433,6 +641,9 @@ async function generate(){
 async function api(type,data){const res=await fetch('/api/gerar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,...data})});if(!res.ok)throw new Error('Falha na função');const j=await res.json();if(j.error)throw new Error(j.error);return j}
 
 async function regenerate(i){
+  if((currentUserData?.credits||0) < 1){
+    error.textContent='⚠️ Créditos insuficientes!';return;
+  }
   const photoNum=i+1;
   error.textContent='';progress.style.display='block';bar.style.width='20%';ptext.textContent='Preparando imagem...';
   const cards=document.querySelectorAll('.res');
@@ -444,6 +655,7 @@ async function regenerate(i){
     let g=await api('generate',{prompt,imageBase64:pngB64});
     state.imgs[i]={b64:g.b64_json,name:`${state.code}-foto${photoNum}.jpg`};
     bar.style.width='100%';ptext.textContent='Pronto!';
+    await decrementCredits(1);
     showResults();
   }catch(e){error.textContent='Erro ao gerar foto '+(i+1)+': '+e.message;showResults();}
   finally{setTimeout(()=>progress.style.display='none',500)}
@@ -451,7 +663,7 @@ async function regenerate(i){
 
 function showResults(){
   if(resultsPlaceholder) resultsPlaceholder.style.display='none';
-  grid.setAttribute('data-qty', state.selectedPhotos.length);
+  grid.setAttribute('data-qty',state.selectedPhotos.length);
   const regenSvg=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>`;
   grid.innerHTML=state.imgs.map((im,i)=>`<div class="res"><img src="data:image/jpeg;base64,${im.b64}"><button class="regen-btn" onclick="regenerate(${i})" title="Gerar novamente">${regenSvg}</button><button class="dl-btn" onclick="download(${i})">Baixar</button></div>`).join('');
   results.style.display='block';
@@ -466,7 +678,6 @@ function resetForm(){
   upload.classList.remove('has-img');
   results.style.display='none';
   if(resultsPlaceholder) resultsPlaceholder.style.display='';
-  // Reset checkboxes
   const ca=document.getElementById('checkAll');if(ca){ca.checked=true;document.getElementById('labelAll')?.classList.add('checked');}
   document.getElementById('individualChecks')?.classList.add('hidden');
   [1,2,3].forEach(n=>{const c=document.getElementById('check'+n);if(c){c.checked=true;document.getElementById('label'+n)?.classList.add('checked');}});
@@ -480,60 +691,35 @@ function addCount(){
   saveCountToFirebase();
 }
 
-function toggleAll(cb){
-  const individual=document.getElementById('individualChecks');
-  document.getElementById('labelAll')?.classList.toggle('checked',cb.checked);
-  if(cb.checked){
-    individual.classList.add('hidden');
-    state.selectedPhotos=[1,2,3];
-    [1,2,3].forEach(n=>{
-      const c=document.getElementById('check'+n);
-      if(c){c.checked=true;document.getElementById('label'+n)?.classList.add('checked');}
-    });
-  }else{
-    individual.classList.remove('hidden');
-    updateSelection();
-  }
-  ready();
-}
-
-function updateSelection(){
-  state.selectedPhotos=[1,2,3].filter(n=>{
-    const c=document.getElementById('check'+n);
-    document.getElementById('label'+n)?.classList.toggle('checked', c&&c.checked);
-    return c&&c.checked;
-  });
-  // Se todas marcadas, marca "Gerar todas"
-  const ca=document.getElementById('checkAll');
-  if(ca){
-    ca.checked=state.selectedPhotos.length===3;
-    document.getElementById('labelAll')?.classList.toggle('checked',ca.checked);
-  }
-  ready();
-}
 function toggleMenu(e){e.stopPropagation();menuDropdown.classList.toggle('hidden')}
 function closeMenu(){menuDropdown.classList.add('hidden')}
 document.addEventListener('click',function(){closeMenu()});
-function openAdmin(){admin.style.display='flex'}
-async function checkAdmin(){
-  adminErr.textContent='';
-  try{
-    const r=await fetch('/api/gerar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'auth',appPass:adminPass.value})});
-    const j=await r.json();
-    if(!r.ok||!j.ok||!j.admin){adminErr.textContent='Senha incorreta.';return;}
-    localStorage.setItem('vitrioAdmin','1');
-    closeModal('admin');app.style.display='none';settings.style.display='block';
-    // Mostra aba Prompts para admin
+
+// Settings - só admin acessa
+function openAdmin(){
+  if(currentUserData?.isAdmin){
+    app.style.display='none';
+    settings.style.display='block';
     if(promptsTabBtn) promptsTabBtn.style.display='';
-  }catch(e){adminErr.textContent='Erro de conexão.';}
+    if(usersTabBtn) usersTabBtn.classList.remove('hidden');
+  } else {
+    alert('Acesso restrito ao administrador.');
+  }
 }
-function closeSettings(){settings.style.display='none';app.style.display='block'}
+
+function closeSettings(){settings.style.display='none';app.style.display='block';}
 function closeModal(id){document.getElementById(id).style.display='none';if(id==='catModal'){catName.style.display='block';catIcon.style.display='block';promptFields.style.display='block';editMode='cat';}}
-function tab(name,btn){['cats','prompts','general'].forEach(n=>document.getElementById(n+'Tab').classList.add('hidden'));document.getElementById(name+'Tab').classList.remove('hidden');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn?.classList.add('on')}
+function tab(name,btn){
+  ['cats','prompts','general','users'].forEach(n=>{const el=document.getElementById(n+'Tab');if(el)el.classList.add('hidden');});
+  document.getElementById(name+'Tab').classList.remove('hidden');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  btn?.classList.add('on');
+  if(name==='users') loadUsers();
+}
+
 function editCat(id){editCatInfo(id)}
 function editCatInfo(id){editMode='cat';editId=id||null;let c=cats.find(x=>x.id===id)||{name:'',icon:'',p1:'Foto profissional em fundo branco, estilo catálogo premium.',p2:'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:'Close detalhado mostrando brilho, textura e acabamento da peça.'};catTitle.textContent=editId?'Editar categoria':'Nova categoria';catName.value=c.name;catIcon.value=c.icon;p1.value=c.p1;p2.value=c.p2;p3.value=c.p3;promptFields.style.display='none';catModal.style.display='flex'}
 function editPrompt(id){editMode='prompt';editId=id;let c=cats.find(x=>x.id===id);if(!c)return;catTitle.textContent='Prompts — '+c.name;catName.value=c.name;catIcon.value=c.icon;catName.style.display='none';catIcon.style.display='none';p1.value=c.p1||'';p2.value=c.p2||'';p3.value=c.p3||'';promptFields.style.display='block';catModal.style.display='flex'}
-
 function saveCat(){
   let current=cats.find(c=>c.id===editId);
   if(editMode==='prompt'){
@@ -545,47 +731,95 @@ function saveCat(){
     if(!obj.name)return alert('Digite o nome.');
     if(editId)cats=cats.map(c=>c.id===editId?obj:c);else cats.push(obj);
   }
-  saveCatsToFirebase(); // Salva no Firebase
+  saveCatsToFirebase();
   closeModal('catModal');
   catName.style.display='block';catIcon.style.display='block';promptFields.style.display='block';
   render();
 }
-
-function delCat(id){
-  if(confirm('Excluir categoria?')){
-    cats=cats.filter(c=>c.id!==id);
-    saveCatsToFirebase(); // Salva no Firebase
-    render();
-  }
+function delCat(id){if(confirm('Excluir categoria?')){cats=cats.filter(c=>c.id!==id);saveCatsToFirebase();render();}}
+function moveCat(id,dir){
+  const idx=cats.findIndex(c=>c.id===id);if(idx<0)return;
+  const newIdx=idx+dir;if(newIdx<0||newIdx>=cats.length)return;
+  const temp=cats[idx];cats[idx]=cats[newIdx];cats[newIdx]=temp;
+  saveCatsToFirebase();render();
 }
 
-function moveCat(id,dir){
-  const idx=cats.findIndex(c=>c.id===id);
-  if(idx<0)return;
-  const newIdx=idx+dir;
-  if(newIdx<0||newIdx>=cats.length)return;
-  const temp=cats[idx];cats[idx]=cats[newIdx];cats[newIdx]=temp;
-  saveCatsToFirebase(); // Salva no Firebase
-  render();
+function toggleAll(cb){
+  const individual=document.getElementById('individualChecks');
+  document.getElementById('labelAll')?.classList.toggle('checked',cb.checked);
+  if(cb.checked){
+    individual.classList.add('hidden');state.selectedPhotos=[1,2,3];
+    [1,2,3].forEach(n=>{const c=document.getElementById('check'+n);if(c){c.checked=true;document.getElementById('label'+n)?.classList.add('checked');}});
+  }else{individual.classList.remove('hidden');updateSelection();}
+  ready();
+}
+
+function updateSelection(){
+  state.selectedPhotos=[1,2,3].filter(n=>{
+    const c=document.getElementById('check'+n);
+    document.getElementById('label'+n)?.classList.toggle('checked',c&&c.checked);
+    return c&&c.checked;
+  });
+  const ca=document.getElementById('checkAll');
+  if(ca){ca.checked=state.selectedPhotos.length===3;document.getElementById('labelAll')?.classList.toggle('checked',ca.checked);}
+  ready();
 }
 
 function updateObsCounter(el){
   const count=el.value.length;
   const counter=document.getElementById('obsCount');
-  if(counter){
-    counter.textContent=count;
-    counter.style.color=count>=20?'#c23':'var(--muted)';
-  }
+  if(counter){counter.textContent=count;counter.style.color=count>=20?'#c23':'var(--muted)';}
 }
 
-// Service Worker — notifica atualização
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.addEventListener('controllerchange',()=>{
-    window.location.reload();
-  });
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{window.location.reload();});
 }
 
 function scrollChips(dir){document.getElementById('chips').scrollBy({left:dir*260,behavior:'smooth'});}
+
+// ============================
+// ADMIN — GERENCIAR USUÁRIOS
+// ============================
+async function loadUsers(){
+  const list = document.getElementById('userList');
+  if(!list) return;
+  list.innerHTML='<p style="color:var(--muted);font-size:13px">Carregando...</p>';
+  try{
+    const snap = await db.collection('users').orderBy('createdAt','desc').get();
+    if(snap.empty){list.innerHTML='<p style="color:var(--muted);font-size:13px">Nenhum usuário cadastrado ainda.</p>';return;}
+    list.innerHTML = snap.docs.map(doc=>{
+      const u = doc.data();
+      const uid = doc.id;
+      const planLabel = {teste:'Teste',starter:'Starter',pro:'Pro',business:'Business',premium:'Premium'}[u.plan]||u.plan;
+      return `<div class="user-row">
+        <div class="user-info">
+          <strong>${u.name||'Sem nome'}</strong>
+          <small>${u.email} ${u.isAdmin?'👑 Admin':''}</small>
+          <span class="plan-badge">${planLabel}</span>
+        </div>
+        <div class="user-credits">${u.credits||0}</div>
+        <div class="add-credits-wrap">
+          <input type="number" id="credits_${uid}" placeholder="Qtd de fotos" min="1">
+          <button onclick="addCredits('${uid}')">+ Adicionar</button>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){list.innerHTML='<p style="color:#c23">Erro ao carregar usuários.</p>';}
+}
+
+async function addCredits(uid){
+  const input = document.getElementById('credits_'+uid);
+  const qty = parseInt(input?.value);
+  if(!qty||qty<1){alert('Digite uma quantidade válida.');return;}
+  try{
+    const snap = await db.collection('users').doc(uid).get();
+    const current = snap.data()?.credits || 0;
+    await db.collection('users').doc(uid).update({credits: current + qty});
+    alert(`✅ ${qty} fotos adicionadas com sucesso!`);
+    input.value = '';
+    loadUsers();
+  }catch(e){alert('Erro ao adicionar créditos: '+e.message);}
+}
 
 init();
 </script>
