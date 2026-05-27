@@ -258,7 +258,7 @@ button,input,textarea{font-family:inherit}
 <div id="app" class="app phone">
 <header class="header"><div class="head-row"><div class="mini-logo"><div class="mini-mark">◇</div><div><div class="name">VITRIO <span>AI</span></div><div class="caption">Gerador de fotos</div></div></div>
 <div style="display:flex;align-items:center;gap:10px">
-  <div id="creditsBadge" class="credits-badge">
+  <div id="creditsBadge" class="credits-badge" onclick="if((currentUserData?.credits||0)===0)openPlans()" style="cursor:default">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
     <span id="creditsCount">15</span> fotos
   </div>
@@ -268,6 +268,10 @@ button,input,textarea{font-family:inherit}
 </div>
 </div></header>
 <div id="menuDropdown" class="menu-dropdown hidden">
+  <button onclick="closeMenu();openPlans()" style="color:var(--purple);font-weight:900">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+    Comprar fotos
+  </button>
   <button onclick="closeMenu();openAdmin()">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.04.04a2 2 0 1 1-2.83 2.83l-.04-.04A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 1 1-4 0v-.06A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H3a2 2 0 1 1 0-4h.06A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.04-.04A2 2 0 1 1 7.05 3.85l.04.04A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.08V3a2 2 0 1 1 4 0v.06A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04A1.7 1.7 0 0 0 19.4 9c.2.35.52.62.9.75.28.1.58.15.88.15H21a2 2 0 1 1 0 4h-.06c-.3 0-.6.05-.88.15-.38.13-.7.4-.9.75z"/></svg>
     Configurações
@@ -544,20 +548,25 @@ function updateCreditsUI(){
   const credits = currentUserData.credits || 0;
   const badge = document.getElementById('creditsBadge');
   const count = document.getElementById('creditsCount');
-  // Admin: mostra badge especial
   if(currentUserData.isAdmin){
-    if(badge){
-      badge.className='admin-badge';
-      badge.innerHTML='👑 Admin ◇';
-    }
+    if(badge){badge.className='admin-badge';badge.innerHTML='👑 Admin ◇';badge.style.cursor='default';}
     return;
   }
   if(count) count.textContent = credits;
   if(badge){
     badge.className='credits-badge';
     badge.classList.remove('low','empty');
-    if(credits === 0) badge.classList.add('empty');
-    else if(credits <= 5) badge.classList.add('low');
+    if(credits === 0){
+      badge.classList.add('empty');
+      badge.style.cursor='pointer';
+      badge.title='Clique para comprar mais fotos';
+      badge.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> + Comprar fotos';
+    } else {
+      badge.style.cursor='default';
+      badge.title='';
+      badge.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span id="creditsCount">${credits}</span> fotos`;
+      if(credits <= 5) badge.classList.add('low');
+    }
   }
 }
 
@@ -657,6 +666,8 @@ async function saveCountToFirebase(){
 // APP
 // ============================
 const FB='https://docs.google.com/forms/d/e/1FAIpQLScwQ1g4VlZUOz0mAQ2OSwRG0lVtxhEPE1mHg50DGkHPzO6gpA/viewform';
+// ⬇️ COLOQUE SEU NÚMERO DE WHATSAPP AQUI (somente números, com DDD e DDI ex: 5537999999999)
+const WHATSAPP_NUMBER = '5537999096812';
 const defaults=[['Anéis'],['Brincos'],['Colares'],['Pulseiras'],['Pingentes']].map((x,i)=>({id:'c'+i,name:x[0],icon:'',p1:'Foto profissional em fundo branco, estilo catálogo premium.',p2:'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:'Close detalhado mostrando brilho, textura e acabamento da peça.'}));
 let cats=defaults, editId=null, editMode='cat';
 let state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],selectedPhotos:[1,2,3]};
@@ -1097,6 +1108,83 @@ init();
 <script>
 function openTerms(){document.getElementById('termsModal').style.display='flex';}
 function closeTerms(){document.getElementById('termsModal').style.display='none';}
+</script>
+
+<!-- MODAL PLANOS -->
+<div id="plansModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closePlans()">
+  <div style="width:min(100%,820px);background:#fff;border-radius:28px 28px 0 0;padding:28px 24px 40px;max-height:90vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div style="font-size:17px;font-weight:900">◇ Escolha seu plano</div>
+      <button onclick="closePlans()" style="width:38px;height:38px;border-radius:12px;border:1px solid #E8E2D6;background:#fff;font-size:20px;cursor:pointer;display:grid;place-items:center">×</button>
+    </div>
+    <div style="font-size:13px;color:#888;margin-bottom:20px">Créditos não expiram · Sem mensalidade · Sem cartão</div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+
+      <!-- STARTER -->
+      <div class="plan-card" onclick="buyPlan('Starter','30 fotos','R$19')">
+        <div class="plan-info"><div class="plan-name">Starter</div><div class="plan-desc">30 fotos · 90 dias</div></div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="plan-price">R$19</div>
+          <div class="plan-btn">Quero este</div>
+        </div>
+      </div>
+
+      <!-- PRO -->
+      <div class="plan-card plan-featured" onclick="buyPlan('Pro','100 fotos','R$39')">
+        <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--grad);color:#fff;font-size:10px;font-weight:800;padding:3px 14px;border-radius:20px;white-space:nowrap;letter-spacing:.05em">⭐ MAIS POPULAR</div>
+        <div class="plan-info"><div class="plan-name" style="color:var(--purple)">Pro</div><div class="plan-desc">100 fotos · 90 dias</div></div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="plan-price" style="color:var(--purple)">R$39</div>
+          <div class="plan-btn plan-btn-featured">Quero este</div>
+        </div>
+      </div>
+
+      <!-- BUSINESS -->
+      <div class="plan-card" onclick="buyPlan('Business','200 fotos','R$69')">
+        <div class="plan-info"><div class="plan-name">Business</div><div class="plan-desc">200 fotos · 90 dias</div></div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="plan-price">R$69</div>
+          <div class="plan-btn">Quero este</div>
+        </div>
+      </div>
+
+      <!-- PREMIUM -->
+      <div class="plan-card" onclick="buyPlan('Premium','300 fotos','R$89')">
+        <div class="plan-info"><div class="plan-name">Premium</div><div class="plan-desc">300 fotos · 90 dias</div></div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="plan-price">R$89</div>
+          <div class="plan-btn">Quero este</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="background:#F3F0FF;border-radius:14px;padding:12px 16px;margin-top:16px;text-align:center">
+      <div style="font-size:12px;color:var(--purple);font-weight:700">💬 Ao clicar em "Quero este" você será direcionado ao WhatsApp para finalizar</div>
+    </div>
+  </div>
+</div>
+
+<style>
+.plan-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:.15s;position:relative}
+.plan-card:hover{border-color:var(--purple);transform:translateY(-1px);box-shadow:0 8px 24px rgba(123,63,242,.12)}
+.plan-featured{border:2px solid var(--purple)}
+.plan-info{flex:1}
+.plan-name{font-size:15px;font-weight:900}
+.plan-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.plan-price{font-size:17px;font-weight:900;min-width:40px;text-align:right}
+.plan-btn{background:#F1E8FF;color:var(--purple);border-radius:10px;padding:8px 14px;font-size:12px;font-weight:800;white-space:nowrap}
+.plan-btn-featured{background:var(--grad);color:#fff}
+</style>
+
+<script>
+function openPlans(){document.getElementById('plansModal').style.display='flex';}
+function closePlans(){document.getElementById('plansModal').style.display='none';}
+function buyPlan(name, fotos, preco){
+  const msg = encodeURIComponent(`Olá! Quero assinar o plano *${name}* — ${fotos} por ${preco}. Poderia me ajudar?`);
+  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`,'_blank');
+}
 </script>
 
 </body>
