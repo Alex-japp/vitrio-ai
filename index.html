@@ -287,6 +287,16 @@ button,input,textarea{font-family:inherit}
   <button onclick="document.getElementById('ajusteFinoBanner').style.display='none';openOnboarding();obShow(1)" style="background:var(--purple);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">Ajuste fino →</button>
   <button onclick="document.getElementById('ajusteFinoBanner').style.display='none';db.collection('users').doc(currentUser.uid).update({onboardingDone:true});currentUserData.onboardingDone=true" style="background:transparent;border:none;color:#aaa;font-size:20px;cursor:pointer;padding:0 4px;line-height:1">×</button>
 </div>
+
+<div id="lowCreditsBanner" style="display:none;background:#FFF8E8;border-bottom:1px solid rgba(230,150,0,.2);padding:10px 20px;align-items:center;gap:12px">
+  <div style="font-size:18px">⚠️</div>
+  <div style="flex:1">
+    <div style="font-size:13px;font-weight:700;color:#9B5E10">Seu saldo está acabando!</div>
+    <div style="font-size:12px;color:#888">Você tem <strong id="lowCreditsCount">0</strong> fotos restantes — recarregue para continuar.</div>
+  </div>
+  <button onclick="document.getElementById('lowCreditsBanner').style.display='none';openPlans()" style="background:#E67E00;color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">Ver planos →</button>
+  <button onclick="document.getElementById('lowCreditsBanner').style.display='none'" style="background:transparent;border:none;color:#aaa;font-size:20px;cursor:pointer;padding:0 4px;line-height:1">×</button>
+</div>
 <div id="menuDropdown" class="menu-dropdown hidden">
   <div class="menu-profile">
     <div class="menu-profile-avatar"><div id="menuAvatarSmall" class="avatar-inner" style="width:44px;height:44px">◇</div></div>
@@ -602,6 +612,17 @@ function updateCreditsUI(){
       if(credits <= 5) badge.classList.add('low');
     }
   }
+  // Notificação saldo baixo
+  const lowBanner = document.getElementById('lowCreditsBanner');
+  const lowCount = document.getElementById('lowCreditsCount');
+  if(lowBanner && !currentUserData.isAdmin){
+    if(credits > 0 && credits <= 5){
+      if(lowCount) lowCount.textContent = credits;
+      lowBanner.style.display = 'flex';
+    } else {
+      lowBanner.style.display = 'none';
+    }
+  }
 }
 
 function updateAvatar(){
@@ -836,7 +857,16 @@ async function generate(){
       const photoNum=photos[idx];
       bar.style.width=(10+(idx+1)*(85/photos.length))+'%';
       ptext.textContent=`Gerando foto ${idx+1} de ${photos.length}...`;
-      let prompt=(state.cat['p'+photoNum]||'Foto profissional de semijoia')+(state.obs?'\nObservações: '+state.obs:'');
+      // Usa prompt personalizado aprovado se disponível, senão usa o global da categoria
+      const customPrompts = currentUserData?.customPrompts;
+      const customApproved = currentUserData?.customPromptsApproved;
+      let catPrompt;
+      if(customApproved && customPrompts?.['p'+photoNum]){
+        catPrompt = customPrompts['p'+photoNum];
+      } else {
+        catPrompt = state.cat['p'+photoNum] || 'Foto profissional de semijoia';
+      }
+      let prompt = catPrompt + (state.obs ? '\nObservações: '+state.obs : '');
       const imageToUse=(photoNum>1&&photo1Result)?photo1Result:pngB64;
       let g=await api('generate',{prompt,imageBase64:imageToUse});
       if(photoNum===1) photo1Result=g.b64_json;
@@ -883,7 +913,15 @@ async function regenerate(i){
   try{
     const pngB64=await toBase64PNG(state.b64,state.mime);
     bar.style.width='60%';ptext.textContent='Gerando foto 1 de 1...';
-    let prompt=(state.cat['p'+photoNum]||'Foto profissional de semijoia')+(state.obs?'\nObservações: '+state.obs:'');
+    const customPrompts = currentUserData?.customPrompts;
+    const customApproved = currentUserData?.customPromptsApproved;
+    let catPrompt;
+    if(customApproved && customPrompts?.['p'+photoNum]){
+      catPrompt = customPrompts['p'+photoNum];
+    } else {
+      catPrompt = state.cat['p'+photoNum] || 'Foto profissional de semijoia';
+    }
+    let prompt = catPrompt + (state.obs ? '\nObservações: '+state.obs : '');
     let g=await api('generate',{prompt,imageBase64:pngB64});
     state.imgs[i]={b64:g.b64_json,name:`${state.code}-foto${photoNum}.jpg`};
     bar.style.width='100%';ptext.textContent='Pronto!';
