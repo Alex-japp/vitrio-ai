@@ -140,7 +140,13 @@ button,input,textarea{font-family:inherit}
 .btn-del{background:#fff0f0;color:#c23;border:1px solid rgba(255,80,80,.3)!important}
 .add-credits-wrap{display:flex;gap:8px;align-items:center;width:100%}
 .add-credits-wrap input{flex:1;height:36px;border-radius:10px;border:1.5px solid var(--line);padding:0 12px;font-size:13px;outline:none}
-.export-bar{display:flex;justify-content:flex-end;margin-bottom:14px}
+.prompt-status{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-block}
+.ps-none{background:#F0EFE9;color:#888}
+.ps-pending{background:#FFF3CD;color:#856404}
+.ps-active{background:#D4EDDA;color:#155724}
+.ps-default{background:#E8F4FE;color:#0C547C}
+.btn-manage-prompts{width:100%;height:36px;border-radius:10px;border:1.5px solid var(--purple);background:transparent;color:var(--purple);font-weight:700;font-size:12px;cursor:pointer;margin-top:8px;transition:.2s}
+.btn-manage-prompts:hover{background:var(--grad);color:#fff;border-color:transparent}
 .btn-export{height:38px;padding:0 18px;border-radius:12px;border:1.5px solid var(--purple);background:transparent;color:var(--purple);font-weight:700;font-size:13px;cursor:pointer}
 .btn-export:hover{background:var(--grad);color:#fff;border-color:transparent}
 /* MENSAGEM CRÉDITOS ESGOTADOS */
@@ -1075,6 +1081,13 @@ function scrollChips(dir){document.getElementById('chips').scrollBy({left:dir*26
 // ============================
 let allUsers = []; // cache para exportação CSV
 
+function getPromptStatus(u){
+  if(!u.onboardingData) return {label:'⚪ Sem onboarding', cls:'ps-none'};
+  if(u.customPromptsApproved) return {label:'🟢 Prompts ativos', cls:'ps-active'};
+  if(u.customPrompts) return {label:'🟡 Aguardando revisão', cls:'ps-pending'};
+  return {label:'🔵 Usando padrão', cls:'ps-default'};
+}
+
 async function loadUsers(){
   const list = document.getElementById('userList');
   if(!list) return;
@@ -1092,6 +1105,7 @@ async function loadUsers(){
     allUsers.map(u=>{
       const uid = u.uid;
       const active = u.active !== false;
+      const ps = getPromptStatus(u);
       const planOpts = planOptions.map(p=>`<option value="${p}" ${u.plan===p?'selected':''}>${planLabel[p]}</option>`).join('');
       return `<div class="user-row" id="row_${uid}">
         <div class="user-row-top">
@@ -1099,8 +1113,11 @@ async function loadUsers(){
             <strong>${u.name||'Sem nome'} ${u.isAdmin?'👑':''}</strong>
             <small>${u.email}</small>
             ${u.whatsapp?`<small>📱 ${u.whatsapp}</small>`:''}
-            <span class="plan-badge">${planLabel[u.plan]||u.plan}</span>
-            <span class="status-badge ${active?'active':'inactive'}">${active?'✓ Ativo':'✗ Inativo'}</span>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+              <span class="plan-badge">${planLabel[u.plan]||u.plan}</span>
+              <span class="status-badge ${active?'active':'inactive'}">${active?'✓ Ativo':'✗ Inativo'}</span>
+              <span class="prompt-status ${ps.cls}">${ps.label}</span>
+            </div>
           </div>
           <div class="user-credits">${u.credits||0}</div>
         </div>
@@ -1113,6 +1130,7 @@ async function loadUsers(){
           <input type="number" id="credits_${uid}" placeholder="Qtd de fotos" min="1">
           <button class="btn-add-cr" onclick="addCredits('${uid}')">+ Adicionar fotos</button>
         </div>
+        ${!u.isAdmin?`<button class="btn-manage-prompts" onclick="openUserPrompts('${uid}')">✎ Gerenciar prompts</button>`:''}
       </div>`;
     }).join('');
   }catch(e){list.innerHTML='<p style="color:#c23">Erro ao carregar usuários: '+e.message+'</p>';}
@@ -1595,6 +1613,219 @@ function showAjusteFino(){
 }
 function showZeroCreditsPopup(){document.getElementById('zeroCreditsPopup').style.display='flex';}
 function closeZeroCredits(){document.getElementById('zeroCreditsPopup').style.display='none';}
+</script>
+
+<!-- MODAL GERENCIAR PROMPTS DO USUÁRIO -->
+<div id="userPromptsModal" style="display:none;position:fixed;inset:0;background:rgba(17,18,39,.7);z-index:300;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto">
+  <div style="width:min(100%,700px);background:#fff;border-radius:28px;padding:28px;box-shadow:0 30px 80px rgba(17,18,39,.2);margin:auto">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div>
+        <div style="font-size:17px;font-weight:900" id="upModalName">Cliente</div>
+        <div style="font-size:12px;color:var(--muted)" id="upModalEmail">email</div>
+      </div>
+      <button onclick="closeUserPrompts()" style="width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:#fff;font-size:20px;cursor:pointer;display:grid;place-items:center">×</button>
+    </div>
+
+    <!-- RESPOSTAS ONBOARDING -->
+    <div id="upOnboarding" style="background:#F9F8F5;border-radius:16px;padding:16px;margin-bottom:20px">
+      <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Respostas do ajuste fino</div>
+      <div id="upOnboardingContent" style="font-size:13px;color:var(--muted)">Sem respostas ainda.</div>
+    </div>
+
+    <!-- PROMPTS POR CATEGORIA -->
+    <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Prompts personalizados por categoria</div>
+    <div id="upPromptsContent"></div>
+
+    <!-- BOTÕES -->
+    <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
+      <button id="upBtnGenerate" class="btn btn-main" onclick="generateUserPrompts()" style="flex:1">🤖 Gerar rascunho com IA</button>
+      <button id="upBtnApprove" class="btn btn-main" onclick="approveUserPrompts()" style="flex:1;background:linear-gradient(135deg,#1A6B3A,#2E9954)">✅ Aprovar e ativar</button>
+      <button id="upBtnDefault" onclick="revertToDefault()" style="height:52px;padding:0 18px;border-radius:16px;border:1.5px solid var(--line);background:#fff;color:#666;font-weight:700;font-size:13px;cursor:pointer;width:100%">↩️ Voltar para padrão</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let currentUpUid = null;
+let currentUpUser = null;
+let upPrompts = {}; // { catId: { p1, p2, p3 } }
+
+async function openUserPrompts(uid){
+  currentUpUid = uid;
+  currentUpUser = allUsers.find(u=>u.uid===uid);
+  if(!currentUpUser) return;
+
+  // Preenche header
+  document.getElementById('upModalName').textContent = currentUpUser.name || 'Sem nome';
+  document.getElementById('upModalEmail').textContent = currentUpUser.email || '';
+
+  // Preenche respostas do onboarding
+  const ob = currentUpUser.onboardingData;
+  const obContent = document.getElementById('upOnboardingContent');
+  if(ob){
+    const rows = [
+      ['O que vende', (ob.pecas||[]).join(', ')],
+      ['Cor do metal', ob.cor||'—'],
+      ['Estilo visual', ob.estilo||'—'],
+      ['Fundo preferido', ob.fundo||'—'],
+      ['Intensidade do brilho', ob.brilho||'—'],
+      ['Acabamento do metal', ob.acabamento||'—'],
+      ['Foco principal', ob.foco||'—'],
+      ['Estilo da modelo', ob.modeloEstilo||'—'],
+      ['Faixa etária', ob.modeloIdade||'—'],
+      ['Posicionamento', ob.posicao||'—'],
+      ['Detalhes extras', ob.extras||'—'],
+    ].filter(r=>r[1]&&r[1]!=='—');
+    obContent.innerHTML = rows.map(r=>`
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #F0EFE9;font-size:13px">
+        <span style="color:var(--muted)">${r[0]}</span>
+        <span style="font-weight:600;color:#111;text-align:right;max-width:60%">${r[1]}</span>
+      </div>`).join('');
+  } else {
+    obContent.innerHTML = '<span style="color:var(--muted);font-size:13px">Cliente ainda não preencheu o ajuste fino.</span>';
+  }
+
+  // Carrega prompts existentes
+  upPrompts = {};
+  const savedPrompts = currentUpUser.customPrompts || {};
+
+  // Determina categorias relevantes (do onboarding ou todas)
+  const obPecas = (ob?.pecas||[]).map(p=>p.toLowerCase());
+  const relevantCats = cats.filter(c=>{
+    if(!ob) return true;
+    return obPecas.some(p=>c.name.toLowerCase().includes(p)||p.includes(c.name.toLowerCase()));
+  });
+  const catsToShow = relevantCats.length > 0 ? relevantCats : cats;
+
+  // Renderiza campos de prompts por categoria
+  const container = document.getElementById('upPromptsContent');
+  container.innerHTML = catsToShow.map(cat=>{
+    const saved = savedPrompts[cat.id] || {};
+    upPrompts[cat.id] = {
+      p1: saved.p1 || cat.p1 || '',
+      p2: saved.p2 || cat.p2 || '',
+      p3: saved.p3 || cat.p3 || ''
+    };
+    return `
+    <div style="background:#FAFAF8;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px">
+      <div style="font-size:14px;font-weight:800;margin-bottom:12px;color:#111">${cat.icon||'✦'} ${cat.name}</div>
+      <div style="margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">📷 Foto 1 — Fundo branco</div>
+        <textarea id="up_${cat.id}_p1" style="width:100%;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12px;color:#111;resize:vertical;min-height:80px;outline:none;font-family:inherit;line-height:1.5" oninput="upPrompts['${cat.id}'].p1=this.value" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--line)'">${upPrompts[cat.id].p1}</textarea>
+      </div>
+      <div style="margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">👤 Foto 2 — Modelo</div>
+        <textarea id="up_${cat.id}_p2" style="width:100%;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12px;color:#111;resize:vertical;min-height:80px;outline:none;font-family:inherit;line-height:1.5" oninput="upPrompts['${cat.id}'].p2=this.value" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--line)'">${upPrompts[cat.id].p2}</textarea>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">🔍 Foto 3 — Close detalhe</div>
+        <textarea id="up_${cat.id}_p3" style="width:100%;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12px;color:#111;resize:vertical;min-height:80px;outline:none;font-family:inherit;line-height:1.5" oninput="upPrompts['${cat.id}'].p3=this.value" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--line)'">${upPrompts[cat.id].p3}</textarea>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('userPromptsModal').style.display='flex';
+}
+
+function closeUserPrompts(){
+  document.getElementById('userPromptsModal').style.display='none';
+  currentUpUid = null;
+  currentUpUser = null;
+  upPrompts = {};
+}
+
+async function generateUserPrompts(){
+  const btn = document.getElementById('upBtnGenerate');
+  btn.disabled = true;
+  btn.textContent = '⏳ Gerando...';
+  const ob = currentUpUser?.onboardingData;
+  try{
+    const req = `Você é especialista em fotografia de semijoias para e-commerce brasileiro.
+Com base no perfil abaixo, crie prompts profissionais em português para geração de fotos de semijoias.
+
+Perfil do cliente:
+- Peças que vende: ${(ob?.pecas||[]).join(', ')||'semijoias em geral'}
+- Cor do metal: ${ob?.cor||'variado'}
+- Estilo visual: ${ob?.estilo||'premium'}
+- Fundo preferido: ${ob?.fundo||'branco puro'}
+- Brilho: ${ob?.brilho||'natural'}
+- Acabamento: ${ob?.acabamento||'polido liso'}
+- Foco: ${ob?.foco||'máxima fidelidade'}
+- Modelo: ${ob?.modeloEstilo||'elegante'}, ${ob?.modeloIdade||'20-30 anos'}
+- Posicionamento: ${ob?.posicao||'minimalista'}
+- Detalhes extras: ${ob?.extras||'nenhum'}
+
+Para cada categoria abaixo, crie 3 prompts (p1=fundo branco catálogo, p2=modelo usando, p3=close detalhe).
+Categorias: ${cats.map(c=>c.name).join(', ')}
+
+Responda APENAS com JSON válido:
+{${cats.map(c=>`"${c.id}":{"p1":"prompt catálogo (400-600 chars)","p2":"prompt modelo (400-600 chars)","p3":"prompt close (400-600 chars)"}`).join(',')}}`;
+
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:req}]})
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text||'';
+    const clean = text.replace(/```json|```/g,'').trim();
+    const generated = JSON.parse(clean);
+
+    // Preenche os campos
+    cats.forEach(cat=>{
+      if(generated[cat.id]){
+        upPrompts[cat.id] = generated[cat.id];
+        const p1El = document.getElementById(`up_${cat.id}_p1`);
+        const p2El = document.getElementById(`up_${cat.id}_p2`);
+        const p3El = document.getElementById(`up_${cat.id}_p3`);
+        if(p1El) p1El.value = generated[cat.id].p1;
+        if(p2El) p2El.value = generated[cat.id].p2;
+        if(p3El) p3El.value = generated[cat.id].p3;
+      }
+    });
+    btn.textContent = '✅ Rascunho gerado!';
+  }catch(e){
+    btn.textContent = '❌ Erro — tente novamente';
+    console.error('Erro ao gerar prompts:',e);
+  }
+  setTimeout(()=>{btn.disabled=false;btn.textContent='🤖 Gerar rascunho com IA';},2000);
+}
+
+async function approveUserPrompts(){
+  const btn = document.getElementById('upBtnApprove');
+  btn.disabled = true;
+  btn.textContent = '⏳ Salvando...';
+  try{
+    await db.collection('users').doc(currentUpUid).update({
+      customPrompts: upPrompts,
+      customPromptsApproved: true
+    });
+    // Atualiza cache local
+    const u = allUsers.find(u=>u.uid===currentUpUid);
+    if(u){ u.customPrompts=upPrompts; u.customPromptsApproved=true; }
+    alert('✅ Prompts aprovados e ativados para o cliente!');
+    closeUserPrompts();
+    loadUsers();
+  }catch(e){
+    alert('Erro ao salvar: '+e.message);
+    btn.disabled=false;
+    btn.textContent='✅ Aprovar e ativar';
+  }
+}
+
+async function revertToDefault(){
+  if(!confirm('Voltar para os prompts padrão?\nO cliente usará os prompts globais.')) return;
+  try{
+    await db.collection('users').doc(currentUpUid).update({customPromptsApproved:false});
+    const u = allUsers.find(u=>u.uid===currentUpUid);
+    if(u) u.customPromptsApproved=false;
+    alert('✅ Cliente voltou para os prompts padrão.');
+    closeUserPrompts();
+    loadUsers();
+  }catch(e){alert('Erro: '+e.message);}
+}
 </script>
 
 </body>
