@@ -243,7 +243,7 @@ button,input,textarea{font-family:inherit}
       <input id="regName" class="input" type="text" placeholder="Seu nome" style="margin-bottom:10px">
       <input id="regEmail" class="input" type="email" placeholder="Email" style="margin-bottom:10px">
       <input id="regPass" class="input" type="password" placeholder="Senha (mínimo 6 caracteres)" style="margin-bottom:10px">
-      <input id="regWhatsapp" class="input" type="tel" placeholder="WhatsApp (opcional — ex: 11999998888)">
+      <input id="regWhatsapp" class="input" type="tel" placeholder="WhatsApp — ex: 11999998888" required>
       <button class="btn btn-main" onclick="register()">✦ Criar conta grátis</button>
       <div style="background:linear-gradient(135deg,rgba(212,175,55,.15),rgba(123,63,242,.12));border:1.5px solid rgba(212,175,55,.5);border-radius:16px;padding:14px 16px;margin-top:14px;text-align:center">
         <div style="font-size:20px;margin-bottom:4px">🎁</div>
@@ -327,8 +327,8 @@ button,input,textarea{font-family:inherit}
       </div>
       <div class="field">
         <label class="label">Observações do produto <span class="opt-tag">(opcional)</span></label>
-        <textarea id="obs" class="textarea" maxlength="25" placeholder="Ex: pedra verde, fundo escuro..." oninput="state.obs=this.value.trim();updateObsCounter(this)"></textarea>
-        <div style="text-align:right;font-size:11px;color:var(--muted);margin-top:4px"><span id="obsCount">0</span>/25 caracteres</div>
+        <textarea id="obs" class="textarea" maxlength="100" placeholder="Ex: pedra verde, fundo escuro, destaque a pedra..." oninput="state.obs=this.value.trim();updateObsCounter(this)"></textarea>
+        <div style="text-align:right;font-size:11px;color:var(--muted);margin-top:4px"><span id="obsCount">0</span>/100 caracteres</div>
       </div>
     </section>
     <!-- SELETOR DE FOTOS -->
@@ -474,6 +474,7 @@ async function register(){
   if(!name){err.textContent='Digite seu nome.';return;}
   if(!email){err.textContent='Digite seu email.';return;}
   if(pass.length<6){err.textContent='Senha deve ter mínimo 6 caracteres.';return;}
+  if(!whatsapp){err.textContent='Digite seu WhatsApp para suporte e avisos de conta.';return;}
   try{
     const cred = await auth.createUserWithEmailAndPassword(email, pass);
     await cred.user.updateProfile({displayName: name});
@@ -727,9 +728,7 @@ async function generate(){
   }
   error.textContent='';progress.style.display='block';
   if(window.innerWidth<900)results.style.display='none';
-  genBtn.disabled=true;bar.style.width='10%';
-  ptext.textContent=msgSet[0];
-  startMotivMsg();
+  genBtn.disabled=true;bar.style.width='10%';ptext.textContent='Preparando imagem...';
   try{
     const pngB64=await toBase64PNG(state.b64,state.mime);
     state.imgs=[];
@@ -746,10 +745,9 @@ async function generate(){
       state.imgs.push({b64:g.b64_json,name:`${state.code}-foto${photoNum}.jpg`});
     }
     bar.style.width='100%';ptext.textContent='✅ Pronto! Fotos geradas com sucesso!';
-    stopMotivMsg();
     await decrementCredits(photos.length);
     addCount();showResults();
-  }catch(e){stopMotivMsg();error.textContent='Erro: '+e.message;genBtn.disabled=false}
+  }catch(e){error.textContent='Erro: '+e.message;genBtn.disabled=false}
   finally{setTimeout(()=>progress.style.display='none',800)}
 }
 
@@ -908,7 +906,12 @@ function updateSelection(){
 function updateObsCounter(el){
   const count=el.value.length;
   const counter=document.getElementById('obsCount');
-  if(counter){counter.textContent=count;counter.style.color=count>=20?'#c23':'var(--muted)';}
+  if(counter){
+    counter.textContent=count;
+    if(count>=90) counter.style.color='#c23';
+    else if(count>=70) counter.style.color='#e67e22';
+    else counter.style.color='var(--muted)';
+  }
 }
 
 if('serviceWorker' in navigator){
