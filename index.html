@@ -767,6 +767,8 @@ function startMotivMsg(){msgSet=LOADING_MSGS[Math.floor(Math.random()*LOADING_MS
 function stopMotivMsg(){if(msgInterval){clearInterval(msgInterval);msgInterval=null;}}
 
 async function api(type,data){const res=await fetch('/api/gerar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,...data})});if(!res.ok)throw new Error('Falha na função');const j=await res.json();if(j.error)throw new Error(j.error);return j}
+
+async function regenerate(i){
   if((currentUserData?.credits||0) < 1){
     error.textContent='⚠️ Créditos insuficientes!';return;
   }
