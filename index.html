@@ -317,7 +317,7 @@ button,input,textarea{font-family:inherit}
   </label>
   <input type="file" id="avatarUpload" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
   <button onclick="closeMenu();openPlans()" style="color:var(--purple);font-weight:900">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l-3 7h18l-3-7z"/><path d="M3 10l9 11 9-11"/><line x1="12" y1="10" x2="12" y2="21"/></svg>
     Comprar fotos
   </button>
   <button onclick="closeMenu();openAdmin()">
@@ -380,7 +380,7 @@ button,input,textarea{font-family:inherit}
       </div>
       <div class="field">
         <label class="label">Observações do produto <span class="opt-tag">(opcional)</span></label>
-        <textarea id="obs" class="textarea" maxlength="100" placeholder="Ex: pedra verde, fundo escuro, destaque a pedra..." oninput="state.obs=this.value.trim();updateObsCounter(this)"></textarea>
+        <textarea id="obs" class="textarea" maxlength="100" placeholder="Ex: dourado, destaque as pedras, fundo claro, sem corrente..." oninput="state.obs=this.value.trim();updateObsCounter(this)"></textarea>
         <div style="text-align:right;font-size:11px;color:var(--muted);margin-top:4px"><span id="obsCount">0</span>/100 caracteres</div>
       </div>
     </section>
@@ -812,14 +812,14 @@ function getCatIcon(cat){
   }
   // Se tem ícone emoji, mostra ele
   if(cat.icon && cat.icon !== '✦') return `<span style="font-size:20px">${cat.icon}</span>`;
-  // Padrão: losango
+  // Padrão: losango da marca
   return `<svg class="chip-svg" viewBox="0 0 24 24"><path d="M12 2L22 12L12 22L2 12Z"/></svg>`;
 }
 
 function render(){
   chips.innerHTML=cats.map(c=>`<button class="chip ${state.cat?.id===c.id?'active':''}" onclick="selectCat('${c.id}')"><div class="ico">${getCatIcon(c)}</div>${c.name}</button>`).join('');
-  catList.innerHTML=cats.map((c,idx)=>`<div class="cat-row"><div class="cat-badge">${c.icon||'✦'}</div><div class="cat-info"><strong>${c.name}</strong><small>Categoria cadastrada</small></div><div class="reorder-btns"><button class="icon-btn" onclick="moveCat('${c.id}',-1)" ${idx===0?'disabled':''}>↑</button><button class="icon-btn" onclick="moveCat('${c.id}',1)" ${idx===cats.length-1?'disabled':''}>↓</button></div><button class="icon-btn" onclick="editCatInfo('${c.id}')">✎</button><button class="icon-btn" onclick="delCat('${c.id}')">🗑</button></div>`).join('');
-  promptList.innerHTML=cats.map(c=>`<div class="cat-row"><div class="cat-badge">${c.icon||'✦'}</div><div class="cat-info"><strong>${c.name}</strong><div class="prm-preview"><div class="prm-line"><b>Foto 1:</b> ${(c.p1||'').slice(0,54)}...</div><div class="prm-line"><b>Foto 2:</b> ${(c.p2||'').slice(0,54)}...</div><div class="prm-line"><b>Foto 3:</b> ${(c.p3||'').slice(0,54)}...</div></div></div><button class="icon-btn" onclick="editPrompt('${c.id}')">✎</button></div>`).join('');
+  catList.innerHTML=cats.map((c,idx)=>`<div class="cat-row"><div class="cat-badge">${c.icon||'◇'}</div><div class="cat-info"><strong>${c.name}</strong><small>Categoria cadastrada</small></div><div class="reorder-btns"><button class="icon-btn" onclick="moveCat('${c.id}',-1)" ${idx===0?'disabled':''}>↑</button><button class="icon-btn" onclick="moveCat('${c.id}',1)" ${idx===cats.length-1?'disabled':''}>↓</button></div><button class="icon-btn" onclick="editCatInfo('${c.id}')">✎</button><button class="icon-btn" onclick="delCat('${c.id}')">🗑</button></div>`).join('');
+  promptList.innerHTML=cats.map(c=>`<div class="cat-row"><div class="cat-badge">${c.icon||'◇'}</div><div class="cat-info"><strong>${c.name}</strong><div class="prm-preview"><div class="prm-line"><b>Foto 1:</b> ${(c.p1||'').slice(0,54)}...</div><div class="prm-line"><b>Foto 2:</b> ${(c.p2||'').slice(0,54)}...</div><div class="prm-line"><b>Foto 3:</b> ${(c.p3||'').slice(0,54)}...</div></div></div><button class="icon-btn" onclick="editPrompt('${c.id}')">✎</button></div>`).join('');
   const p=localStorage.getItem('cntP')||0, im=localStorage.getItem('cntI')||0;
   cntP.textContent=p; cntI.textContent=im;
   if(deskCntP) deskCntP.textContent=p;
@@ -1021,7 +1021,7 @@ function saveCat(){
     current.p1=p1.value.trim();current.p2=p2.value.trim();current.p3=p3.value.trim();
     if(!current.p1||!current.p2||!current.p3)return alert('Preencha os 3 prompts antes de salvar.');
   }else{
-    let obj={id:editId||Date.now().toString(),name:catName.value.trim(),icon:catIcon.value.trim()||'✦',p1:current?.p1||p1.value.trim()||'Foto profissional em fundo branco, estilo catálogo premium.',p2:current?.p2||p2.value.trim()||'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:current?.p3||p3.value.trim()||'Close detalhado mostrando brilho, textura e acabamento da peça.'};
+    let obj={id:editId||Date.now().toString(),name:catName.value.trim(),icon:catIcon.value.trim()||'◇',p1:current?.p1||p1.value.trim()||'Foto profissional em fundo branco, estilo catálogo premium.',p2:current?.p2||p2.value.trim()||'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:current?.p3||p3.value.trim()||'Close detalhado mostrando brilho, textura e acabamento da peça.'};
     if(!obj.name)return alert('Digite o nome.');
     if(editId)cats=cats.map(c=>c.id===editId?obj:c);else cats.push(obj);
   }
@@ -1691,13 +1691,8 @@ async function openUserPrompts(uid){
   upPrompts = {};
   const savedPrompts = currentUpUser.customPrompts || {};
 
-  // Determina categorias relevantes (do onboarding ou todas)
-  const obPecas = (ob?.pecas||[]).map(p=>p.toLowerCase());
-  const relevantCats = cats.filter(c=>{
-    if(!ob) return true;
-    return obPecas.some(p=>c.name.toLowerCase().includes(p)||p.includes(c.name.toLowerCase()));
-  });
-  const catsToShow = relevantCats.length > 0 ? relevantCats : cats;
+  // Mostra TODAS as categorias do admin
+  const catsToShow = cats;
 
   // Renderiza campos de prompts por categoria
   const container = document.getElementById('upPromptsContent');
