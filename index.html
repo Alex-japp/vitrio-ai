@@ -108,16 +108,31 @@ button,input,textarea{font-family:inherit}
 .credits-badge{display:flex;align-items:center;gap:6px;background:#F1E8FF;border:1px solid rgba(123,63,242,.2);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;color:var(--purple)}
 .credits-badge.low{background:#FFF0F0;border-color:rgba(255,80,80,.2);color:#ff4f4f}
 .credits-badge.empty{background:#FFE8E8;border-color:#ff4f4f;color:#ff4f4f}
+/* ADMIN BADGE HEADER */
+.admin-badge{display:flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(212,175,55,.18),rgba(123,63,242,.12));border:1px solid rgba(212,175,55,.5);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:800;color:#9C7410;letter-spacing:.05em}
 /* USERS ADMIN */
-.user-row{background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:12px;box-shadow:0 8px 20px rgba(17,18,39,.04);flex-wrap:wrap}
+.user-row{background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:10px;margin-bottom:12px;box-shadow:0 8px 20px rgba(17,18,39,.04)}
+.user-row-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .user-info{flex:1;min-width:150px}
 .user-info strong{display:block;font-size:14px}
-.user-info small{color:var(--muted);font-size:12px}
+.user-info small{color:var(--muted);font-size:12px;display:block}
 .user-credits{font-size:22px;font-weight:950;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;min-width:40px;text-align:center}
-.plan-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;background:#F1E8FF;color:var(--purple)}
-.add-credits-wrap{display:flex;gap:8px;align-items:center;margin-top:8px;width:100%}
-.add-credits-wrap input{flex:1;height:38px;border-radius:10px;border:1.5px solid var(--line);padding:0 12px;font-size:13px;outline:none}
-.add-credits-wrap button{height:38px;padding:0 14px;border-radius:10px;border:0;background:var(--grad);color:#fff;font-weight:700;cursor:pointer;font-size:13px}
+.plan-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;background:#F1E8FF;color:var(--purple);display:inline-block;margin-top:3px}
+.status-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-block;margin-top:3px;margin-left:4px}
+.status-badge.active{background:#e8fff0;color:#1A6B3A}
+.status-badge.inactive{background:#fff0f0;color:#c23}
+.user-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.user-actions select{height:36px;border-radius:10px;border:1.5px solid var(--line);padding:0 10px;font-size:13px;outline:none;background:#fff;cursor:pointer}
+.user-actions button{height:36px;padding:0 12px;border-radius:10px;border:0;font-weight:700;cursor:pointer;font-size:12px;white-space:nowrap}
+.btn-add-cr{background:var(--grad);color:#fff}
+.btn-toggle{background:#F1E8FF;color:var(--purple)}
+.btn-toggle.inactive{background:#fff0f0;color:#c23}
+.btn-del{background:#fff0f0;color:#c23;border:1px solid rgba(255,80,80,.3)!important}
+.add-credits-wrap{display:flex;gap:8px;align-items:center;width:100%}
+.add-credits-wrap input{flex:1;height:36px;border-radius:10px;border:1.5px solid var(--line);padding:0 12px;font-size:13px;outline:none}
+.export-bar{display:flex;justify-content:flex-end;margin-bottom:14px}
+.btn-export{height:38px;padding:0 18px;border-radius:12px;border:1.5px solid var(--purple);background:transparent;color:var(--purple);font-weight:700;font-size:13px;cursor:pointer}
+.btn-export:hover{background:var(--grad);color:#fff;border-color:transparent}
 /* MENSAGEM CRÉDITOS ESGOTADOS */
 .credits-empty-msg{background:linear-gradient(135deg,rgba(108,59,255,.06),rgba(77,123,255,.06));border:1px solid rgba(108,59,255,.2);border-radius:18px;padding:16px 20px;text-align:center;margin-top:14px;display:none}
 .credits-empty-msg.show{display:block}
@@ -227,9 +242,14 @@ button,input,textarea{font-family:inherit}
       <div class="divider">ou</div>
       <input id="regName" class="input" type="text" placeholder="Seu nome" style="margin-bottom:10px">
       <input id="regEmail" class="input" type="email" placeholder="Email" style="margin-bottom:10px">
-      <input id="regPass" class="input" type="password" placeholder="Senha (mínimo 6 caracteres)">
+      <input id="regPass" class="input" type="password" placeholder="Senha (mínimo 6 caracteres)" style="margin-bottom:10px">
+      <input id="regWhatsapp" class="input" type="tel" placeholder="WhatsApp (opcional — ex: 11999998888)">
       <button class="btn btn-main" onclick="register()">✦ Criar conta grátis</button>
-      <div style="font-size:11px;color:var(--muted);margin-top:10px">🎁 Ganhe 15 fotos grátis para testar!</div>
+      <div style="background:linear-gradient(135deg,rgba(212,175,55,.15),rgba(123,63,242,.12));border:1.5px solid rgba(212,175,55,.5);border-radius:16px;padding:14px 16px;margin-top:14px;text-align:center">
+        <div style="font-size:20px;margin-bottom:4px">🎁</div>
+        <div style="font-size:15px;font-weight:900;color:var(--purple)">15 fotos grátis para começar!</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px">Sem precisar de cartão de crédito</div>
+      </div>
       <div id="regErr" class="err"></div>
     </div>
   </div>
@@ -369,7 +389,15 @@ button,input,textarea{font-family:inherit}
   <button class="nav logout" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sair</button>
 </nav>
 </div>
-<div id="settings" class="settings phone"><header class="cfg-head"><button class="dark-btn" onclick="closeSettings()">←</button><div class="cfg-title">CONFIGURAÇÕES</div><button class="dark-btn" onclick="closeSettings()">✓</button></header><div class="tabs"><button class="tab on" onclick="tab('cats',this)">Categorias</button><button id="promptsTabBtn" class="tab" onclick="tab('prompts',this)">Prompts</button><button class="tab" onclick="tab('general',this)">Geral</button><button id="usersTabBtn" class="tab hidden" onclick="tab('users',this)">Usuários</button></div><main class="cfg-body"><section id="catsTab"><h3>Suas categorias</h3><p class="cfg-sub">Gerencie as categorias dos seus produtos</p><div id="catList"></div><button class="add" onclick="editCat()">+ Nova Categoria</button></section><section id="promptsTab" class="hidden"><h3>Prompts por categoria</h3><p class="cfg-sub">Edite os prompts que guiam cada tipo de foto.</p><div id="promptList"></div></section><section id="generalTab" class="hidden"><h3>Uso do app</h3><p class="cfg-sub">Controle simples para teste beta.</p><div class="counter"><div class="count-card"><div id="cntP" class="num">0</div><small>Produtos</small></div><div class="count-card"><div id="cntI" class="num">0</div><small>Imagens</small></div></div><button class="cfg-link" onclick="feedback()">💬 Enviar feedback</button><button class="danger" onclick="logout()">Sair com segurança</button></section><section id="usersTab" class="hidden"><h3>Gerenciar usuários</h3><p class="cfg-sub">Gerencie clientes, créditos e planos.</p><div id="userList"><p style="color:var(--muted);font-size:13px">Carregando usuários...</p></div></section></main><nav class="bottom" style="background:#0f1027;border-color:rgba(255,255,255,.08)"><button class="nav" onclick="tab('cats',document.querySelectorAll('.tab')[0])"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.04.04a2 2 0 1 1-2.83 2.83l-.04-.04A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 1 1-4 0v-.06A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H3a2 2 0 1 1 0-4h.06A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.04-.04A2 2 0 1 1 7.05 3.85l.04.04A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.08V3a2 2 0 1 1 4 0v.06A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04A1.7 1.7 0 0 0 19.4 9c.2.35.52.62.9.75.28.1.58.15.88.15H21a2 2 0 1 1 0 4h-.06c-.3 0-.6.05-.88.15-.38.13-.7.4-.9.75z"></path></svg>Configurações</button><button class="nav" onclick="feedback()"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>Feedback</button><button class="nav logout" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sair</button></nav></div>
+<div id="settings" class="settings phone"><header class="cfg-head"><button class="dark-btn" onclick="closeSettings()">←</button><div class="cfg-title">CONFIGURAÇÕES</div><button class="dark-btn" onclick="closeSettings()">✓</button></header><div class="tabs"><button class="tab on" onclick="tab('cats',this)">Categorias</button><button id="promptsTabBtn" class="tab" onclick="tab('prompts',this)">Prompts</button><button class="tab" onclick="tab('general',this)">Geral</button><button id="usersTabBtn" class="tab hidden" onclick="tab('users',this)">Usuários</button></div><main class="cfg-body"><section id="catsTab"><h3>Suas categorias</h3><p class="cfg-sub">Gerencie as categorias dos seus produtos</p><div id="catList"></div><button class="add" onclick="editCat()">+ Nova Categoria</button></section><section id="promptsTab" class="hidden"><h3>Prompts por categoria</h3><p class="cfg-sub">Edite os prompts que guiam cada tipo de foto.</p><div id="promptList"></div></section><section id="generalTab" class="hidden"><h3>Uso do app</h3><p class="cfg-sub">Controle simples para teste beta.</p><div class="counter"><div class="count-card"><div id="cntP" class="num">0</div><small>Produtos</small></div><div class="count-card"><div id="cntI" class="num">0</div><small>Imagens</small></div></div>
+<div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 18px;margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 8px 20px rgba(17,18,39,.04)">
+  <div><div style="font-weight:800;font-size:14px">Código do produto</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Exigir preenchimento do código</div></div>
+  <label style="position:relative;display:inline-flex;cursor:pointer">
+    <input type="checkbox" id="codeRequiredToggle" onchange="toggleCodeRequired(this.checked)" style="opacity:0;width:0;height:0;position:absolute">
+    <div id="codeRequiredSlider" style="width:46px;height:26px;background:#ddd;border-radius:13px;transition:.2s;position:relative"><div style="position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 2px 4px rgba(0,0,0,.2)" id="codeSliderDot"></div></div>
+  </label>
+</div>
+<button class="cfg-link" onclick="feedback()">💬 Enviar feedback</button><button class="danger" onclick="logout()">Sair com segurança</button></section><section id="usersTab" class="hidden"><h3>Gerenciar usuários</h3><p class="cfg-sub">Gerencie clientes, créditos e planos.</p><div id="userList"><p style="color:var(--muted);font-size:13px">Carregando usuários...</p></div></section></main><nav class="bottom" style="background:#0f1027;border-color:rgba(255,255,255,.08)"><button class="nav" onclick="tab('cats',document.querySelectorAll('.tab')[0])"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.04.04a2 2 0 1 1-2.83 2.83l-.04-.04A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 1 1-4 0v-.06A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H3a2 2 0 1 1 0-4h.06A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.04-.04A2 2 0 1 1 7.05 3.85l.04.04A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.08V3a2 2 0 1 1 4 0v.06A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04A1.7 1.7 0 0 0 19.4 9c.2.35.52.62.9.75.28.1.58.15.88.15H21a2 2 0 1 1 0 4h-.06c-.3 0-.6.05-.88.15-.38.13-.7.4-.9.75z"></path></svg>Configurações</button><button class="nav" onclick="feedback()"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>Feedback</button><button class="nav logout" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sair</button></nav></div>
 <div id="admin" class="modal"><div class="sheet"><h3>Área restrita</h3><input id="adminPass" type="password" class="input" placeholder="Senha admin"><div class="sheet-actions"><button onclick="closeModal('admin')">Cancelar</button><button class="save" onclick="checkAdmin()">Entrar</button></div><div id="adminErr" class="err"></div></div></div>
 <div id="catModal" class="modal"><div class="sheet"><h3 id="catTitle">Categoria</h3><input id="catName" class="input" placeholder="Nome da categoria"><input id="catIcon" class="input" placeholder="Ícone / emoji. Ex: 💍"><div id="promptFields"><span class="prompt-mini">Foto 1</span><textarea id="p1" class="textarea" placeholder="Prompt da foto 1"></textarea><span class="prompt-mini">Foto 2</span><textarea id="p2" class="textarea" placeholder="Prompt da foto 2"></textarea><span class="prompt-mini">Foto 3</span><textarea id="p3" class="textarea" placeholder="Prompt da foto 3"></textarea></div><div class="sheet-actions"><button onclick="closeModal('catModal')">Cancelar</button><button class="save" onclick="saveCat()">Salvar</button></div></div></div>
 <!-- Firebase SDK - carregado antes do app -->
@@ -440,6 +468,7 @@ async function register(){
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim();
   const pass = document.getElementById('regPass').value;
+  const whatsapp = document.getElementById('regWhatsapp')?.value.trim() || '';
   const err = document.getElementById('regErr');
   err.textContent = '';
   if(!name){err.textContent='Digite seu nome.';return;}
@@ -450,9 +479,9 @@ async function register(){
     await cred.user.updateProfile({displayName: name});
     // Cria documento do usuário no Firestore
     await db.collection('users').doc(cred.user.uid).set({
-      name, email, plan:'teste', credits:15, totalCredits:15,
+      name, email, whatsapp, plan:'teste', credits:15, totalCredits:15,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      isAdmin: false
+      isAdmin: false, active: true
     });
   }catch(e){
     err.textContent = e.code==='auth/email-already-in-use' ? 'Email já cadastrado.' : 'Erro: '+e.message;
@@ -512,8 +541,17 @@ function updateCreditsUI(){
   const credits = currentUserData.credits || 0;
   const badge = document.getElementById('creditsBadge');
   const count = document.getElementById('creditsCount');
+  // Admin: mostra badge especial
+  if(currentUserData.isAdmin){
+    if(badge){
+      badge.className='admin-badge';
+      badge.innerHTML='👑 Admin ◇';
+    }
+    return;
+  }
   if(count) count.textContent = credits;
   if(badge){
+    badge.className='credits-badge';
     badge.classList.remove('low','empty');
     if(credits === 0) badge.classList.add('empty');
     else if(credits <= 5) badge.classList.add('low');
@@ -564,12 +602,38 @@ async function loadFromFirebase(){
       if(data.cats && data.cats.length > 0) cats = data.cats;
       if(data.cntP !== undefined) localStorage.setItem('cntP', data.cntP);
       if(data.cntI !== undefined) localStorage.setItem('cntI', data.cntI);
+      if(data.appConfig) appConfig = {...appConfig, ...data.appConfig};
     }
+    applyCodeConfig();
   }catch(e){
     console.log('Firebase offline');
   }finally{
     showSync(false);
   }
+}
+
+function applyCodeConfig(){
+  const codeInput = document.getElementById('code');
+  if(codeInput){
+    const field = codeInput.closest('.field');
+    const optTag = field?.querySelector('.opt-tag');
+    const lbl = field?.querySelector('.label');
+    if(optTag) optTag.style.display = appConfig.codeRequired ? 'none' : 'inline';
+  }
+  // Atualiza toggle visual
+  const toggle = document.getElementById('codeRequiredToggle');
+  const slider = document.getElementById('codeRequiredSlider');
+  const dot = document.getElementById('codeSliderDot');
+  if(toggle) toggle.checked = appConfig.codeRequired;
+  if(slider) slider.style.background = appConfig.codeRequired ? 'var(--purple)' : '#ddd';
+  if(dot) dot.style.transform = appConfig.codeRequired ? 'translateX(20px)' : 'translateX(0)';
+  ready();
+}
+
+async function toggleCodeRequired(val){
+  appConfig.codeRequired = val;
+  applyCodeConfig();
+  try{await CONFIG_REF.set({appConfig},{merge:true});}catch(e){console.log('Erro salvar config:',e);}
 }
 
 async function saveCatsToFirebase(){
@@ -593,10 +657,12 @@ const FB='https://docs.google.com/forms/d/e/1FAIpQLScwQ1g4VlZUOz0mAQ2OSwRG0lVtxh
 const defaults=[['Anéis'],['Brincos'],['Colares'],['Pulseiras'],['Pingentes']].map((x,i)=>({id:'c'+i,name:x[0],icon:'',p1:'Foto profissional em fundo branco, estilo catálogo premium.',p2:'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:'Close detalhado mostrando brilho, textura e acabamento da peça.'}));
 let cats=defaults, editId=null, editMode='cat';
 let state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],selectedPhotos:[1,2,3]};
+let appConfig={codeRequired:true}; // código do produto obrigatório por padrão
 
 async function init(){
   if(promptsTabBtn) promptsTabBtn.style.display='none';
   render();
+  applyCodeConfig();
 }
 
 function feedback(){window.open(FB,'_blank')}
@@ -639,7 +705,8 @@ function render(){
 function selectCat(id){state.cat=cats.find(c=>c.id===id);render()}
 function ready(){
   const hasCredits = (currentUserData?.credits||0) > 0;
-  genBtn.disabled=!(state.cat&&state.code&&state.b64&&state.selectedPhotos.length>0&&hasCredits);
+  const codeOk = appConfig.codeRequired ? !!state.code : true;
+  genBtn.disabled=!(state.cat&&codeOk&&state.b64&&state.selectedPhotos.length>0&&hasCredits);
   const msg = document.getElementById('creditsEmptyMsg');
   if(msg) msg.classList.toggle('show', (currentUserData?.credits||0)===0 && !!currentUser);
   if(error && (currentUserData?.credits||0)===0 && currentUser) error.textContent='';
@@ -660,7 +727,9 @@ async function generate(){
   }
   error.textContent='';progress.style.display='block';
   if(window.innerWidth<900)results.style.display='none';
-  genBtn.disabled=true;bar.style.width='10%';ptext.textContent='Preparando imagem...';
+  genBtn.disabled=true;bar.style.width='10%';
+  ptext.textContent=msgSet[0];
+  startMotivMsg();
   try{
     const pngB64=await toBase64PNG(state.b64,state.mime);
     state.imgs=[];
@@ -676,16 +745,28 @@ async function generate(){
       if(photoNum===1) photo1Result=g.b64_json;
       state.imgs.push({b64:g.b64_json,name:`${state.code}-foto${photoNum}.jpg`});
     }
-    bar.style.width='100%';ptext.textContent='Pronto!';
+    bar.style.width='100%';ptext.textContent='✅ Pronto! Fotos geradas com sucesso!';
+    stopMotivMsg();
     await decrementCredits(photos.length);
     addCount();showResults();
-  }catch(e){error.textContent='Erro: '+e.message;genBtn.disabled=false}
-  finally{setTimeout(()=>progress.style.display='none',500)}
+  }catch(e){stopMotivMsg();error.textContent='Erro: '+e.message;genBtn.disabled=false}
+  finally{setTimeout(()=>progress.style.display='none',800)}
 }
 
-async function api(type,data){const res=await fetch('/api/gerar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,...data})});if(!res.ok)throw new Error('Falha na função');const j=await res.json();if(j.error)throw new Error(j.error);return j}
+const LOADING_MSGS = [
+  ['✨ Preparando a mágica...','🎨 Analisando sua semijoia...','💎 Capturando cada detalhe...'],
+  ['🔮 A IA está trabalhando...','✦ Criando composição perfeita...','🌟 Quase pronto...'],
+  ['💫 Isso vai ficar incrível!','🎯 Ajustando iluminação...','✅ Finalizando com brilho!'],
+  ['🪄 Transformando em foto profissional...','💡 Aplicando estilo premium...','🏆 Resultado chegando!'],
+  ['✨ Cada foto conta uma história...','🎬 Cena perfeita sendo criada...','💎 Um segundo mais...'],
+];
+let msgSet = LOADING_MSGS[Math.floor(Math.random()*LOADING_MSGS.length)];
+let msgIdx = 0;
+let msgInterval = null;
+function startMotivMsg(){msgSet=LOADING_MSGS[Math.floor(Math.random()*LOADING_MSGS.length)];msgIdx=0;msgInterval=setInterval(()=>{msgIdx=(msgIdx+1)%msgSet.length;ptext.textContent=msgSet[msgIdx];},2200);}
+function stopMotivMsg(){if(msgInterval){clearInterval(msgInterval);msgInterval=null;}}
 
-async function regenerate(i){
+async function api(type,data){const res=await fetch('/api/gerar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,...data})});if(!res.ok)throw new Error('Falha na função');const j=await res.json();if(j.error)throw new Error(j.error);return j}
   if((currentUserData?.credits||0) < 1){
     error.textContent='⚠️ Créditos insuficientes!';return;
   }
@@ -837,6 +918,8 @@ function scrollChips(dir){document.getElementById('chips').scrollBy({left:dir*26
 // ============================
 // ADMIN — GERENCIAR USUÁRIOS
 // ============================
+let allUsers = []; // cache para exportação CSV
+
 async function loadUsers(){
   const list = document.getElementById('userList');
   if(!list) return;
@@ -844,24 +927,89 @@ async function loadUsers(){
   try{
     const snap = await db.collection('users').orderBy('createdAt','desc').get();
     if(snap.empty){list.innerHTML='<p style="color:var(--muted);font-size:13px">Nenhum usuário cadastrado ainda.</p>';return;}
-    list.innerHTML = snap.docs.map(doc=>{
-      const u = doc.data();
-      const uid = doc.id;
-      const planLabel = {teste:'Teste',starter:'Starter',pro:'Pro',business:'Business',premium:'Premium'}[u.plan]||u.plan;
-      return `<div class="user-row">
-        <div class="user-info">
-          <strong>${u.name||'Sem nome'}</strong>
-          <small>${u.email} ${u.isAdmin?'👑 Admin':''}</small>
-          <span class="plan-badge">${planLabel}</span>
+    allUsers = snap.docs.map(doc=>({uid:doc.id,...doc.data()}));
+    const planOptions = ['teste','starter','pro','business','premium'];
+    const planLabel = {teste:'Teste',starter:'Starter',pro:'Pro',business:'Business',premium:'Premium'};
+    list.innerHTML = `
+      <div class="export-bar">
+        <button class="btn-export" onclick="exportCSV()">📥 Exportar CSV</button>
+      </div>` +
+    allUsers.map(u=>{
+      const uid = u.uid;
+      const active = u.active !== false;
+      const planOpts = planOptions.map(p=>`<option value="${p}" ${u.plan===p?'selected':''}>${planLabel[p]}</option>`).join('');
+      return `<div class="user-row" id="row_${uid}">
+        <div class="user-row-top">
+          <div class="user-info">
+            <strong>${u.name||'Sem nome'} ${u.isAdmin?'👑':''}</strong>
+            <small>${u.email}</small>
+            ${u.whatsapp?`<small>📱 ${u.whatsapp}</small>`:''}
+            <span class="plan-badge">${planLabel[u.plan]||u.plan}</span>
+            <span class="status-badge ${active?'active':'inactive'}">${active?'✓ Ativo':'✗ Inativo'}</span>
+          </div>
+          <div class="user-credits">${u.credits||0}</div>
         </div>
-        <div class="user-credits">${u.credits||0}</div>
+        <div class="user-actions">
+          <select id="plan_${uid}" onchange="changePlan('${uid}',this.value)">${planOpts}</select>
+          <button class="btn-toggle ${active?'':'inactive'}" onclick="toggleActive('${uid}',${active})">${active?'🔒 Inativar':'✅ Ativar'}</button>
+          <button class="btn-del" onclick="deleteUser('${uid}','${u.name||u.email}')">🗑 Deletar</button>
+        </div>
         <div class="add-credits-wrap">
           <input type="number" id="credits_${uid}" placeholder="Qtd de fotos" min="1">
-          <button onclick="addCredits('${uid}')">+ Adicionar</button>
+          <button class="btn-add-cr" onclick="addCredits('${uid}')">+ Adicionar fotos</button>
         </div>
       </div>`;
     }).join('');
-  }catch(e){list.innerHTML='<p style="color:#c23">Erro ao carregar usuários.</p>';}
+  }catch(e){list.innerHTML='<p style="color:#c23">Erro ao carregar usuários: '+e.message+'</p>';}
+}
+
+async function changePlan(uid, newPlan){
+  try{
+    await db.collection('users').doc(uid).update({plan: newPlan});
+    const row = document.getElementById('row_'+uid);
+    const badge = row?.querySelector('.plan-badge');
+    const planLabel = {teste:'Teste',starter:'Starter',pro:'Pro',business:'Business',premium:'Premium'};
+    if(badge) badge.textContent = planLabel[newPlan]||newPlan;
+  }catch(e){alert('Erro ao trocar plano: '+e.message);}
+}
+
+async function toggleActive(uid, currentActive){
+  try{
+    const newActive = !currentActive;
+    await db.collection('users').doc(uid).update({active: newActive});
+    loadUsers();
+  }catch(e){alert('Erro: '+e.message);}
+}
+
+async function deleteUser(uid, name){
+  if(!confirm(`Deletar conta de "${name}"?\n\nEsta ação é irreversível!`)) return;
+  try{
+    await db.collection('users').doc(uid).delete();
+    document.getElementById('row_'+uid)?.remove();
+    allUsers = allUsers.filter(u=>u.uid!==uid);
+    alert('✅ Conta deletada com sucesso.');
+  }catch(e){alert('Erro ao deletar: '+e.message);}
+}
+
+function exportCSV(){
+  if(!allUsers.length){alert('Nenhum usuário para exportar.');return;}
+  const planLabel = {teste:'Teste',starter:'Starter',pro:'Pro',business:'Business',premium:'Premium'};
+  const header = ['Nome','Email','WhatsApp','Plano','Créditos','Status','Cadastro'];
+  const rows = allUsers.map(u=>[
+    `"${(u.name||'').replace(/"/g,'""')}"`,
+    `"${(u.email||'').replace(/"/g,'""')}"`,
+    `"${(u.whatsapp||'').replace(/"/g,'""')}"`,
+    planLabel[u.plan]||u.plan,
+    u.credits||0,
+    u.active!==false?'Ativo':'Inativo',
+    u.createdAt?.toDate?.()?new Date(u.createdAt.toDate()).toLocaleDateString('pt-BR'):''
+  ]);
+  const csv = [header,...rows].map(r=>r.join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=`vitrio_clientes_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.csv`;
+  a.click(); URL.revokeObjectURL(url);
 }
 
 async function addCredits(uid){
