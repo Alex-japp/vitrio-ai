@@ -1,3 +1,7 @@
+export const config = {
+  maxDuration: 60
+};
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -44,14 +48,17 @@ export default async function handler(req, res) {
         tools: [{ type: 'image_generation', size: '1024x1024' }]
       })
     });
+
     if (response.status === 429 && retries > 0) {
       await new Promise(r => setTimeout(r, delay));
       return callOpenAI(retries - 1, delay + 10000);
     }
+
     if (!response.ok) {
       const errData = await response.json();
       throw new Error(`OpenAI ${response.status}: ${JSON.stringify(errData)}`);
     }
+
     return response;
   }
 
