@@ -266,7 +266,17 @@ button,input,textarea{font-family:inherit}
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
   </button>
 </div>
+
 </div></header>
+<div id="ajusteFinoBanner" style="display:none;background:#F3F0FF;border-bottom:1px solid rgba(123,63,242,.15);padding:10px 20px;align-items:center;gap:12px">
+  <div style="font-size:18px">✨</div>
+  <div style="flex:1">
+    <div style="font-size:13px;font-weight:700;color:var(--purple)">Quer fotos ainda melhores?</div>
+    <div style="font-size:12px;color:#888">Responda 7 perguntas rápidas e a IA se ajusta ao seu estilo</div>
+  </div>
+  <button onclick="document.getElementById('ajusteFinoBanner').style.display='none';openOnboarding();obShow(1)" style="background:var(--purple);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">Ajuste fino →</button>
+  <button onclick="document.getElementById('ajusteFinoBanner').style.display='none';db.collection('users').doc(currentUser.uid).update({onboardingDone:true});currentUserData.onboardingDone=true" style="background:transparent;border:none;color:#aaa;font-size:20px;cursor:pointer;padding:0 4px;line-height:1">×</button>
+</div>
 <div id="menuDropdown" class="menu-dropdown hidden">
   <button onclick="closeMenu();openPlans()" style="color:var(--purple);font-weight:900">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
@@ -593,6 +603,10 @@ auth.onAuthStateChanged(async (user) => {
       if(promptsTabBtn) promptsTabBtn.style.display='';
       if(usersTabBtn) usersTabBtn.classList.remove('hidden');
     }
+    // Onboarding para novos usuários
+    if(!currentUserData?.onboardingDone && !currentUserData?.isAdmin){
+      setTimeout(()=>openOnboarding(), 600);
+    }
   } else {
     currentUser = null;
     currentUserData = null;
@@ -737,6 +751,7 @@ async function toBase64PNG(b64,mime){return new Promise(resolve=>{const img=new 
 async function generate(){
   if((currentUserData?.credits||0) < state.selectedPhotos.length){
     error.textContent='⚠️ Créditos insuficientes! Você tem '+(currentUserData?.credits||0)+' foto(s) disponível(is).';
+    if((currentUserData?.credits||0) === 0) showZeroCreditsPopup();
     return;
   }
   error.textContent='';progress.style.display='block';
@@ -760,6 +775,8 @@ async function generate(){
     bar.style.width='100%';ptext.textContent='✅ Pronto! Fotos geradas com sucesso!';
     await decrementCredits(photos.length);
     addCount();showResults();
+    if((currentUserData?.credits||0) === 0) setTimeout(()=>showZeroCreditsPopup(), 1500);
+    else setTimeout(()=>showAjusteFino(), 1000);
   }catch(e){
     const msg = e.message.includes('Falha na função') || e.message.includes('timeout') || e.message.includes('504')
       ? '⚠️ Nossos servidores estão sobrecarregados no momento. Aguarde alguns minutos e tente novamente.'
@@ -1185,6 +1202,273 @@ function buyPlan(name, fotos, preco){
   const msg = encodeURIComponent(`Olá! Quero assinar o plano *${name}* — ${fotos} por ${preco}. Poderia me ajudar?`);
   window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`,'_blank');
 }
+</script>
+
+<!-- MODAL ONBOARDING -->
+<div id="onboardingModal" style="display:none;position:fixed;inset:0;background:rgba(17,18,39,.7);z-index:300;align-items:center;justify-content:center;padding:20px">
+  <div style="width:min(100%,480px);background:#fff;border-radius:28px;padding:32px 28px;box-shadow:0 30px 80px rgba(17,18,39,.2);position:relative;max-height:90vh;overflow-y:auto">
+
+    <div id="ob0" class="ob-screen">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="width:72px;height:72px;border-radius:22px;background:linear-gradient(135deg,#7B3FF2,#4D7BFF);display:grid;place-items:center;margin:0 auto 16px;font-size:32px;color:#fff">◇</div>
+        <div style="font-size:22px;font-weight:900;margin-bottom:8px">Bem-vindo ao Vitrio AI!</div>
+        <div style="font-size:14px;color:#888;line-height:1.6">Você ganhou <strong style="color:var(--purple)">15 fotos grátis</strong>.<br>Envie a foto — a IA faz o resto.</div>
+      </div>
+      <button class="btn btn-main" onclick="obGo(1);db.collection('users').doc(currentUser.uid).update({onboardingDone:true})">✦ Quero testar agora!</button>
+    </div>
+
+    <div id="ob1" class="ob-screen" style="display:none">
+      <div class="ob-step">1 de 7 · Ajuste fino</div>
+      <div class="ob-title">O que você vende?</div>
+      <div class="ob-subtitle">Selecione pelo menos uma opção</div>
+      <div class="ob-grid" id="ob1opts">
+        <div class="ob-opt" data-val="Brinco" onclick="obToggle(this)">Brinco</div>
+        <div class="ob-opt" data-val="Argolinha" onclick="obToggle(this)">Argolinha</div>
+        <div class="ob-opt" data-val="Anel" onclick="obToggle(this)">Anel</div>
+        <div class="ob-opt" data-val="Colar" onclick="obToggle(this)">Colar</div>
+        <div class="ob-opt" data-val="Pingente" onclick="obToggle(this)">Pingente</div>
+        <div class="ob-opt" data-val="Pulseira" onclick="obToggle(this)">Pulseira</div>
+        <div class="ob-opt" data-val="Tornozeleira" onclick="obToggle(this)">Tornozeleira</div>
+        <div class="ob-opt" data-val="Corrente masculina" onclick="obToggle(this)">Corrente masculina</div>
+        <div class="ob-opt" data-val="Conjunto" onclick="obToggle(this)">Conjunto</div>
+        <div class="ob-opt" data-val="Bolsa" onclick="obToggle(this)">Bolsa</div>
+        <div class="ob-opt" data-val="Oculos" onclick="obToggle(this)">Oculos</div>
+      </div>
+      <button class="btn btn-main" onclick="obNext(2,'ob1opts')" style="margin-top:20px">Proximo</button>
+    </div>
+
+    <div id="ob2" class="ob-screen" style="display:none">
+      <div class="ob-step">2 de 7 · Ajuste fino</div>
+      <div class="ob-title">Quais fotos quer gerar?</div>
+      <div class="ob-subtitle">Selecione pelo menos uma opcao</div>
+      <div class="ob-grid ob-col1" id="ob2opts">
+        <div class="ob-opt" data-val="Fundo branco catalogo" onclick="obToggle(this)">Fundo branco catalogo</div>
+        <div class="ob-opt" data-val="Modelo usando" onclick="obToggle(this)">Modelo usando</div>
+        <div class="ob-opt" data-val="Close detalhe" onclick="obToggle(this)">Close detalhe</div>
+        <div class="ob-opt" data-val="Todas" onclick="obToggle(this)">Todas</div>
+      </div>
+      <button class="btn btn-main" onclick="obNext(3,'ob2opts')" style="margin-top:20px">Proximo</button>
+    </div>
+
+    <div id="ob3" class="ob-screen" style="display:none">
+      <div class="ob-step">3 de 7 · Ajuste fino</div>
+      <div class="ob-title">Cor predominante</div>
+      <div class="ob-grid" id="ob3cor" style="margin-bottom:20px">
+        <div class="ob-opt ob-single" data-val="Ouro" onclick="obSingle(this,'ob3cor')" style="display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:50%;background:#D4AF37;display:inline-block;flex-shrink:0"></span>Ouro</div>
+        <div class="ob-opt ob-single" data-val="Prata" onclick="obSingle(this,'ob3cor')" style="display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:50%;background:#C0C0C0;border:1px solid #ddd;display:inline-block;flex-shrink:0"></span>Prata</div>
+        <div class="ob-opt ob-single" data-val="Rose gold" onclick="obSingle(this,'ob3cor')" style="display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:50%;background:#B76E79;display:inline-block;flex-shrink:0"></span>Rose gold</div>
+      </div>
+      <div class="ob-title">Estilo visual</div>
+      <div class="ob-grid" id="ob3estilo">
+        <div class="ob-opt ob-single" data-val="Minimalista premium" onclick="obSingle(this,'ob3estilo')">Minimalista premium</div>
+        <div class="ob-opt ob-single" data-val="Luxo joalheria" onclick="obSingle(this,'ob3estilo')">Luxo joalheria</div>
+        <div class="ob-opt ob-single" data-val="Moderno clean" onclick="obSingle(this,'ob3estilo')">Moderno clean</div>
+        <div class="ob-opt ob-single" data-val="Sofisticado feminino" onclick="obSingle(this,'ob3estilo')">Sofisticado feminino</div>
+        <div class="ob-opt ob-single" data-val="Masculino elegante" onclick="obSingle(this,'ob3estilo')">Masculino elegante</div>
+        <div class="ob-opt ob-single" data-val="Delicado romantico" onclick="obSingle(this,'ob3estilo')">Delicado romantico</div>
+        <div class="ob-opt ob-single" data-val="Fashion editorial" onclick="obSingle(this,'ob3estilo')">Fashion editorial</div>
+      </div>
+      <button class="btn btn-main" onclick="obNext(4,'ob3cor','ob3estilo')" style="margin-top:20px">Proximo</button>
+    </div>
+
+    <div id="ob4" class="ob-screen" style="display:none">
+      <div class="ob-step">4 de 7 · Ajuste fino</div>
+      <div class="ob-title">Fundo preferido</div>
+      <div class="ob-grid" id="ob4fundo" style="margin-bottom:20px">
+        <div class="ob-opt ob-single" data-val="Branco puro" onclick="obSingle(this,'ob4fundo')">Branco puro</div>
+        <div class="ob-opt ob-single" data-val="Marmore claro" onclick="obSingle(this,'ob4fundo')">Marmore claro</div>
+        <div class="ob-opt ob-single" data-val="Bege acetinado" onclick="obSingle(this,'ob4fundo')">Bege acetinado</div>
+        <div class="ob-opt ob-single" data-val="Pedra neutra premium" onclick="obSingle(this,'ob4fundo')">Pedra neutra</div>
+        <div class="ob-opt ob-single" data-val="Fundo desfocado elegante" onclick="obSingle(this,'ob4fundo')">Fundo desfocado</div>
+      </div>
+      <div class="ob-title">Intensidade do brilho</div>
+      <div class="ob-grid" id="ob4brilho" style="margin-bottom:20px">
+        <div class="ob-opt ob-single" data-val="Natural" onclick="obSingle(this,'ob4brilho')">Natural</div>
+        <div class="ob-opt ob-single" data-val="Premium equilibrado" onclick="obSingle(this,'ob4brilho')">Premium equilibrado</div>
+        <div class="ob-opt ob-single" data-val="Mais intenso" onclick="obSingle(this,'ob4brilho')">Mais intenso</div>
+        <div class="ob-opt ob-single" data-val="Luxo joalheria" onclick="obSingle(this,'ob4brilho')">Luxo joalheria</div>
+      </div>
+      <div class="ob-title">Acabamento do metal</div>
+      <div class="ob-grid" id="ob4acabamento">
+        <div class="ob-opt ob-single" data-val="Polido liso" onclick="obSingle(this,'ob4acabamento')">Polido liso</div>
+        <div class="ob-opt ob-single" data-val="Espelhado premium" onclick="obSingle(this,'ob4acabamento')">Espelhado premium</div>
+        <div class="ob-opt ob-single" data-val="Fosco elegante" onclick="obSingle(this,'ob4acabamento')">Fosco elegante</div>
+        <div class="ob-opt ob-single" data-val="Escovado leve" onclick="obSingle(this,'ob4acabamento')">Escovado leve</div>
+      </div>
+      <button class="btn btn-main" onclick="obNext(5,'ob4fundo','ob4brilho','ob4acabamento')" style="margin-top:20px">Proximo</button>
+    </div>
+
+    <div id="ob5" class="ob-screen" style="display:none">
+      <div class="ob-step">5 de 7 · Ajuste fino</div>
+      <div class="ob-title">Foco principal</div>
+      <div class="ob-grid" id="ob5foco" style="margin-bottom:20px">
+        <div class="ob-opt ob-single" data-val="Maxima fidelidade" onclick="obSingle(this,'ob5foco')">Maxima fidelidade</div>
+        <div class="ob-opt ob-single" data-val="Mais realismo" onclick="obSingle(this,'ob5foco')">Mais realismo</div>
+        <div class="ob-opt ob-single" data-val="Mais luxo" onclick="obSingle(this,'ob5foco')">Mais luxo</div>
+        <div class="ob-opt ob-single" data-val="Mais nitidez" onclick="obSingle(this,'ob5foco')">Mais nitidez</div>
+        <div class="ob-opt ob-single" data-val="Foco em vendas e-commerce" onclick="obSingle(this,'ob5foco')">Foco em vendas</div>
+      </div>
+      <div class="ob-title">Estilo da modelo</div>
+      <div class="ob-grid" id="ob5estilo" style="margin-bottom:20px">
+        <div class="ob-opt ob-single" data-val="Elegante" onclick="obSingle(this,'ob5estilo')">Elegante</div>
+        <div class="ob-opt ob-single" data-val="Moderna" onclick="obSingle(this,'ob5estilo')">Moderna</div>
+        <div class="ob-opt ob-single" data-val="Luxo clean" onclick="obSingle(this,'ob5estilo')">Luxo clean</div>
+        <div class="ob-opt ob-single" data-val="Casual sofisticado" onclick="obSingle(this,'ob5estilo')">Casual sofisticado</div>
+      </div>
+      <div class="ob-title">Faixa etaria da modelo</div>
+      <div class="ob-grid" id="ob5idade">
+        <div class="ob-opt ob-single" data-val="20-30 anos" onclick="obSingle(this,'ob5idade')">20-30</div>
+        <div class="ob-opt ob-single" data-val="30-40 anos" onclick="obSingle(this,'ob5idade')">30-40</div>
+        <div class="ob-opt ob-single" data-val="40+ anos" onclick="obSingle(this,'ob5idade')">40+</div>
+      </div>
+      <button class="btn btn-main" onclick="obNext(6,'ob5foco','ob5estilo','ob5idade')" style="margin-top:20px">Proximo</button>
+    </div>
+
+    <div id="ob6" class="ob-screen" style="display:none">
+      <div class="ob-step">6 de 7 · Ajuste fino</div>
+      <div class="ob-title">Como deseja posicionar as pecas?</div>
+      <div class="ob-subtitle">Selecione pelo menos uma opcao</div>
+      <div class="ob-grid" id="ob6opts">
+        <div class="ob-opt ob-single" data-val="Composicao minimalista" onclick="obSingle(this,'ob6opts')">Composicao minimalista</div>
+        <div class="ob-opt ob-single" data-val="Layout compacto premium" onclick="obSingle(this,'ob6opts')">Layout compacto premium</div>
+        <div class="ob-opt ob-single" data-val="Composicao sofisticada" onclick="obSingle(this,'ob6opts')">Composicao sofisticada</div>
+        <div class="ob-opt ob-single" data-val="Layout vitrine joalheria" onclick="obSingle(this,'ob6opts')">Layout vitrine</div>
+        <div class="ob-opt ob-single" data-val="Colar em V" onclick="obSingle(this,'ob6opts')">Colar em V</div>
+        <div class="ob-opt ob-single" data-val="Colar em U" onclick="obSingle(this,'ob6opts')">Colar em U</div>
+      </div>
+      <button class="btn btn-main" onclick="obNext(7,'ob6opts')" style="margin-top:20px">Proximo</button>
+    </div>
+
+    <div id="ob7" class="ob-screen" style="display:none">
+      <div class="ob-step">7 de 7 · Ajuste fino</div>
+      <div class="ob-title">Algum detalhe especial?</div>
+      <div class="ob-subtitle">Opcional - ex: corrente veneziana, mostrar fecho, pedras brilhantes...</div>
+      <textarea id="obExtras" style="background:#FAFAF8;border:1.5px solid var(--line);border-radius:12px;padding:12px;font-size:13px;color:#111;width:100%;outline:none;min-height:100px;resize:none;font-family:inherit;margin-bottom:16px" placeholder="Ex: corrente veneziana, pedras mais brilhantes, mostrar fecho..."></textarea>
+      <button class="btn btn-main" onclick="obFinish()">Enviar</button>
+    </div>
+
+    <div id="ob8" class="ob-screen" style="display:none;text-align:center">
+      <div style="font-size:40px;margin-bottom:16px">🤖</div>
+      <div style="font-size:17px;font-weight:900;margin-bottom:8px">Configurando sua conta...</div>
+      <div style="font-size:13px;color:#888" id="obLoadMsg">A IA esta personalizando seus prompts</div>
+      <div style="margin-top:24px;height:4px;background:#F0EFE9;border-radius:2px;overflow:hidden">
+        <div id="obBar" style="height:100%;background:linear-gradient(135deg,#7B3FF2,#4D7BFF);width:0%;transition:width .5s;border-radius:2px"></div>
+      </div>
+    </div>
+
+    <div id="ob9" class="ob-screen" style="display:none;text-align:center">
+      <div style="font-size:48px;margin-bottom:16px">🎉</div>
+      <div style="font-size:20px;font-weight:900;margin-bottom:8px">Tudo pronto!</div>
+      <div style="font-size:13px;color:#888;margin-bottom:24px;line-height:1.6">Seus prompts foram personalizados.<br>Agora suas fotos vao ficar ainda melhores!</div>
+      <button class="btn btn-main" onclick="closeOnboarding()">Comecar agora!</button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- POPUP CRÉDITOS ZERADOS -->
+<div id="zeroCreditsPopup" style="display:none;position:fixed;inset:0;background:rgba(17,18,39,.7);z-index:250;align-items:center;justify-content:center;padding:20px">
+  <div style="width:min(100%,380px);background:#fff;border-radius:24px;padding:28px 24px;text-align:center;box-shadow:0 30px 80px rgba(17,18,39,.2)">
+    <div style="font-size:40px;margin-bottom:12px">😕</div>
+    <div style="font-size:18px;font-weight:900;margin-bottom:8px">Suas fotos acabaram!</div>
+    <div style="font-size:13px;color:#888;margin-bottom:24px;line-height:1.6">Para continuar gerando fotos profissionais escolha um plano e continue crescendo suas vendas.</div>
+    <button class="btn btn-main" onclick="closeZeroCredits();openPlans()" style="margin-bottom:10px">✦ Ver planos</button>
+    <button onclick="closeZeroCredits()" style="width:100%;height:44px;border-radius:14px;border:1px solid #E8E2D6;background:#fff;color:#888;font-size:13px;cursor:pointer">Agora não</button>
+  </div>
+</div>
+
+<style>
+.ob-screen{animation:obFade .25s ease}
+@keyframes obFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.ob-step{font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.ob-title{font-size:16px;font-weight:900;margin-bottom:6px;color:#111}
+.ob-subtitle{font-size:12px;color:var(--muted);margin-bottom:14px}
+.ob-grid{display:flex;flex-wrap:wrap;gap:8px}
+.ob-col1{flex-direction:column}
+.ob-opt{background:#F5F4F0;border:1.5px solid transparent;border-radius:12px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;user-select:none;color:#111}
+.ob-opt:hover{border-color:var(--purple);background:#F3F0FF}
+.ob-opt.selected{background:#F3F0FF;border-color:var(--purple);color:var(--purple)}
+</style>
+
+<script>
+let obData={pecas:[],fotos:[],cor:'',estilo:'',fundo:'',brilho:'',acabamento:'',foco:'',modeloEstilo:'',modeloIdade:'',posicao:'',extras:''};
+function openOnboarding(){document.getElementById('onboardingModal').style.display='flex';obShow(0);}
+function closeOnboarding(){document.getElementById('onboardingModal').style.display='none';}
+function obShow(n){document.querySelectorAll('.ob-screen').forEach(s=>s.style.display='none');document.getElementById('ob'+n).style.display='block';}
+function obGo(n){obShow(n);}
+function obToggle(el){el.classList.toggle('selected');}
+function obSingle(el,groupId){document.querySelectorAll('#'+groupId+' .ob-opt').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');}
+function obNext(next,...groupIds){
+  for(const gid of groupIds){
+    const hasOne=document.querySelector('#'+gid+' .ob-opt.selected');
+    if(!hasOne){
+      const g=document.getElementById(gid);
+      g.style.outline='2px solid #c23';g.style.borderRadius='12px';
+      setTimeout(()=>{g.style.outline='';},1500);return;
+    }
+  }
+  obShow(next);
+}
+async function obFinish(){
+  obData.pecas=[...document.querySelectorAll('#ob1opts .selected')].map(e=>e.dataset.val);
+  obData.fotos=[...document.querySelectorAll('#ob2opts .selected')].map(e=>e.dataset.val);
+  obData.cor=document.querySelector('#ob3cor .selected')?.dataset.val||'';
+  obData.estilo=document.querySelector('#ob3estilo .selected')?.dataset.val||'';
+  obData.fundo=document.querySelector('#ob4fundo .selected')?.dataset.val||'';
+  obData.brilho=document.querySelector('#ob4brilho .selected')?.dataset.val||'';
+  obData.acabamento=document.querySelector('#ob4acabamento .selected')?.dataset.val||'';
+  obData.foco=document.querySelector('#ob5foco .selected')?.dataset.val||'';
+  obData.modeloEstilo=document.querySelector('#ob5estilo .selected')?.dataset.val||'';
+  obData.modeloIdade=document.querySelector('#ob5idade .selected')?.dataset.val||'';
+  obData.posicao=document.querySelector('#ob6opts .selected')?.dataset.val||'';
+  obData.extras=document.getElementById('obExtras').value.trim();
+  obShow(8);
+  const bar=document.getElementById('obBar');
+  const msg=document.getElementById('obLoadMsg');
+  bar.style.width='30%';msg.textContent='Analisando seu perfil...';
+  try{
+    bar.style.width='60%';msg.textContent='A IA esta criando seus prompts personalizados...';
+    const req=`Voce e especialista em fotografia de semijoias para e-commerce brasileiro. Com base no perfil abaixo, crie 3 prompts profissionais em portugues para geracao de fotos de semijoias.
+
+Perfil:
+- Pecas: ${obData.pecas.join(', ')||'semijoias em geral'}
+- Tipos de foto: ${obData.fotos.join(', ')||'catalogo'}
+- Cor do metal: ${obData.cor||'variado'}
+- Estilo visual: ${obData.estilo||'premium'}
+- Fundo preferido: ${obData.fundo||'branco puro'}
+- Intensidade do brilho: ${obData.brilho||'natural'}
+- Acabamento do metal: ${obData.acabamento||'polido liso'}
+- Foco principal: ${obData.foco||'maxima fidelidade'}
+- Estilo da modelo: ${obData.modeloEstilo||'elegante'}
+- Faixa etaria da modelo: ${obData.modeloIdade||'20-30 anos'}
+- Posicionamento: ${obData.posicao||'composicao minimalista'}
+- Detalhes extras: ${obData.extras||'nenhum'}
+
+Regras automaticas: metal liso sem porosidade, reflexos naturais, evitar deformacoes, aparencia premium, iluminacao adequada, fidelidade estrutural, foco nitido.
+
+Responda APENAS com JSON valido, sem markdown:
+{"p1":"prompt catalogo fundo branco (400-700 chars)","p2":"prompt modelo usando (400-700 chars)","p3":"prompt close detalhe (400-700 chars)"}`;
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:req}]})});
+    const data=await res.json();
+    const text=data.content?.[0]?.text||'';
+    const clean=text.replace(/```json|```/g,'').trim();
+    const prompts=JSON.parse(clean);
+    await db.collection('users').doc(currentUser.uid).update({onboardingDone:true,onboardingData:obData,customPrompts:prompts});
+    currentUserData.onboardingDone=true;currentUserData.customPrompts=prompts;
+    bar.style.width='100%';
+    await new Promise(r=>setTimeout(r,400));
+    obShow(9);
+  }catch(e){
+    console.error('Onboarding erro:',e);
+    await db.collection('users').doc(currentUser.uid).update({onboardingDone:true,onboardingData:obData});
+    currentUserData.onboardingDone=true;
+    obShow(9);
+  }
+}
+function showAjusteFino(){const b=document.getElementById('ajusteFinoBanner');if(b&&!currentUserData?.onboardingDone)b.style.display='flex';}
+function showZeroCreditsPopup(){document.getElementById('zeroCreditsPopup').style.display='flex';}
+function closeZeroCredits(){document.getElementById('zeroCreditsPopup').style.display='none';}
 </script>
 
 </body>
