@@ -227,8 +227,8 @@ button,input,textarea{font-family:inherit}
         Continuar com Google
       </button>
       <div class="divider">ou</div>
-      <input id="loginEmail" class="input" type="email" placeholder="Email" style="margin-bottom:10px">
-      <input id="loginPass" class="input" type="password" placeholder="Senha">
+      <input id="loginEmail" class="input" type="email" placeholder="Email" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')loginEmail()">
+      <input id="loginPass" class="input" type="password" placeholder="Senha" onkeydown="if(event.key==='Enter')loginEmail()">
       <span class="forgot-link" onclick="forgotPassword()">Esqueci minha senha</span>
       <button class="btn btn-main" onclick="loginEmail()">✦ Entrar</button>
       <div id="loginErr" class="err"></div>
@@ -241,8 +241,8 @@ button,input,textarea{font-family:inherit}
       </button>
       <div class="divider">ou</div>
       <input id="regName" class="input" type="text" placeholder="Seu nome" style="margin-bottom:10px">
-      <input id="regEmail" class="input" type="email" placeholder="Email" style="margin-bottom:10px">
-      <input id="regPass" class="input" type="password" placeholder="Senha (mínimo 6 caracteres)" style="margin-bottom:10px">
+      <input id="regEmail" class="input" type="email" placeholder="Email" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')register()">
+      <input id="regPass" class="input" type="password" placeholder="Senha (mínimo 6 caracteres)" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')register()">
       <input id="regWhatsapp" class="input" type="tel" placeholder="WhatsApp — ex: 11999998888" required>
       <button class="btn btn-main" onclick="register()">✦ Criar conta grátis</button>
       <div style="background:linear-gradient(135deg,rgba(212,175,55,.15),rgba(123,63,242,.12));border:1.5px solid rgba(212,175,55,.5);border-radius:16px;padding:14px 16px;margin-top:14px;text-align:center">
@@ -747,7 +747,13 @@ async function generate(){
     bar.style.width='100%';ptext.textContent='✅ Pronto! Fotos geradas com sucesso!';
     await decrementCredits(photos.length);
     addCount();showResults();
-  }catch(e){error.textContent='Erro: '+e.message;genBtn.disabled=false}
+  }catch(e){
+    const msg = e.message.includes('Falha na função') || e.message.includes('timeout') || e.message.includes('504')
+      ? '⚠️ Nossos servidores estão sobrecarregados no momento. Aguarde alguns minutos e tente novamente.'
+      : 'Erro: '+e.message;
+    error.textContent=msg;
+    genBtn.disabled=false;
+  }
   finally{setTimeout(()=>progress.style.display='none',800)}
 }
 
@@ -783,7 +789,13 @@ async function regenerate(i){
     bar.style.width='100%';ptext.textContent='Pronto!';
     await decrementCredits(1);
     showResults();
-  }catch(e){error.textContent='Erro ao gerar foto '+(i+1)+': '+e.message;showResults();}
+  }catch(e){
+    const msg = e.message.includes('Falha na função') || e.message.includes('timeout') || e.message.includes('504')
+      ? '⚠️ Nossos servidores estão sobrecarregados no momento. Aguarde alguns minutos e tente novamente.'
+      : 'Erro ao gerar foto '+(i+1)+': '+e.message;
+    error.textContent=msg;
+    showResults();
+  }
   finally{setTimeout(()=>progress.style.display='none',500)}
 }
 
