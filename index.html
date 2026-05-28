@@ -946,12 +946,12 @@ const catIcons = {
 };
 
 function getCatIcon(cat){
+  // Se tem ícone definido (não vazio e não ✦), usa ele primeiro
+  if(cat.icon && cat.icon !== '✦') return `<span style="font-size:20px">${cat.icon}</span>`;
   // Tenta encontrar por nome exato ou parcial
   for(const key of Object.keys(catIcons)){
     if(cat.name.toLowerCase().includes(key.toLowerCase())) return catIcons[key];
   }
-  // Se tem ícone emoji, mostra ele
-  if(cat.icon && cat.icon !== '✦') return `<span style="font-size:20px">${cat.icon}</span>`;
   // Padrão: losango da marca
   return `<svg class="chip-svg" viewBox="0 0 24 24"><path d="M12 2L22 12L12 22L2 12Z"/></svg>`;
 }
