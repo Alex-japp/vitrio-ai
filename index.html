@@ -94,11 +94,26 @@ button,input,textarea{font-family:inherit}
 .content{padding:28px 38px;max-width:760px;margin:0 auto}
 .label{display:block;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin:20px 0 10px;color:var(--ink)}
 .chips-wrap{position:relative;margin:2px 0 24px;display:flex;align-items:center;justify-content:center}.chips{display:flex;gap:14px;overflow-x:auto;padding:6px 4px 16px;scrollbar-width:none;scroll-behavior:smooth;justify-content:center;max-width:100%}.chips::-webkit-scrollbar{display:none}.chip{min-width:100px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 10px;box-shadow:0 2px 10px rgba(28,28,28,.04);text-align:center;font-weight:700;font-size:12px;color:var(--ink);cursor:pointer;transition:all .2s ease}.chip .ico{width:44px;height:44px;margin:0 auto 8px;border-radius:12px;background:rgba(123,97,255,.07);color:var(--purple);display:grid;place-items:center;font-size:22px;transition:all .2s ease}.chip:hover:not(.active){border-color:rgba(123,97,255,.3);background:rgba(123,97,255,.03);transform:translateY(-1px);box-shadow:0 4px 14px rgba(28,28,28,.07)}.chip.active{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 8px 20px rgba(123,97,255,.25);transform:translateY(-2px)}.chip.active .ico{background:rgba(255,255,255,.18);color:#fff}.chip-arrow{position:absolute;top:42%;transform:translateY(-50%);z-index:5;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:26px;line-height:1;box-shadow:0 4px 16px rgba(28,28,28,.08);cursor:pointer;transition:all .2s ease}.chip-arrow.left{left:0}.chip-arrow.right{right:0}.chip-arrow:hover{border-color:var(--purple);color:var(--purple);transform:translateY(-50%) scale(1.05)}
-.card{background:#fff;border:1px solid var(--line);border-radius:28px;padding:28px;box-shadow:var(--shadow);margin-top:10px}.field{margin-bottom:24px}.field:last-child{margin-bottom:0}.inp-wrap{position:relative}.inp-ico{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:#B8B8C3;font-size:20px}.with-ico{padding-left:56px}.upload{position:relative;border:1.5px dashed rgba(123,97,255,.30);background:linear-gradient(160deg,#fff 60%,rgba(123,97,255,.04) 100%);border-radius:24px;min-height:240px;display:flex;align-items:center;justify-content:center;text-align:center;padding:28px;overflow:hidden;transition:all .25s ease}.upload:hover{border-color:var(--purple);background:linear-gradient(160deg,#fff 40%,rgba(123,97,255,.07) 100%);transform:translateY(-1px);box-shadow:0 8px 24px rgba(123,97,255,.08)}.upload.has-img{padding:0;border-style:solid;transform:none;box-shadow:none}.upload img{width:100%;height:100%;max-height:280px;object-fit:contain;display:block}.remove-photo{display:none;position:absolute;right:14px;top:14px;width:42px;height:42px;border:0;border-radius:50%;background:rgba(28,28,28,.75);color:#fff;font-size:22px;font-weight:900;cursor:pointer;box-shadow:0 8px 24px rgba(28,28,28,.22);z-index:3}.upload.has-img .remove-photo{display:grid;place-items:center}.remove-photo:hover{background:#ff4f4f}
-.camera-dot{width:82px;height:82px;margin:0 auto 14px;border-radius:50%;background:rgba(123,97,255,.08);border:1px solid rgba(123,97,255,.15);display:grid;place-items:center;font-size:34px}.upload strong{font-size:17px}.upload small{display:block;color:var(--muted);margin-top:8px}.row{display:flex;gap:18px}.outline{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:14px;height:58px;font-weight:700;cursor:pointer;color:var(--ink);box-shadow:0 4px 12px rgba(28,28,28,.04);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s ease}.outline:hover{border-color:var(--purple);color:var(--purple);background:var(--hover);transform:translateY(-1px)}.secure{text-align:center;font-size:12px;color:var(--muted);margin-top:14px}.progress{display:none;background:#fff;border:1px solid var(--line);border-radius:26px;padding:22px;margin-top:18px;box-shadow:var(--shadow)}.ring{width:52px;height:52px;border-radius:50%;border:4px solid #eee;border-top-color:var(--purple);animation:spin .8s linear infinite;margin:0 auto 14px}@keyframes spin{to{transform:rotate(360deg)}}.bar{height:7px;background:#eee;border-radius:9px;overflow:hidden;margin-top:12px}.bar span{display:block;height:100%;width:0;background:var(--grad);transition:.4s}.results{display:none;margin-top:22px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:#fff;border:1px solid var(--line);border-radius:28px;padding:28px;box-shadow:var(--shadow);margin-top:10px}.field{margin-bottom:24px}.field:last-child{margin-bottom:0}.inp-wrap{position:relative}.inp-ico{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:#B8B8C3;font-size:20px}.with-ico{padding-left:56px}.upload{position:relative;border:1.5px dashed rgba(123,97,255,.30);background:linear-gradient(160deg,#fff 60%,rgba(123,97,255,.04) 100%);border-radius:24px;min-height:240px;display:flex;align-items:center;justify-content:center;text-align:center;padding:28px;overflow:hidden;transition:all .25s ease}.upload:hover{border-color:var(--purple);background:linear-gradient(160deg,#fff 40%,rgba(123,97,255,.07) 100%);transform:translateY(-1px);box-shadow:0 8px 24px rgba(123,97,255,.08)}.upload.drag-over{border-color:var(--purple);border-style:solid;background:rgba(123,97,255,.05);transform:scale(1.01);box-shadow:0 12px 32px rgba(123,97,255,.12)}
+.upload.has-img{padding:0;border-style:solid;border-color:rgba(123,97,255,.3);transform:none;box-shadow:none}
+.upload-success{position:absolute;top:12px;left:12px;background:rgba(26,107,58,.9);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;display:none;animation:fadeInUp .25s ease}
+.upload.has-img .upload-success{display:block}.upload img{width:100%;height:100%;max-height:280px;object-fit:contain;display:block}.remove-photo{display:none;position:absolute;right:14px;top:14px;width:42px;height:42px;border:0;border-radius:50%;background:rgba(28,28,28,.75);color:#fff;font-size:22px;font-weight:900;cursor:pointer;box-shadow:0 8px 24px rgba(28,28,28,.22);z-index:3}.upload.has-img .remove-photo{display:grid;place-items:center}.remove-photo:hover{background:#ff4f4f}
+.camera-dot{width:82px;height:82px;margin:0 auto 14px;border-radius:50%;background:rgba(123,97,255,.08);border:1px solid rgba(123,97,255,.15);display:grid;place-items:center;font-size:34px}.upload strong{font-size:17px}.upload small{display:block;color:var(--muted);margin-top:8px}.row{display:flex;gap:18px}.outline{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:14px;height:58px;font-weight:700;cursor:pointer;color:var(--ink);box-shadow:0 4px 12px rgba(28,28,28,.04);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s ease}.outline:hover{border-color:var(--purple);color:var(--purple);background:var(--hover);transform:translateY(-1px)}.secure{text-align:center;font-size:12px;color:var(--muted);margin-top:14px}.progress{display:none;background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px 24px;margin-top:18px;box-shadow:var(--shadow);text-align:center}
+.progress-icon{width:64px;height:64px;border-radius:50%;background:rgba(123,97,255,.08);border:2px solid rgba(123,97,255,.15);display:grid;place-items:center;margin:0 auto 16px;font-size:28px;animation:pulseIcon 2s ease-in-out infinite}
+@keyframes pulseIcon{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(123,97,255,.2)}50%{transform:scale(1.06);box-shadow:0 0 0 8px rgba(123,97,255,.0)}}
+.bar{height:5px;background:#EAEAF2;border-radius:9px;overflow:hidden;margin-top:16px}.bar span{display:block;height:100%;width:0;background:var(--grad);transition:.5s ease;border-radius:9px}
+.ptext{font-size:13px;color:var(--muted);margin-top:10px;font-weight:500}.results{display:none;margin-top:22px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.res-animate{animation:fadeInUp .35s ease forwards;opacity:0}
+.res-animate:nth-child(1){animation-delay:.05s}
+.res-animate:nth-child(2){animation-delay:.12s}
+.res-animate:nth-child(3){animation-delay:.19s}
 .res{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 4px 16px rgba(28,28,28,.06);position:relative;transition:all .2s ease}
 .res:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(28,28,28,.10);border-color:rgba(123,97,255,.2)}
-.res img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+@keyframes shimmer{0%{background-position:-468px 0}100%{background-position:468px 0}}
+.skeleton{background:linear-gradient(90deg,#f0f0f5 25%,#e8e8f0 50%,#f0f0f5 75%);background-size:936px 100%;animation:shimmer 1.4s infinite linear;border-radius:18px;aspect-ratio:1}
+.res img{width:100%;aspect-ratio:1;object-fit:cover;display:block;transition:opacity .3s ease}
+.res img.loading{opacity:0}
 .res .dl-btn{width:100%;border:0;background:var(--grad);color:#fff;font-size:10px;font-weight:800;padding:10px 3px;cursor:pointer;transition:all .2s ease}
 .res .dl-btn:hover{opacity:.9}
 .regen-btn{position:absolute;top:7px;right:7px;width:28px;height:28px;border-radius:50%;border:0;background:rgba(28,28,28,.65);color:#fff;display:grid;place-items:center;cursor:pointer;z-index:2;transition:all .2s ease;opacity:0}
@@ -360,11 +375,15 @@ button,input,textarea{font-family:inherit}
       </div>
       <div class="field">
         <label class="label">Foto do produto</label>
-        <div id="upload" class="upload" onclick="document.getElementById('file').click()">
+        <div id="upload" class="upload" onclick="document.getElementById('file').click()"
+          ondragover="event.preventDefault();this.classList.add('drag-over')"
+          ondragleave="this.classList.remove('drag-over')"
+          ondrop="event.preventDefault();this.classList.remove('drag-over');readFile(event.dataTransfer.files[0])">
+          <div class="upload-success">✓ Foto carregada</div>
           <button id="removePhoto" class="remove-photo" type="button" onclick="clearPhoto(event)" title="Remover foto">×</button>
           <div id="uEmpty">
             <div class="camera-dot">
-              <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#7B3FF2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#7B61FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
             </div>
             <strong>Clique para selecionar</strong>
             <small>ou arraste a foto aqui</small>
@@ -420,8 +439,8 @@ button,input,textarea{font-family:inherit}
       <small>Entre em contato para adquirir mais fotos e continuar gerando.</small>
     </div>
     <div id="progress" class="progress">
-      <div class="ring"></div>
-      <p id="ptext" style="text-align:center;color:var(--muted);font-weight:800">Preparando...</p>
+      <div class="progress-icon">◇</div>
+      <p id="ptext" class="ptext">Preparando imagem...</p>
       <div class="bar"><span id="bar"></span></div>
     </div>
     <div id="error" class="err" style="height:auto;text-align:center;margin-top:12px"></div>
@@ -859,6 +878,10 @@ async function generate(){
   error.textContent='';progress.style.display='block';
   if(window.innerWidth<900)results.style.display='none';
   genBtn.disabled=true;bar.style.width='10%';ptext.textContent='Preparando imagem...';
+  // Skeleton loading
+  const skeletonCount = state.selectedPhotos.length;
+  grid.innerHTML = Array(skeletonCount).fill('<div class="skeleton"></div>').join('');
+  results.style.display='block';
   try{
     const pngB64=await toBase64PNG(state.b64,state.mime);
     state.imgs=[];
@@ -952,7 +975,7 @@ function showResults(){
   if(resultsPlaceholder) resultsPlaceholder.style.display='none';
   grid.setAttribute('data-qty',state.selectedPhotos.length);
   const regenSvg=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>`;
-  grid.innerHTML=state.imgs.map((im,i)=>`<div class="res"><img src="data:image/jpeg;base64,${im.b64}"><button class="regen-btn" onclick="regenerate(${i})" title="Gerar novamente">${regenSvg}</button><button class="dl-btn" onclick="download(${i})">Baixar</button></div>`).join('');
+  grid.innerHTML=state.imgs.map((im,i)=>`<div class="res res-animate"><img src="data:image/jpeg;base64,${im.b64}" class="loading" onload="this.classList.remove('loading')"><button class="regen-btn" onclick="regenerate(${i})" title="Gerar novamente">${regenSvg}</button><button class="dl-btn" onclick="download(${i})">Baixar</button></div>`).join('');
   results.style.display='block';
 }
 
