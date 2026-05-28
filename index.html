@@ -946,9 +946,15 @@ const catIcons = {
 };
 
 function getCatIcon(cat){
-  // Se tem ícone definido (não vazio e não ✦), usa ele primeiro
-  if(cat.icon && cat.icon !== '✦') return `<span style="font-size:20px">${cat.icon}</span>`;
-  // Tenta encontrar por nome exato ou parcial
+  // Se tem ícone SVG personalizado, usa ele direto
+  if(cat.icon && cat.icon.startsWith('<svg')) return cat.icon;
+  // Se tem emoji ou texto customizado (não ✦ e não ◇), usa como span
+  if(cat.icon && cat.icon !== '✦' && cat.icon !== '◇'){
+    return `<span style="font-size:20px">${cat.icon}</span>`;
+  }
+  // Se ◇ ou sem ícone → usa SVG losango padrão (ignora mapa por nome)
+  if(cat.icon === '◇') return `<svg class="chip-svg" viewBox="0 0 24 24"><path d="M12 2L22 12L12 22L2 12Z"/></svg>`;
+  // Tenta encontrar por nome
   for(const key of Object.keys(catIcons)){
     if(cat.name.toLowerCase().includes(key.toLowerCase())) return catIcons[key];
   }
