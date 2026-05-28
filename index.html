@@ -483,7 +483,7 @@ button,input,textarea{font-family:inherit}
   <button class="nav logout" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sair</button>
 </nav>
 </div>
-<div id="settings" class="settings phone"><header class="cfg-head"><button class="dark-btn" onclick="closeSettings()">←</button><div class="cfg-title">CONFIGURAÇÕES</div><button class="dark-btn" onclick="closeSettings()">✓</button></header><div class="tabs"><button class="tab on" onclick="tab('cats',this)">Categorias</button><button id="promptsTabBtn" class="tab" onclick="tab('prompts',this)">Prompts</button><button class="tab" onclick="tab('general',this)">Geral</button><button id="usersTabBtn" class="tab hidden" onclick="tab('users',this)">Usuários</button></div><main class="cfg-body"><section id="catsTab"><h3>Suas categorias</h3><p class="cfg-sub">Gerencie as categorias dos seus produtos</p><div id="catList"></div><button class="add" onclick="editCat()">+ Nova Categoria</button></section><section id="promptsTab" class="hidden"><h3>Prompts por categoria</h3><p class="cfg-sub">Edite os prompts que guiam cada tipo de foto.</p><div id="promptList"></div></section><section id="generalTab" class="hidden"><h3>Uso do app</h3><p class="cfg-sub">Controle simples para teste beta.</p><div class="counter"><div class="count-card"><div id="cntP" class="num">0</div><small>Produtos</small></div><div class="count-card"><div id="cntI" class="num">0</div><small>Imagens</small></div></div>
+<div id="settings" class="settings phone"><header class="cfg-head"><button class="dark-btn" onclick="closeSettings()">←</button><div class="cfg-title">CONFIGURAÇÕES</div><button class="dark-btn" onclick="closeSettings()">✓</button></header><div class="tabs"><button class="tab on" onclick="tab('cats',this)">Categorias</button><button id="promptsTabBtn" class="tab" onclick="tab('prompts',this)">Prompts</button><button class="tab" onclick="tab('general',this)">Geral</button><button id="dashTabBtn" class="tab hidden" onclick="tab('dash',this);loadDashboard()">Dashboard</button><button id="usersTabBtn" class="tab hidden" onclick="tab('users',this)">Usuários</button></div><main class="cfg-body"><section id="catsTab"><h3>Suas categorias</h3><p class="cfg-sub">Gerencie as categorias dos seus produtos</p><div id="catList"></div><button class="add" onclick="editCat()">+ Nova Categoria</button><button onclick="updateAllIcons()" style="width:100%;height:48px;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;margin-top:8px">◇ Atualizar ícone padrão de todas as categorias</button></section><section id="promptsTab" class="hidden"><h3>Prompts por categoria</h3><p class="cfg-sub">Edite os prompts que guiam cada tipo de foto.</p><div id="promptList"></div></section><section id="generalTab" class="hidden"><h3>Uso do app</h3><p class="cfg-sub">Controle simples para teste beta.</p><div class="counter"><div class="count-card"><div id="cntP" class="num">0</div><small>Produtos</small></div><div class="count-card"><div id="cntI" class="num">0</div><small>Imagens</small></div></div>
 <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 18px;margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 8px 20px rgba(17,18,39,.04)">
   <div><div style="font-weight:800;font-size:14px">Código do produto</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Exigir preenchimento do código</div></div>
   <label style="position:relative;display:inline-flex;cursor:pointer">
@@ -491,7 +491,14 @@ button,input,textarea{font-family:inherit}
     <div id="codeRequiredSlider" style="width:46px;height:26px;background:#ddd;border-radius:13px;transition:.2s;position:relative"><div style="position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 2px 4px rgba(0,0,0,.2)" id="codeSliderDot"></div></div>
   </label>
 </div>
-<button class="cfg-link" onclick="feedback()">💬 Enviar feedback</button><button class="cfg-link" onclick="openTerms()" style="border-color:var(--purple);color:var(--purple)">📜 Termos de Uso e Privacidade</button><button class="danger" onclick="logout()">Sair com segurança</button></section><section id="usersTab" class="hidden"><h3>Gerenciar usuários</h3><p class="cfg-sub">Gerencie clientes, créditos e planos.</p><div id="userList"><p style="color:var(--muted);font-size:13px">Carregando usuários...</p></div></section></main><nav class="bottom" style="background:#0f1027;border-color:rgba(255,255,255,.08)"><button class="nav" onclick="tab('cats',document.querySelectorAll('.tab')[0])"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.04.04a2 2 0 1 1-2.83 2.83l-.04-.04A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 1 1-4 0v-.06A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H3a2 2 0 1 1 0-4h.06A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.04-.04A2 2 0 1 1 7.05 3.85l.04.04A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.08V3a2 2 0 1 1 4 0v.06A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04A1.7 1.7 0 0 0 19.4 9c.2.35.52.62.9.75.28.1.58.15.88.15H21a2 2 0 1 1 0 4h-.06c-.3 0-.6.05-.88.15-.38.13-.7.4-.9.75z"></path></svg>Configurações</button><button class="nav" onclick="feedback()"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>Feedback</button><button class="nav logout" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sair</button></nav></div>
+<button class="cfg-link" onclick="feedback()">💬 Enviar feedback</button><button class="cfg-link" onclick="openTerms()" style="border-color:var(--purple);color:var(--purple)">📜 Termos de Uso e Privacidade</button><button class="danger" onclick="logout()">Sair com segurança</button></section><section id="dashTab" class="hidden">
+  <h3>Dashboard</h3>
+  <p class="cfg-sub">Visão geral do negócio em tempo real.</p>
+  <div id="dashContent">
+    <p style="color:var(--muted);font-size:13px">Carregando...</p>
+  </div>
+</section>
+<section id="usersTab" class="hidden"><h3>Gerenciar usuários</h3><p class="cfg-sub">Gerencie clientes, créditos e planos.</p><div id="userList"><p style="color:var(--muted);font-size:13px">Carregando usuários...</p></div></section></main><nav class="bottom" style="background:#0f1027;border-color:rgba(255,255,255,.08)"><button class="nav" onclick="tab('cats',document.querySelectorAll('.tab')[0])"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.04.04a2 2 0 1 1-2.83 2.83l-.04-.04A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 1 1-4 0v-.06A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H3a2 2 0 1 1 0-4h.06A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.04-.04A2 2 0 1 1 7.05 3.85l.04.04A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.08V3a2 2 0 1 1 4 0v.06A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04A1.7 1.7 0 0 0 19.4 9c.2.35.52.62.9.75.28.1.58.15.88.15H21a2 2 0 1 1 0 4h-.06c-.3 0-.6.05-.88.15-.38.13-.7.4-.9.75z"></path></svg>Configurações</button><button class="nav" onclick="feedback()"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>Feedback</button><button class="nav logout" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sair</button></nav></div>
 <div id="admin" class="modal"><div class="sheet"><h3>Área restrita</h3><input id="adminPass" type="password" class="input" placeholder="Senha admin"><div class="sheet-actions"><button onclick="closeModal('admin')">Cancelar</button><button class="save" onclick="checkAdmin()">Entrar</button></div><div id="adminErr" class="err"></div></div></div>
 <div id="catModal" class="modal"><div class="sheet"><h3 id="catTitle">Categoria</h3><input id="catName" class="input" placeholder="Nome da categoria"><input id="catIcon" class="input" placeholder="Ícone / emoji. Ex: 💍"><div id="promptFields"><span class="prompt-mini">Foto 1</span><textarea id="p1" class="textarea" placeholder="Prompt da foto 1"></textarea><span class="prompt-mini">Foto 2</span><textarea id="p2" class="textarea" placeholder="Prompt da foto 2"></textarea><span class="prompt-mini">Foto 3</span><textarea id="p3" class="textarea" placeholder="Prompt da foto 3"></textarea></div><div class="sheet-actions"><button onclick="closeModal('catModal')">Cancelar</button><button class="save" onclick="saveCat()">Salvar</button></div></div></div>
 <!-- Firebase SDK - carregado antes do app -->
@@ -740,6 +747,8 @@ auth.onAuthStateChanged(async (user) => {
     if(currentUserData?.isAdmin){
       if(promptsTabBtn) promptsTabBtn.style.display='';
       if(usersTabBtn) usersTabBtn.classList.remove('hidden');
+      const dashTabBtn = document.getElementById('dashTabBtn');
+      if(dashTabBtn) dashTabBtn.classList.remove('hidden');
     }
     // Onboarding para novos usuários
     if(!currentUserData?.onboardingDone && !currentUserData?.isAdmin){
@@ -794,10 +803,100 @@ function applyCodeConfig(){
   ready();
 }
 
+async function updateAllIcons(){
+  if(!confirm('Atualizar o ícone padrão de todas as categorias para ◇?\n\nCategorias com ícone personalizado não serão alteradas.')) return;
+  let updated = 0;
+  cats = cats.map(c => {
+    if(!c.icon || c.icon === '✦'){
+      updated++;
+      return {...c, icon: '◇'};
+    }
+    return c;
+  });
+  try{
+    await CONFIG_REF.set({cats},{merge:true});
+    render();
+    alert(`✅ ${updated} categoria(s) atualizada(s) para ◇`);
+  }catch(e){
+    alert('Erro ao salvar: '+e.message);
+  }
+}
+
 async function toggleCodeRequired(val){
   appConfig.codeRequired = val;
   applyCodeConfig();
   try{await CONFIG_REF.set({appConfig},{merge:true});}catch(e){console.log('Erro salvar config:',e);}
+}
+
+async function loadDashboard(){
+  const content = document.getElementById('dashContent');
+  if(!content) return;
+  content.innerHTML='<p style="color:var(--muted);font-size:13px">Carregando...</p>';
+  try{
+    const snap = await db.collection('users').get();
+    const users = snap.docs.map(d=>({...d.data()}));
+    const total = users.length;
+    const ativos = users.filter(u=>u.active!==false && !u.isAdmin).length;
+    const semCredito = users.filter(u=>!u.isAdmin&&(u.credits||0)===0).length;
+    const creditosBaixos = users.filter(u=>!u.isAdmin&&(u.credits||0)>0&&(u.credits||0)<=5).length;
+    const totalFotos = parseInt(localStorage.getItem('cntI')||'0');
+    const totalProdutos = parseInt(localStorage.getItem('cntP')||'0');
+    const planCount = {teste:0,starter:0,pro:0,business:0,premium:0};
+    users.filter(u=>!u.isAdmin).forEach(u=>{ if(planCount[u.plan]!==undefined) planCount[u.plan]++; });
+    const receitaEst = (planCount.starter*19)+(planCount.pro*39)+(planCount.business*69)+(planCount.premium*89);
+
+    content.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+        <div class="count-card">
+          <div class="num">${total}</div>
+          <small>Total clientes</small>
+        </div>
+        <div class="count-card">
+          <div class="num">${ativos}</div>
+          <small>Clientes ativos</small>
+        </div>
+        <div class="count-card">
+          <div class="num">${totalFotos}</div>
+          <small>Fotos geradas</small>
+        </div>
+        <div class="count-card">
+          <div class="num">${totalProdutos}</div>
+          <small>Produtos</small>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px">
+        <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Distribuição por plano</div>
+        ${Object.entries(planCount).map(([plan,count])=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #F5F4F0">
+            <span style="font-size:13px;font-weight:600;text-transform:capitalize">${plan}</span>
+            <span style="font-size:13px;font-weight:800;color:var(--purple)">${count} cliente${count!==1?'s':''}</span>
+          </div>`).join('')}
+      </div>
+
+      <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px">
+        <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Alertas</div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F5F4F0">
+          <span style="font-size:13px">😕 Sem créditos</span>
+          <span style="font-size:13px;font-weight:800;color:#c23">${semCredito} cliente${semCredito!==1?'s':''}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0">
+          <span style="font-size:13px">⚠️ Créditos baixos (≤5)</span>
+          <span style="font-size:13px;font-weight:800;color:#E67E00">${creditosBaixos} cliente${creditosBaixos!==1?'s':''}</span>
+        </div>
+      </div>
+
+      <div style="background:linear-gradient(135deg,rgba(123,97,255,.08),rgba(108,59,255,.05));border:1px solid rgba(123,97,255,.2);border-radius:18px;padding:16px;text-align:center">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Receita estimada</div>
+        <div style="font-size:32px;font-weight:900;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent">R$${receitaEst}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Baseado nos planos ativos</div>
+      </div>
+
+      <button onclick="loadDashboard()" style="width:100%;height:44px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;margin-top:12px">↻ Atualizar</button>
+    `;
+  }catch(e){
+    content.innerHTML='<p style="color:#c23">Erro ao carregar dashboard: '+e.message+'</p>';
+  }
 }
 
 async function saveCatsToFirebase(){
