@@ -1018,32 +1018,20 @@ async function generate(){
   }
   error.textContent='';progress.style.display='block';
   if(window.innerWidth<900)results.style.display='none';
-  genBtn.disabled=true;bar.style.width='5%';ptext.textContent='Analisando a peça...';
+  genBtn.disabled=true;bar.style.width='5%';ptext.textContent='Enviando para processamento...';
   // Skeleton loading
   const skeletonCount = state.selectedPhotos.length;
   grid.innerHTML = Array(skeletonCount).fill('<div class="skeleton"></div>').join('');
   results.style.display='block';
+  if(resultsPlaceholder) resultsPlaceholder.style.display='none';
+
   try{
-    const pngB64=await compressImage(state.b64,state.mime,1024,0.85);
-    state.imgs=[];
-    const photos=state.selectedPhotos;
-    let photo1Result=null;
+    const pngB64 = await compressImage(state.b64, state.mime, 1024, 0.85);
+    const photos = state.selectedPhotos;
 
-    // ETAPA 1 — Análise técnica da peça
-    let analise = {};
-    try{
-      bar.style.width='12%';ptext.textContent='Identificando características da peça...';
-      const analiseRes = await api('analyze',{imageBase64:pngB64});
-      analise = analiseRes.analise || {};
-    }catch(e){
-      console.log('Análise técnica falhou, continuando sem ela:', e.message);
-    }
-
-    // ETAPA 2 — Geração das fotos
-    for(let idx=0;idx<photos.length;idx++){
-      const photoNum=photos[idx];
-      bar.style.width=(12+(idx+1)*(80/photos.length))+'%';
-      ptext.textContent=`Gerando foto ${idx+1} de ${photos.length}...`;
+    // Monta prompts para cada foto selecionada
+    const prompts = {};
+    photos.forEach(photoNum => {
       const customPrompts = currentUserData?.customPrompts;
       const customApproved = currentUserData?.customPromptsApproved;
       let catPrompt;
@@ -1052,25 +1040,80 @@ async function generate(){
       } else {
         catPrompt = state.cat['p'+photoNum] || 'Foto profissional de semijoia';
       }
-      let prompt = catPrompt + (state.obs ? '\nObservações: '+state.obs : '');
-      const imageToUse=(photoNum>1&&photo1Result)?photo1Result:pngB64;
-      const payload = {
-        prompt,
-        imageBase64: pngB64,
-        analise,
-        ...(photoNum > 1 && photo1Result ? {imageBase64Ref: photo1Result} : {})
-      };
-      let g=await api('generate', payload);
-      if(photoNum===1) photo1Result=g.b64_json;
-      if(photoNum===1 && photo1Result){
-        photo1Result = await compressImage(photo1Result,'image/jpeg',1024,0.85);
-      }
-      state.imgs.push({b64:g.b64_json,name:`${state.code}-foto${photoNum}.jpg`});
+      prompts[photoNum] = catPrompt + (state.obs ? '\nObservações: '+state.obs : '');
+    });
 
-      // Mostra a foto imediatamente assim que fica pronta
-      showPhotoImediata(idx, g.b64_json, photoNum);
-    }
-    bar.style.width='100%';ptext.textContent='✅ Pronto! Fotos geradas com sucesso!';
+    // Cria o job no Inngest
+    bar.style.width='10%';ptext.textContent='Iniciando geração...';
+    const jobRes = await fetch('/api/criar-job', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        imageBase64: pngB64,
+        prompts,
+        selectedPhotos: photos,
+        userId: currentUser?.uid || '',
+        code: state.code
+      })
+    });
+
+    if(!jobRes.ok) throw new Error('Falha ao criar job');
+    const { jobId } = await jobRes.json();
+
+    // Polling — verifica status a cada 4 segundos
+    state.imgs = [];
+    const fotosMostradas = new Set();
+    const nomes = {1:'Analisando e gerando foto 1...', 2:'Gerando foto com modelo...', 3:'Gerando close detalhe...'};
+
+    await new Promise((resolve, reject) => {
+      let tentativas = 0;
+      const maxTentativas = 120; // 8 minutos máximo
+
+      const poll = setInterval(async () => {
+        tentativas++;
+        if(tentativas > maxTentativas){
+          clearInterval(poll);
+          reject(new Error('Tempo limite excedido. Tente novamente.'));
+          return;
+        }
+
+        try{
+          const statusRes = await fetch(`/api/status?jobId=${jobId}`);
+          const status = await statusRes.json();
+
+          // Mostra fotos assim que ficam prontas
+          photos.forEach((photoNum, idx) => {
+            if(status.photos[photoNum] && !fotosMostradas.has(photoNum)){
+              fotosMostradas.add(photoNum);
+              const b64 = status.photos[photoNum];
+              state.imgs.push({b64, name:`${state.code}-foto${photoNum}.jpg`});
+              showPhotoImediata(idx, b64, photoNum);
+              bar.style.width = (10 + (fotosMostradas.size / photos.length) * 85) + '%';
+              ptext.textContent = fotosMostradas.size < photos.length
+                ? nomes[photos[fotosMostradas.size]] || 'Gerando próxima foto...'
+                : '✅ Pronto! Fotos geradas com sucesso!';
+            }
+          });
+
+          // Job completo
+          if(status.status === 'completed' || fotosMostradas.size === photos.length){
+            clearInterval(poll);
+            resolve();
+          }
+
+          // Job falhou
+          if(status.status === 'failed'){
+            clearInterval(poll);
+            reject(new Error('Erro no processamento. Tente novamente.'));
+          }
+
+        }catch(e){
+          console.warn('Erro no polling:', e.message);
+        }
+      }, 4000);
+    });
+
+    bar.style.width='100%';
     await decrementCredits(photos.length);
     addCount();
     showToast('✓ Fotos geradas com sucesso!');
