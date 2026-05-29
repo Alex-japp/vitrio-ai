@@ -97,7 +97,7 @@ button,input,textarea{font-family:inherit}
 .card{background:#fff;border:1px solid var(--line);border-radius:28px;padding:28px;box-shadow:var(--shadow);margin-top:10px}.field{margin-bottom:24px}.field:last-child{margin-bottom:0}.inp-wrap{position:relative}.inp-ico{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:#B8B8C3;font-size:20px}.with-ico{padding-left:56px}.upload{position:relative;border:1.5px dashed rgba(123,97,255,.30);background:linear-gradient(160deg,#fff 60%,rgba(123,97,255,.04) 100%);border-radius:24px;min-height:240px;display:flex;align-items:center;justify-content:center;text-align:center;padding:28px;overflow:hidden;transition:all .25s ease}.upload:hover{border-color:var(--purple);background:linear-gradient(160deg,#fff 40%,rgba(123,97,255,.07) 100%);transform:translateY(-1px);box-shadow:0 8px 24px rgba(123,97,255,.08)}.upload.drag-over{border-color:var(--purple);border-style:solid;background:rgba(123,97,255,.05);transform:scale(1.01);box-shadow:0 12px 32px rgba(123,97,255,.12)}
 .upload.has-img{padding:0;border-style:solid;border-color:rgba(123,97,255,.3);transform:none;box-shadow:none}
 .upload-success{position:absolute;top:12px;left:12px;background:rgba(26,107,58,.9);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;display:none;animation:fadeInUp .25s ease}
-.upload.has-img .upload-success{display:block}.upload img{width:100%;height:100%;max-height:280px;object-fit:contain;display:block}.remove-photo{display:none;position:absolute;right:14px;top:14px;width:42px;height:42px;border:0;border-radius:50%;background:rgba(28,28,28,.75);color:#fff;font-size:22px;font-weight:900;cursor:pointer;box-shadow:0 8px 24px rgba(28,28,28,.22);z-index:3}.upload.has-img .remove-photo{display:grid;place-items:center}.remove-photo:hover{background:#ff4f4f}
+.upload.has-img .upload-success{display:block}.upload img{width:100%;height:100%;max-height:280px;object-fit:contain;display:block}.remove-photo{display:none;position:absolute;right:14px;top:14px;width:42px;height:42px;border:0;border-radius:50%;background:rgba(28,28,28,.75);color:#fff;font-size:22px;font-weight:900;cursor:pointer;box-shadow:0 8px 24px rgba(28,28,28,.22);z-index:3;outline:none;-webkit-tap-highlight-color:transparent}.upload.has-img .remove-photo{display:grid;place-items:center}.remove-photo:hover{background:#ff4f4f}.remove-photo:focus{outline:none}
 .camera-dot{width:82px;height:82px;margin:0 auto 14px;border-radius:50%;background:rgba(123,97,255,.08);border:1px solid rgba(123,97,255,.15);display:grid;place-items:center;font-size:34px}.upload strong{font-size:17px}.upload small{display:block;color:var(--muted);margin-top:8px}.row{display:flex;gap:18px}.outline{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:14px;height:58px;font-weight:700;cursor:pointer;color:var(--ink);box-shadow:0 4px 12px rgba(28,28,28,.04);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s ease}.outline:hover{border-color:var(--purple);color:var(--purple);background:var(--hover);transform:translateY(-1px)}.secure{text-align:center;font-size:12px;color:var(--muted);margin-top:14px}.progress{display:none;background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px 24px;margin-top:18px;box-shadow:var(--shadow);text-align:center}
 .progress-icon{width:64px;height:64px;border-radius:50%;background:rgba(123,97,255,.08);border:2px solid rgba(123,97,255,.15);display:grid;place-items:center;margin:0 auto 16px;font-size:28px;animation:pulseIcon 2s ease-in-out infinite}
 @keyframes pulseIcon{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(123,97,255,.2)}50%{transform:scale(1.06);box-shadow:0 0 0 8px rgba(123,97,255,.0)}}
@@ -1206,7 +1206,14 @@ function updateSelection(){
     return c&&c.checked;
   });
   const ca=document.getElementById('checkAll');
-  if(ca){ca.checked=state.selectedPhotos.length===3;document.getElementById('labelAll')?.classList.toggle('checked',ca.checked);}
+  const individual=document.getElementById('individualChecks');
+  if(ca){
+    const allChecked=state.selectedPhotos.length===3;
+    ca.checked=allChecked;
+    document.getElementById('labelAll')?.classList.toggle('checked',allChecked);
+    // Auto-fecha os individuais quando todos estão marcados
+    if(allChecked && individual) individual.classList.add('hidden');
+  }
   ready();
 }
 
@@ -1239,6 +1246,45 @@ function getPromptStatus(u){
   return {label:'🔵 Usando padrão', cls:'ps-default'};
 }
 
+function renderUserList(users){
+  const list = document.getElementById('userList');
+  if(!list) return;
+  const planOptions = ['teste','starter','pro','business','premium'];
+  const planLabel = {teste:'Teste',starter:'Starter',pro:'Pro',business:'Business',premium:'Premium'};
+  if(!users.length){list.innerHTML='<p style="color:var(--muted);font-size:13px;padding:12px 0">Nenhum usuário encontrado.</p>';return;}
+  list.innerHTML = users.map(u=>{
+    const uid = u.uid;
+    const active = u.active !== false;
+    const ps = getPromptStatus(u);
+    const planOpts = planOptions.map(p=>`<option value="${p}" ${u.plan===p?'selected':''}>${planLabel[p]}</option>`).join('');
+    return `<div class="user-row" id="row_${uid}">
+      <div class="user-row-top">
+        <div class="user-info">
+          <strong>${u.name||'Sem nome'} ${u.isAdmin?'👑':''}</strong>
+          <small>${u.email}</small>
+          ${u.whatsapp?`<small>📱 ${u.whatsapp}</small>`:''}
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+            <span class="plan-badge">${planLabel[u.plan]||u.plan}</span>
+            <span class="status-badge ${active?'active':'inactive'}">${active?'✓ Ativo':'✗ Inativo'}</span>
+            <span class="prompt-status ${ps.cls}">${ps.label}</span>
+          </div>
+        </div>
+        <div class="user-credits">${u.credits||0}</div>
+      </div>
+      <div class="user-actions">
+        <select id="plan_${uid}" onchange="changePlan('${uid}',this.value)">${planOpts}</select>
+        <button class="btn-toggle ${active?'':'inactive'}" onclick="toggleActive('${uid}',${active})">${active?'🔒 Inativar':'✅ Ativar'}</button>
+        <button class="btn-del" onclick="deleteUser('${uid}','${u.name||u.email}')">🗑 Deletar</button>
+      </div>
+      <div class="add-credits-wrap">
+        <input type="number" id="credits_${uid}" placeholder="Qtd de fotos" min="1">
+        <button class="btn-add-cr" onclick="addCredits('${uid}')">+ Adicionar fotos</button>
+      </div>
+      ${!u.isAdmin?`<button class="btn-manage-prompts" onclick="openUserPrompts('${uid}')">✎ Gerenciar prompts</button>`:''}
+    </div>`;
+  }).join('');
+}
+
 async function loadUsers(){
   const list = document.getElementById('userList');
   if(!list) return;
@@ -1247,44 +1293,113 @@ async function loadUsers(){
     const snap = await db.collection('users').orderBy('createdAt','desc').get();
     if(snap.empty){list.innerHTML='<p style="color:var(--muted);font-size:13px">Nenhum usuário cadastrado ainda.</p>';return;}
     allUsers = snap.docs.map(doc=>({uid:doc.id,...doc.data()}));
-    const planOptions = ['teste','starter','pro','business','premium'];
-    const planLabel = {teste:'Teste',starter:'Starter',pro:'Pro',business:'Business',premium:'Premium'};
-    list.innerHTML = `
-      <div class="export-bar">
-        <button class="btn-export" onclick="exportCSV()">📥 Exportar CSV</button>
-      </div>` +
-    allUsers.map(u=>{
-      const uid = u.uid;
-      const active = u.active !== false;
-      const ps = getPromptStatus(u);
-      const planOpts = planOptions.map(p=>`<option value="${p}" ${u.plan===p?'selected':''}>${planLabel[p]}</option>`).join('');
-      return `<div class="user-row" id="row_${uid}">
-        <div class="user-row-top">
-          <div class="user-info">
-            <strong>${u.name||'Sem nome'} ${u.isAdmin?'👑':''}</strong>
-            <small>${u.email}</small>
-            ${u.whatsapp?`<small>📱 ${u.whatsapp}</small>`:''}
-            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
-              <span class="plan-badge">${planLabel[u.plan]||u.plan}</span>
-              <span class="status-badge ${active?'active':'inactive'}">${active?'✓ Ativo':'✗ Inativo'}</span>
-              <span class="prompt-status ${ps.cls}">${ps.label}</span>
-            </div>
-          </div>
-          <div class="user-credits">${u.credits||0}</div>
-        </div>
-        <div class="user-actions">
-          <select id="plan_${uid}" onchange="changePlan('${uid}',this.value)">${planOpts}</select>
-          <button class="btn-toggle ${active?'':'inactive'}" onclick="toggleActive('${uid}',${active})">${active?'🔒 Inativar':'✅ Ativar'}</button>
-          <button class="btn-del" onclick="deleteUser('${uid}','${u.name||u.email}')">🗑 Deletar</button>
-        </div>
-        <div class="add-credits-wrap">
-          <input type="number" id="credits_${uid}" placeholder="Qtd de fotos" min="1">
-          <button class="btn-add-cr" onclick="addCredits('${uid}')">+ Adicionar fotos</button>
-        </div>
-        ${!u.isAdmin?`<button class="btn-manage-prompts" onclick="openUserPrompts('${uid}')">✎ Gerenciar prompts</button>`:''}
-      </div>`;
-    }).join('');
+    renderFilterBar();
+    applyFilters();
   }catch(e){list.innerHTML='<p style="color:#c23">Erro ao carregar usuários: '+e.message+'</p>';}
+}
+
+function renderFilterBar(){
+  const list = document.getElementById('userList');
+  const filterBar = `
+    <div style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:14px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+        <select id="filterPlan" onchange="applyFilters()" style="height:36px;border-radius:10px;border:1.5px solid var(--line);padding:0 10px;font-size:13px;outline:none;background:#fff;cursor:pointer;flex:1">
+          <option value="">Todos os planos</option>
+          <option value="teste">Teste</option>
+          <option value="starter">Starter</option>
+          <option value="pro">Pro</option>
+          <option value="business">Business</option>
+          <option value="premium">Premium</option>
+        </select>
+        <select id="filterCredits" onchange="applyFilters()" style="height:36px;border-radius:10px;border:1.5px solid var(--line);padding:0 10px;font-size:13px;outline:none;background:#fff;cursor:pointer;flex:1">
+          <option value="">Todos os créditos</option>
+          <option value="zero">Sem créditos</option>
+          <option value="low">Créditos baixos (≤5)</option>
+          <option value="ok">Créditos OK (>5)</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-export" onclick="exportCSV()">📥 Exportar CSV</button>
+        <button class="btn-export" onclick="copyWhatsapps()" style="background:rgba(37,211,102,.1);border-color:#25D366;color:#128C7E">📱 Copiar WhatsApps</button>
+        <span id="filterCount" style="font-size:12px;color:var(--muted);align-self:center;margin-left:4px"></span>
+      </div>
+    </div>
+    <div id="filteredList"></div>`;
+  list.innerHTML = filterBar;
+}
+
+function applyFilters(){
+  const plan = document.getElementById('filterPlan')?.value || '';
+  const credits = document.getElementById('filterCredits')?.value || '';
+  let filtered = allUsers.filter(u => !u.isAdmin);
+  if(plan) filtered = filtered.filter(u => u.plan === plan);
+  if(credits === 'zero') filtered = filtered.filter(u => (u.credits||0) === 0);
+  else if(credits === 'low') filtered = filtered.filter(u => (u.credits||0) > 0 && (u.credits||0) <= 5);
+  else if(credits === 'ok') filtered = filtered.filter(u => (u.credits||0) > 5);
+  const countEl = document.getElementById('filterCount');
+  if(countEl) countEl.textContent = `${filtered.length} usuário${filtered.length!==1?'s':''}`;
+  const container = document.getElementById('filteredList');
+  if(container){
+    const temp = document.createElement('div');
+    temp.id = 'userList';
+    temp.innerHTML = '';
+    document.getElementById('userList').appendChild(temp);
+    renderUserListTo(filtered, container);
+  }
+}
+
+function renderUserListTo(users, container){
+  const planOptions = ['teste','starter','pro','business','premium'];
+  const planLabel = {teste:'Teste',starter:'Starter',pro:'Pro',business:'Business',premium:'Premium'};
+  if(!users.length){container.innerHTML='<p style="color:var(--muted);font-size:13px;padding:12px 0">Nenhum usuário encontrado com esses filtros.</p>';return;}
+  container.innerHTML = users.map(u=>{
+    const uid = u.uid;
+    const active = u.active !== false;
+    const ps = getPromptStatus(u);
+    const planOpts = planOptions.map(p=>`<option value="${p}" ${u.plan===p?'selected':''}>${planLabel[p]}</option>`).join('');
+    return `<div class="user-row" id="row_${uid}">
+      <div class="user-row-top">
+        <div class="user-info">
+          <strong>${u.name||'Sem nome'} ${u.isAdmin?'👑':''}</strong>
+          <small>${u.email}</small>
+          ${u.whatsapp?`<small>📱 ${u.whatsapp}</small>`:''}
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+            <span class="plan-badge">${planLabel[u.plan]||u.plan}</span>
+            <span class="status-badge ${active?'active':'inactive'}">${active?'✓ Ativo':'✗ Inativo'}</span>
+            <span class="prompt-status ${ps.cls}">${ps.label}</span>
+          </div>
+        </div>
+        <div class="user-credits">${u.credits||0}</div>
+      </div>
+      <div class="user-actions">
+        <select id="plan_${uid}" onchange="changePlan('${uid}',this.value)">${planOpts}</select>
+        <button class="btn-toggle ${active?'':'inactive'}" onclick="toggleActive('${uid}',${active})">${active?'🔒 Inativar':'✅ Ativar'}</button>
+        <button class="btn-del" onclick="deleteUser('${uid}','${u.name||u.email}')">🗑 Deletar</button>
+      </div>
+      <div class="add-credits-wrap">
+        <input type="number" id="credits_${uid}" placeholder="Qtd de fotos" min="1">
+        <button class="btn-add-cr" onclick="addCredits('${uid}')">+ Adicionar fotos</button>
+      </div>
+      ${!u.isAdmin?`<button class="btn-manage-prompts" onclick="openUserPrompts('${uid}')">✎ Gerenciar prompts</button>`:''}
+    </div>`;
+  }).join('');
+}
+
+function copyWhatsapps(){
+  const plan = document.getElementById('filterPlan')?.value || '';
+  const credits = document.getElementById('filterCredits')?.value || '';
+  let filtered = allUsers.filter(u => !u.isAdmin && u.whatsapp);
+  if(plan) filtered = filtered.filter(u => u.plan === plan);
+  if(credits === 'zero') filtered = filtered.filter(u => (u.credits||0) === 0);
+  else if(credits === 'low') filtered = filtered.filter(u => (u.credits||0) > 0 && (u.credits||0) <= 5);
+  else if(credits === 'ok') filtered = filtered.filter(u => (u.credits||0) > 5);
+  if(!filtered.length){alert('Nenhum usuário com WhatsApp encontrado nesse filtro.');return;}
+  const numbers = filtered.map(u=>u.whatsapp).join('\n');
+  navigator.clipboard.writeText(numbers).then(()=>{
+    alert(`✅ ${filtered.length} número(s) copiado(s)!\n\nCole no WhatsApp para disparar sua mensagem.`);
+  }).catch(()=>{
+    prompt('Copie os números abaixo:', numbers);
+  });
 }
 
 async function changePlan(uid, newPlan){
