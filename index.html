@@ -1211,9 +1211,14 @@ function toggleAll(cb){
   const individual=document.getElementById('individualChecks');
   document.getElementById('labelAll')?.classList.toggle('checked',cb.checked);
   if(cb.checked){
-    individual.classList.add('hidden');state.selectedPhotos=[1,2,3];
+    individual.classList.add('hidden');
+    state.selectedPhotos=[1,2,3];
     [1,2,3].forEach(n=>{const c=document.getElementById('check'+n);if(c){c.checked=true;document.getElementById('label'+n)?.classList.add('checked');}});
-  }else{individual.classList.remove('hidden');updateSelection();}
+  } else {
+    // Mostra individuais SEM chamar updateSelection para evitar auto-fechar
+    individual.classList.remove('hidden');
+    state.selectedPhotos=[1,2,3];
+  }
   ready();
 }
 
