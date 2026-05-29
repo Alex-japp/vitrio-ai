@@ -989,7 +989,26 @@ function openGallery(e){e.stopPropagation();file.removeAttribute('capture');file
 upload?.addEventListener('dragover',e=>e.preventDefault());
 upload?.addEventListener('drop',e=>{e.preventDefault();readFile(e.dataTransfer.files[0])});
 
-async function toBase64PNG(b64,mime){return new Promise(resolve=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.getContext('2d').drawImage(img,0,0);resolve(c.toDataURL('image/png').split(',')[1])};img.src=`data:${mime};base64,${b64}`});}
+async function compressImage(b64, mime, maxSize=1024, quality=0.85){
+  return new Promise(resolve=>{
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      // Redimensiona se maior que maxSize
+      if(w > maxSize || h > maxSize){
+        if(w > h){ h = Math.round(h * maxSize / w); w = maxSize; }
+        else { w = Math.round(w * maxSize / h); h = maxSize; }
+      }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      // JPEG com qualidade controlada — muito menor que PNG
+      const dataUrl = canvas.toDataURL('image/jpeg', quality);
+      resolve(dataUrl.split(',')[1]);
+    };
+    img.src = `data:${mime};base64,${b64}`;
+  });
+}
 
 async function generate(){
   if((currentUserData?.credits||0) < state.selectedPhotos.length){
@@ -1005,7 +1024,7 @@ async function generate(){
   grid.innerHTML = Array(skeletonCount).fill('<div class="skeleton"></div>').join('');
   results.style.display='block';
   try{
-    const pngB64=await toBase64PNG(state.b64,state.mime);
+    const pngB64=await compressImage(state.b64,state.mime,1024,0.85);
     state.imgs=[];
     const photos=state.selectedPhotos;
     let photo1Result=null;
@@ -1044,6 +1063,10 @@ async function generate(){
       };
       let g=await api('generate', payload);
       if(photoNum===1) photo1Result=g.b64_json;
+      // Comprime a foto 1 antes de usar como referência nas fotos 2 e 3
+      if(photoNum===1 && photo1Result){
+        photo1Result = await compressImage(photo1Result,'image/jpeg',1024,0.85);
+      }
       state.imgs.push({b64:g.b64_json,name:`${state.code}-foto${photoNum}.jpg`});
     }
     bar.style.width='100%';ptext.textContent='✅ Pronto! Fotos geradas com sucesso!';
@@ -1086,7 +1109,7 @@ async function regenerate(i){
   const cards=document.querySelectorAll('.res');
   if(cards[i]){const img=cards[i].querySelector('img');if(img)img.style.opacity='0.3';const btn=cards[i].querySelector('.regen-btn');if(btn){btn.disabled=true;btn.style.opacity='0.4';}}
   try{
-    const pngB64=await toBase64PNG(state.b64,state.mime);
+    const pngB64=await compressImage(state.b64,state.mime,1024,0.85);
     bar.style.width='60%';ptext.textContent='Gerando foto 1 de 1...';
     const customPrompts = currentUserData?.customPrompts;
     const customApproved = currentUserData?.customPromptsApproved;
