@@ -999,7 +999,7 @@ async function generate(){
   }
   error.textContent='';progress.style.display='block';
   if(window.innerWidth<900)results.style.display='none';
-  genBtn.disabled=true;bar.style.width='10%';ptext.textContent='Preparando imagem...';
+  genBtn.disabled=true;bar.style.width='5%';ptext.textContent='Analisando a peça...';
   // Skeleton loading
   const skeletonCount = state.selectedPhotos.length;
   grid.innerHTML = Array(skeletonCount).fill('<div class="skeleton"></div>').join('');
@@ -1009,11 +1009,22 @@ async function generate(){
     state.imgs=[];
     const photos=state.selectedPhotos;
     let photo1Result=null;
+
+    // ETAPA 1 — Análise técnica da peça
+    let analise = {};
+    try{
+      bar.style.width='12%';ptext.textContent='Identificando características da peça...';
+      const analiseRes = await api('analyze',{imageBase64:pngB64});
+      analise = analiseRes.analise || {};
+    }catch(e){
+      console.log('Análise técnica falhou, continuando sem ela:', e.message);
+    }
+
+    // ETAPA 2 — Geração das fotos
     for(let idx=0;idx<photos.length;idx++){
       const photoNum=photos[idx];
-      bar.style.width=(10+(idx+1)*(85/photos.length))+'%';
+      bar.style.width=(12+(idx+1)*(80/photos.length))+'%';
       ptext.textContent=`Gerando foto ${idx+1} de ${photos.length}...`;
-      // Usa prompt personalizado aprovado se disponível, senão usa o global da categoria
       const customPrompts = currentUserData?.customPrompts;
       const customApproved = currentUserData?.customPromptsApproved;
       let catPrompt;
@@ -1024,7 +1035,14 @@ async function generate(){
       }
       let prompt = catPrompt + (state.obs ? '\nObservações: '+state.obs : '');
       const imageToUse=(photoNum>1&&photo1Result)?photo1Result:pngB64;
-      let g=await api('generate',{prompt,imageBase64:imageToUse});
+      // Para fotos 2 e 3, passa a foto original como imageBase64 para análise e foto1 como referência
+      const payload = {
+        prompt,
+        imageBase64: pngB64,
+        analise,
+        ...(photoNum > 1 && photo1Result ? {imageBase64Ref: photo1Result} : {})
+      };
+      let g=await api('generate', payload);
       if(photoNum===1) photo1Result=g.b64_json;
       state.imgs.push({b64:g.b64_json,name:`${state.code}-foto${photoNum}.jpg`});
     }
