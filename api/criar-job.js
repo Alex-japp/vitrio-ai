@@ -13,9 +13,6 @@ module.exports = async function handler(req, res) {
   const firebaseProjectId = process.env.FIREBASE_PROJECT_ID;
   const inngestKey = process.env.INNGEST_EVENT_KEY;
 
-  console.log('Firebase Project ID:', firebaseProjectId ? 'OK' : 'MISSING');
-  console.log('Inngest Key:', inngestKey ? 'OK' : 'MISSING');
-
   const jobId = `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
   try {
@@ -39,17 +36,13 @@ module.exports = async function handler(req, res) {
 
     if (!firestoreRes.ok) {
       const err = await firestoreRes.text();
-      console.error('Firestore erro:', err);
       return res.status(500).json({ error: 'Erro Firestore: ' + err });
     }
 
-    // Dispara evento no Inngest — URL correta
-    const inngestRes = await fetch('https://inn.gs/e/v1', {
+    // Dispara evento no Inngest — chave vai NA URL
+    const inngestRes = await fetch(`https://inn.gs/e/${inngestKey}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${inngestKey}`
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: 'vitrio/gerar',
         data: { jobId, imageBase64, prompts, selectedPhotos, userId: userId || '', code: code || '' }
@@ -58,7 +51,7 @@ module.exports = async function handler(req, res) {
 
     if (!inngestRes.ok) {
       const err = await inngestRes.text();
-      console.error('Inngest erro:', err);
+      console.error('Inngest erro:', inngestRes.status, err);
       return res.status(500).json({ error: 'Erro Inngest: ' + err });
     }
 
