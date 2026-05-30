@@ -8,12 +8,12 @@ const inngest = new Inngest({
 
 // ── SALVA IMAGEM NO FIREBASE STORAGE E RETORNA URL ──────
 async function salvarImagem(jobId, photoNum, b64) {
-  const firebaseApiKey = process.env.FIREBASE_API_KEY;
   const projectId = process.env.FIREBASE_PROJECT_ID;
   const fileName = `jobs/${jobId}/photo_${photoNum}.jpg`;
-  const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${projectId}.appspot.com/o/${encodeURIComponent(fileName)}?uploadType=media`;
+  // URL correta para projetos novos do Firebase (.firebasestorage.app)
+  const bucket = `${projectId}.firebasestorage.app`;
+  const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(fileName)}?uploadType=media`;
 
-  // Converte base64 para buffer
   const buffer = Buffer.from(b64, 'base64');
 
   const res = await fetch(uploadUrl, {
@@ -27,8 +27,7 @@ async function salvarImagem(jobId, photoNum, b64) {
     throw new Error(`Storage upload falhou: ${err}`);
   }
 
-  // Retorna URL pública da imagem
-  const url = `https://firebasestorage.googleapis.com/v0/b/${projectId}.appspot.com/o/${encodeURIComponent(fileName)}?alt=media`;
+  const url = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(fileName)}?alt=media`;
   return url;
 }
 
@@ -42,7 +41,7 @@ async function updateJob(jobId, updates) {
     fieldPaths.push(fieldName);
     if (k === 'status') fields[fieldName] = { stringValue: v };
     else if (k === 'updatedAt') fields[fieldName] = { integerValue: v.toString() };
-    else fields[fieldName] = { stringValue: v }; // URL da imagem
+    else fields[fieldName] = { stringValue: v };
   });
 
   const maskParams = fieldPaths.map(f => `updateMask.fieldPaths=${encodeURIComponent(f)}`).join('&');
@@ -150,7 +149,7 @@ const gerarFotos = inngest.createFunction(
         const b64 = await gerarFoto(prompts[1], imageBase64, descricao);
         const url = await salvarImagem(jobId, 1, b64);
         await updateJob(jobId, { 1: url, updatedAt: Date.now() });
-        return b64; // retorna b64 para usar como referência nas fotos 2 e 3
+        return b64;
       });
     }
 
