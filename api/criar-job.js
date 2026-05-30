@@ -39,13 +39,22 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ error: 'Erro Firestore: ' + err });
     }
 
-    // Dispara evento no Inngest — chave vai NA URL
-    const inngestRes = await fetch(`https://inn.gs/e/${inngestKey}`, {
+    // Dispara evento no Inngest
+    // Chave vai na URL — precisa de encodeURIComponent por causa dos caracteres especiais (+, /)
+    const encodedKey = encodeURIComponent(inngestKey);
+    const inngestRes = await fetch(`https://inn.gs/e/${encodedKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: 'vitrio/gerar',
-        data: { jobId, imageBase64, prompts, selectedPhotos, userId: userId || '', code: code || '' }
+        data: {
+          jobId,
+          imageBase64,
+          prompts,
+          selectedPhotos,
+          userId: userId || '',
+          code: code || ''
+        }
       })
     });
 
@@ -56,6 +65,7 @@ module.exports = async function handler(req, res) {
     }
 
     return res.status(200).json({ jobId });
+
   } catch (e) {
     console.error('Erro criar-job:', e.message);
     return res.status(500).json({ error: e.message });
