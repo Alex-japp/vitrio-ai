@@ -548,9 +548,9 @@ async function checkAppVersion(){
     if(!doc.exists) return;
     const serverVersion = doc.data()?.version;
     if(serverVersion && serverVersion !== APP_VERSION){
-      // Verifica se já tentou atualizar para essa versão
       const lastUpdate = localStorage.getItem('vitrio_version');
       if(lastUpdate !== serverVersion){
+        window._serverVersion = serverVersion;
         showUpdatePopup();
       }
     }
@@ -563,9 +563,10 @@ function showUpdatePopup(){
 }
 
 function forceUpdate(){
-  const doc = db.collection('app').doc('version').get().then(d => {
-    if(d.exists) localStorage.setItem('vitrio_version', d.data()?.version);
-  });
+  // Salva versão ANTES de recarregar
+  if(window._serverVersion){
+    localStorage.setItem('vitrio_version', window._serverVersion);
+  }
   if('serviceWorker' in navigator){
     navigator.serviceWorker.getRegistrations().then(regs => {
       regs.forEach(reg => reg.unregister());
