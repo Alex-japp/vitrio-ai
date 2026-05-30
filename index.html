@@ -1085,9 +1085,9 @@ async function generate(){
           photos.forEach((photoNum, idx) => {
             if(status.photos[photoNum] && !fotosMostradas.has(photoNum)){
               fotosMostradas.add(photoNum);
-              const b64 = status.photos[photoNum];
-              state.imgs.push({b64, name:`${state.code}-foto${photoNum}.jpg`});
-              showPhotoImediata(idx, b64, photoNum);
+              const url = status.photos[photoNum];
+              state.imgs.push({url, name:`${state.code}-foto${photoNum}.jpg`});
+              showPhotoImediata(idx, url, photoNum);
               bar.style.width = (10 + (fotosMostradas.size / photos.length) * 85) + '%';
               ptext.textContent = fotosMostradas.size < photos.length
                 ? nomes[photos[fotosMostradas.size]] || 'Gerando próxima foto...'
@@ -1181,7 +1181,7 @@ async function regenerate(i){
 
 const regenSvg=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>`;
 
-function showPhotoImediata(idx, b64, photoNum){
+function showPhotoImediata(idx, url, photoNum){
   results.style.display='block';
   if(resultsPlaceholder) resultsPlaceholder.style.display='none';
   const slots = grid.children;
@@ -1189,7 +1189,7 @@ function showPhotoImediata(idx, b64, photoNum){
   if(targetSlot){
     const card = document.createElement('div');
     card.className = 'res res-animate';
-    card.innerHTML = `<img src="data:image/jpeg;base64,${b64}" class="loading" style="cursor:zoom-in" onclick="openImgPreview('${b64}',${idx})" onload="this.classList.remove('loading')"><button class="regen-btn" onclick="regenerate(${idx})" title="Gerar novamente">${regenSvg}</button><button class="dl-btn" onclick="download(${idx})">Baixar</button>`;
+    card.innerHTML = `<img src="${url}" class="loading" style="cursor:zoom-in" onclick="openImgPreview('${url}',${idx},'url')" onload="this.classList.remove('loading')"><button class="regen-btn" onclick="regenerate(${idx})" title="Gerar novamente">${regenSvg}</button><button class="dl-btn" onclick="downloadUrl('${url}','${state.code}-foto${photoNum}.jpg')">Baixar</button>`;
     grid.replaceChild(card, targetSlot);
   }
 }
@@ -1202,6 +1202,7 @@ function showResults(){
 }
 
 function download(i){const canvas=document.createElement('canvas');const img=new Image();img.onload=()=>{canvas.width=img.width;canvas.height=img.height;canvas.getContext('2d').drawImage(img,0,0);const a=document.createElement('a');a.href=canvas.toDataURL('image/jpeg',0.95);a.download=state.imgs[i].name;a.click()};img.src=`data:image/png;base64,${state.imgs[i].b64}`;}
+function downloadUrl(url, name){const a=document.createElement('a');a.href=url;a.download=name;a.target='_blank';a.click();}
 
 function resetForm(){
   state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],selectedPhotos:[1,2,3]};
