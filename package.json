@@ -1,0 +1,8 @@
+{
+  "name": "vitrio-ai",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "inngest": "^3.0.0"
+  }
+}
