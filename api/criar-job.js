@@ -10,12 +10,18 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Dados incompletos' });
   }
 
+  const firebaseProjectId = process.env.FIREBASE_PROJECT_ID;
+  const inngestKey = process.env.INNGEST_EVENT_KEY;
+
+  console.log('Firebase Project ID:', firebaseProjectId ? 'OK' : 'MISSING');
+  console.log('Inngest Key:', inngestKey ? 'OK' : 'MISSING');
+
   const jobId = `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
   try {
     // Cria job no Firestore
-    await fetch(
-      `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents/jobs/${jobId}`,
+    const firestoreRes = await fetch(
+      `https://firestore.googleapis.com/v1/projects/${firebaseProjectId}/databases/(default)/documents/jobs/${jobId}`,
       {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -31,23 +37,29 @@ module.exports = async function handler(req, res) {
       }
     );
 
-    // Dispara evento no Inngest
-    const inngestRes = await fetch('https://inn.gs/e/v1', {
+    if (!firestoreRes.ok) {
+      const err = await firestoreRes.text();
+      console.error('Firestore erro:', err);
+      return res.status(500).json({ error: 'Erro Firestore: ' + err });
+    }
+
+    // Dispara evento no Inngest — URL correta
+    const inngestRes = await fetch('https://api.inngest.com/e/v1', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.INNGEST_EVENT_KEY}`
+        'Authorization': `Bearer ${inngestKey}`
       },
-      body: JSON.stringify({
+      body: JSON.stringify([{
         name: 'vitrio/gerar',
         data: { jobId, imageBase64, prompts, selectedPhotos, userId: userId || '', code: code || '' }
-      })
+      }])
     });
 
     if (!inngestRes.ok) {
       const err = await inngestRes.text();
       console.error('Inngest erro:', err);
-      return res.status(500).json({ error: 'Erro ao enviar para fila: ' + err });
+      return res.status(500).json({ error: 'Erro Inngest: ' + err });
     }
 
     return res.status(200).json({ jobId });
