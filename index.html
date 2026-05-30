@@ -306,7 +306,10 @@ button,input,textarea{font-family:inherit}
       <input id="regEmail" class="input" type="email" placeholder="Email" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')register()">
       <input id="regPass" class="input" type="password" placeholder="Senha (mínimo 6 caracteres)" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')register()">
       <input id="regWhatsapp" class="input" type="tel" placeholder="WhatsApp — ex: 11999998888" required>
-      <div style="font-size:11px;color:var(--muted);margin:10px 0 4px;text-align:center">Ao criar sua conta você concorda com os <button onclick="openTerms()" style="background:none;border:none;color:var(--purple);font-weight:700;cursor:pointer;font-size:11px;padding:0">Termos de Uso e Privacidade</button></div>
+      <div style="display:flex;align-items:flex-start;gap:10px;margin:14px 0 4px;background:#F8F7FF;border:1px solid #EAEAF2;border-radius:12px;padding:12px">
+        <input type="checkbox" id="regTerms" style="margin-top:2px;width:18px;height:18px;accent-color:#7B61FF;cursor:pointer;flex-shrink:0">
+        <label for="regTerms" style="font-size:12px;color:#1C1C1C;cursor:pointer;line-height:1.5">Li e aceito os <button onclick="openTerms()" style="background:none;border:none;color:#7B61FF;font-weight:700;cursor:pointer;font-size:12px;padding:0;text-decoration:underline">Termos de Uso e Política de Privacidade</button>, incluindo a política de não reembolso de créditos e responsabilidade pelo uso das imagens geradas.</label>
+      </div>
       <button class="btn btn-main" onclick="register()">✦ Criar conta grátis</button>
       <div style="background:linear-gradient(135deg,rgba(212,175,55,.15),rgba(123,63,242,.12));border:1.5px solid rgba(212,175,55,.5);border-radius:16px;padding:14px 16px;margin-top:14px;text-align:center">
         <div style="font-size:20px;margin-bottom:4px">🎁</div>
@@ -619,12 +622,14 @@ async function register(){
   const email = document.getElementById('regEmail').value.trim();
   const pass = document.getElementById('regPass').value;
   const whatsapp = document.getElementById('regWhatsapp')?.value.trim() || '';
+  const termsAccepted = document.getElementById('regTerms')?.checked;
   const err = document.getElementById('regErr');
   err.textContent = '';
   if(!name){err.textContent='Digite seu nome.';return;}
   if(!email){err.textContent='Digite seu email.';return;}
   if(pass.length<6){err.textContent='Senha deve ter mínimo 6 caracteres.';return;}
   if(!whatsapp){err.textContent='Digite seu WhatsApp para suporte e avisos de conta.';return;}
+  if(!termsAccepted){err.textContent='Você precisa aceitar os Termos de Uso para criar sua conta.';return;}
   try{
     const cred = await auth.createUserWithEmailAndPassword(email, pass);
     await cred.user.updateProfile({displayName: name});
@@ -780,6 +785,25 @@ async function decrementCredits(qty){
   currentUserData.credits = newCredits;
   updateCreditsUI();
   await db.collection('users').doc(currentUser.uid).update({credits: newCredits});
+  // Aviso saldo baixo — aparece 1x quando chegar em 10 fotos
+  if(newCredits <= 10 && newCredits > 0){
+    const key = `vitrio_lowcredits_${currentUser.uid}_${Math.floor(newCredits/10)}`;
+    if(!localStorage.getItem(key)){
+      localStorage.setItem(key, '1');
+      showLowCreditsWarning(newCredits);
+    }
+  }
+}
+
+function showLowCreditsWarning(credits){
+  const existing = document.getElementById('lowCreditsBar');
+  if(existing) existing.remove();
+  const bar = document.createElement('div');
+  bar.id = 'lowCreditsBar';
+  bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:500;background:#FFF3CD;border-bottom:1px solid #FFD54F;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:#7A6000;animation:fadeIn .3s ease';
+  bar.innerHTML = `<span>⚠️ Você tem apenas ${credits} foto${credits>1?'s':''} restante${credits>1?'s':''}. Entre em contato para recarregar.</span><button onclick="document.getElementById('lowCreditsBar').remove()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#7A6000;padding:0 4px;line-height:1">×</button>`;
+  document.body.prepend(bar);
+  setTimeout(()=>{ if(bar.parentNode) bar.remove(); }, 8000);
 }
 
 // Auth state listener
@@ -1688,45 +1712,52 @@ init();
 </script>
 <!-- MODAL TERMOS DE USO -->
 <div id="termsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:flex-end;justify-content:center">
-  <div style="width:min(100%,820px);background:#fff;border-radius:28px 28px 0 0;padding:28px 28px 40px;max-height:85vh;overflow-y:auto">
+  <div style="width:min(100%,820px);background:#fff;border-radius:28px 28px 0 0;padding:28px 28px 40px;max-height:90vh;overflow-y:auto">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
       <div style="font-size:17px;font-weight:900">◇ Termos de Uso e Privacidade</div>
       <button onclick="closeTerms()" style="width:38px;height:38px;border-radius:12px;border:1px solid #E8E2D6;background:#fff;font-size:20px;cursor:pointer;display:grid;place-items:center">×</button>
     </div>
-    <div style="font-size:12px;color:#666;line-height:1.9">
+    <div style="font-size:12px;color:#444;line-height:1.9">
 
-      <div style="font-weight:800;color:#111;font-size:13px;margin-bottom:6px">1. Sobre o Vitrio AI</div>
-      <p>O Vitrio AI é uma plataforma de geração de fotos profissionais para semijoias utilizando inteligência artificial. Ao criar uma conta, você concorda com os presentes Termos de Uso e nossa Política de Privacidade.</p>
+      <div style="background:#F0EDFF;border-radius:12px;padding:14px 16px;margin-bottom:20px;font-size:12px;color:#3C2C8A;font-weight:600">
+        ⚠️ Pontos mais importantes: fotos disponíveis por 24h — baixe na hora. Créditos utilizados não são reembolsáveis. Você é responsável pelo uso das imagens geradas.
+      </div>
 
-      <div style="font-weight:800;color:#111;font-size:13px;margin:16px 0 6px">2. Uso da plataforma</div>
-      <p>O Vitrio AI é destinado exclusivamente para uso profissional e comercial na criação de fotos de produtos para catálogos e redes sociais. É proibido utilizar a plataforma para gerar conteúdo ilegal, ofensivo, enganoso ou que viole direitos de terceiros.</p>
+      <div style="font-weight:900;color:#111;font-size:13px;margin-bottom:6px">1. Identificação</div>
+      <p>O <strong>Vitrio AI</strong> é operado pela <strong>STARNEL SEMIJOIAS</strong>, sediada em Divinópolis, MG. Contato: starnelsemijoias@gmail.com</p>
 
-      <div style="font-weight:800;color:#111;font-size:13px;margin:16px 0 6px">3. Créditos e pagamentos</div>
-      <p>Novos usuários recebem 15 créditos gratuitos para teste. Cada foto gerada consome 1 crédito. Créditos adicionais podem ser adquiridos conforme os planos disponíveis. Créditos não utilizados não são reembolsáveis após a compra.</p>
+      <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">2. O serviço e a natureza da IA</div>
+      <p>O Vitrio AI gera fotografias profissionais de semijoias utilizando Inteligência Artificial. Os resultados são de <strong>natureza probabilística e variável</strong> — a mesma imagem pode gerar resultados diferentes a cada geração. Variações em fidelidade, cores, texturas e proporções são inerentes à tecnologia e <strong>não constituem defeito do serviço</strong>.</p>
 
-      <div style="font-weight:800;color:#111;font-size:13px;margin:16px 0 6px">4. Imagens geradas</div>
-      <p>As imagens geradas pelo Vitrio AI são de uso exclusivo do usuário que as gerou. A plataforma não reivindica direitos sobre as imagens produzidas. O usuário é responsável pelo uso das imagens geradas e por garantir que as fotos dos produtos enviados são de sua propriedade ou que possui autorização para seu uso.</p>
+      <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">3. Créditos e política de não reembolso</div>
+      <p>Cada geração consome créditos independentemente do resultado. <strong>Créditos utilizados não são reembolsáveis</strong>, incluindo casos de resultado insatisfatório, desistência após início da geração ou encerramento da conta. Créditos vencidos também não são reembolsados. Exceção: falha técnica comprovada e exclusiva da plataforma, analisada caso a caso.</p>
 
-      <div style="font-weight:800;color:#111;font-size:13px;margin:16px 0 6px">5. Privacidade e proteção de dados (LGPD)</div>
-      <p>Em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018), coletamos apenas os dados necessários para o funcionamento da plataforma:</p>
-      <ul style="margin:8px 0 8px 20px">
-        <li><strong>Nome e email</strong> — para identificação e acesso à conta</li>
-        <li><strong>WhatsApp</strong> — exclusivamente para suporte e avisos de conta</li>
-        <li><strong>Fotos enviadas</strong> — processadas temporariamente para geração de imagens, não armazenadas permanentemente</li>
-      </ul>
-      <p>Seus dados não são vendidos, compartilhados ou utilizados para fins publicitários. Você pode solicitar a exclusão da sua conta e dados a qualquer momento pelo suporte.</p>
+      <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">4. Armazenamento das imagens — ATENÇÃO</div>
+      <p>As imagens geradas ficam disponíveis por <strong>até 24 horas</strong>. Após esse prazo são <strong>excluídas automaticamente e de forma permanente</strong>, sem possibilidade de recuperação. É responsabilidade exclusiva do usuário realizar o download dentro do prazo.</p>
 
-      <div style="font-weight:800;color:#111;font-size:13px;margin:16px 0 6px">6. Disponibilidade do serviço</div>
-      <p>O Vitrio AI depende de serviços de inteligência artificial de terceiros (OpenAI). Eventuais instabilidades nesses serviços podem afetar temporariamente a geração de imagens. Não nos responsabilizamos por interrupções causadas por terceiros.</p>
+      <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">5. Propriedade e responsabilidade pelo uso das imagens</div>
+      <p>As imagens geradas pertencem ao usuário. O Vitrio AI não reivindica direitos sobre elas e não as utiliza para treinamento de IA. O <strong>usuário é o único responsável</strong> pelo uso, divulgação e consequências jurídicas das imagens, incluindo eventual violação de direitos de terceiros, uso enganoso ao consumidor ou uso indevido.</p>
 
-      <div style="font-weight:800;color:#111;font-size:13px;margin:16px 0 6px">7. Cancelamento</div>
-      <p>O usuário pode cancelar sua conta a qualquer momento entrando em contato pelo WhatsApp de suporte. Créditos não utilizados não são reembolsados após a ativação do plano.</p>
+      <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">6. Usos proibidos</div>
+      <p>É vedado utilizar o Vitrio AI para: gerar imagens de produtos falsificados; induzir consumidores ao erro; violar direitos autorais, marcas ou direitos de imagem de terceiros; qualquer finalidade ilícita. A violação implica suspensão imediata da conta sem reembolso.</p>
 
-      <div style="font-weight:800;color:#111;font-size:13px;margin:16px 0 6px">8. Contato</div>
-      <p>Dúvidas, suporte ou solicitações relacionadas à privacidade podem ser enviadas pelo WhatsApp informado no momento do cadastro ou pelo email: <strong>starnelsemijoias@gmail.com</strong></p>
+      <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">7. Limitação de responsabilidade</div>
+      <p>A responsabilidade total do Vitrio AI está limitada ao valor dos créditos não utilizados na conta. Não respondemos por danos indiretos, lucros cessantes, perda de dados ou falhas de serviços de terceiros (OpenAI, Firebase, Vercel, Replicate).</p>
+
+      <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">8. Privacidade e proteção de dados (LGPD)</div>
+      <p>Em conformidade com a Lei nº 13.709/2018 (LGPD). Coletamos: <strong>nome e email</strong> (cadastro), <strong>WhatsApp</strong> (suporte), <strong>fotos de produtos</strong> (processadas para geração, não armazenadas permanentemente). Seus dados não são vendidos nem compartilhados para fins comerciais. Os serviços de terceiros utilizados (OpenAI, Firebase, Vercel, Replicate) estão localizados nos EUA e possuem seus próprios termos de privacidade. Você pode solicitar acesso, correção ou exclusão dos seus dados pelo e-mail de contato.</p>
+
+      <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">9. Disponibilidade do serviço</div>
+      <p>O Vitrio AI não garante disponibilidade ininterrupta. Interrupções para manutenção ou por falhas de terceiros não geram direito a reembolso ou indenização.</p>
+
+      <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">10. Cancelamento</div>
+      <p>O usuário pode cancelar sua conta a qualquer momento. Créditos remanescentes não são reembolsados em cancelamento voluntário. Violações aos termos podem resultar em suspensão imediata sem reembolso.</p>
+
+      <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">11. Foro e lei aplicável</div>
+      <p>Estes Termos são regidos pela legislação brasileira (CDC, LGPD, Marco Civil da Internet). Foro eleito: Comarca de Divinópolis, MG.</p>
 
       <div style="margin-top:20px;padding-top:16px;border-top:1px solid #E8E2D6;font-size:11px;color:#aaa;text-align:center">
-        Vitrio AI · Última atualização: maio de 2026
+        Vitrio AI · Versão 2.0 · Última atualização: 30 de maio de 2026
       </div>
     </div>
     <button onclick="closeTerms()" style="width:100%;height:52px;border-radius:16px;border:none;background:linear-gradient(135deg,#7B3FF2,#4D7BFF);color:#fff;font-weight:900;font-size:15px;cursor:pointer;margin-top:20px">Entendi e aceito</button>
