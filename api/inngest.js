@@ -38,8 +38,8 @@ function montarDescricao(analise) {
   if (analise.acabamento) p.push(`acabamento ${analise.acabamento}`);
   if (analise.pedras && analise.tipo_pedra !== 'sem_pedra') p.push(`${analise.quantidade_pedras} pedra(s) ${analise.tipo_pedra}`);
   if (analise.perolas) p.push(`${analise.quantidade_perolas} pérola(s)`);
-  if (analise.tipo_elo !== 'sem_elo') p.push(`elo ${analise.tipo_elo} ${analise.espessura_elo}`);
-  if (analise.fecho !== 'sem_fecho') p.push(`fecho ${analise.fecho}`);
+  if (analise.tipo_elo && analise.tipo_elo !== 'sem_elo') p.push(`elo ${analise.tipo_elo} ${analise.espessura_elo}`);
+  if (analise.fecho && analise.fecho !== 'sem_fecho') p.push(`fecho ${analise.fecho}`);
   if (analise.pingente && analise.tipo_pingente !== 'sem_pingente') p.push(`pingente ${analise.tipo_pingente}`);
   if (analise.gravacao) p.push('com gravação');
   if (analise.detalhes_extras) p.push(analise.detalhes_extras);
@@ -76,21 +76,35 @@ async function gerarFoto(prompt, imageBase64, descricao = '', retries = 3) {
   return img.result;
 }
 
+// ── ATUALIZA CAMPOS ESPECÍFICOS SEM SOBRESCREVER O DOCUMENTO ──
 async function updateJob(jobId, updates) {
   const fields = {};
+  const fieldPaths = [];
+
   Object.entries(updates).forEach(([k, v]) => {
-    if (k === 'status') fields[k] = { stringValue: v };
-    else if (k === 'updatedAt') fields[k] = { integerValue: v.toString() };
-    else fields[`photo_${k}`] = { stringValue: v };
+    const fieldName = (k === 'status' || k === 'updatedAt') ? k : `photo_${k}`;
+    fieldPaths.push(fieldName);
+    if (k === 'status') fields[fieldName] = { stringValue: v };
+    else if (k === 'updatedAt') fields[fieldName] = { integerValue: v.toString() };
+    else fields[fieldName] = { stringValue: v };
   });
-  await fetch(
-    `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents/jobs/${jobId}`,
+
+  // updateMask garante que só os campos especificados são atualizados
+  const maskParams = fieldPaths.map(f => `updateMask.fieldPaths=${encodeURIComponent(f)}`).join('&');
+
+  const res = await fetch(
+    `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents/jobs/${jobId}?${maskParams}`,
     {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ fields })
     }
   );
+
+  if (!res.ok) {
+    const err = await res.text();
+    console.error('updateJob erro:', res.status, err);
+  }
 }
 
 const gerarFotos = inngest.createFunction(
