@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Vitrio AI</title>
 <meta name="color-scheme" content="only light">
+<style>:root{color-scheme:light only}</style>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%237B3FF2'/><stop offset='100%25' stop-color='%234D7BFF'/></linearGradient></defs><rect width='32' height='32' rx='8' fill='url(%23g)'/><text x='16' y='22' font-size='22' fill='white' text-anchor='middle' font-family='Arial,sans-serif'>◇</text></svg>">
 <link rel="manifest" href="/manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -108,7 +109,7 @@ button,input,textarea{font-family:inherit}
 .res-animate:nth-child(1){animation-delay:.05s}
 .res-animate:nth-child(2){animation-delay:.12s}
 .res-animate:nth-child(3){animation-delay:.19s}
-.res{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 4px 16px rgba(28,28,28,.06);position:relative;transition:all .2s ease}
+.res{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 4px 16px rgba(28,28,28,.06);position:relative;transition:all .2s ease;aspect-ratio:1}
 .res:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(28,28,28,.10);border-color:rgba(123,97,255,.2)}
 @keyframes shimmer{0%{background-position:-468px 0}100%{background-position:468px 0}}
 .skeleton{background:linear-gradient(90deg,#f0f0f5 25%,#e8e8f0 50%,#f0f0f5 75%);background-size:936px 100%;animation:shimmer 1.4s infinite linear;border-radius:18px;aspect-ratio:1}
@@ -1104,7 +1105,7 @@ async function generate(){
           // Job falhou
           if(status.status === 'failed'){
             clearInterval(poll);
-            reject(new Error('Erro no processamento. Tente novamente.'));
+            reject(new Error('Não foi possível gerar as fotos. Tente novamente em alguns instantes.'));
           }
 
         }catch(e){
@@ -1149,12 +1150,19 @@ async function regenerate(i){
     error.textContent='⚠️ Créditos insuficientes!';return;
   }
   const photoNum=i+1;
-  error.textContent='';progress.style.display='block';bar.style.width='20%';ptext.textContent='Preparando imagem...';
-  const cards=document.querySelectorAll('.res');
-  if(cards[i]){const img=cards[i].querySelector('img');if(img)img.style.opacity='0.3';const btn=cards[i].querySelector('.regen-btn');if(btn){btn.disabled=true;btn.style.opacity='0.4';}}
+  error.textContent='';progress.style.display='block';bar.style.width='10%';ptext.textContent='Gerando foto...';
+
+  // Coloca skeleton só na foto que está sendo regerada — mantém as outras
+  const cards=document.querySelectorAll('.res, .skeleton');
+  const targetCard = cards[i];
+  if(targetCard){
+    const skeleton = document.createElement('div');
+    skeleton.className = 'skeleton';
+    grid.replaceChild(skeleton, targetCard);
+  }
+
   try{
     const pngB64=await compressImage(state.b64,state.mime,1024,0.85);
-    bar.style.width='60%';ptext.textContent='Gerando foto 1 de 1...';
     const customPrompts = currentUserData?.customPrompts;
     const customApproved = currentUserData?.customPromptsApproved;
     let catPrompt;
@@ -1164,17 +1172,57 @@ async function regenerate(i){
       catPrompt = state.cat['p'+photoNum] || 'Foto profissional de semijoia';
     }
     let prompt = catPrompt + (state.obs ? '\nObservações: '+state.obs : '');
-    let g=await api('generate',{prompt,imageBase64:pngB64});
-    state.imgs[i]={b64:g.b64_json,name:`${state.code}-foto${photoNum}.jpg`};
-    bar.style.width='100%';ptext.textContent='Pronto!';
+
+    // Cria job para regenerar só essa foto
+    bar.style.width='20%';ptext.textContent='Enviando para processamento...';
+    const prompts = { [photoNum]: prompt };
+    const jobRes = await fetch('/api/criar-job', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        imageBase64: pngB64,
+        prompts,
+        selectedPhotos: [photoNum],
+        userId: currentUser?.uid || '',
+        code: state.code
+      })
+    });
+    if(!jobRes.ok) throw new Error('Falha ao criar job');
+    const { jobId } = await jobRes.json();
+
+    // Polling
+    await new Promise((resolve, reject) => {
+      let tentativas = 0;
+      const poll = setInterval(async () => {
+        tentativas++;
+        if(tentativas > 90){ clearInterval(poll); reject(new Error('Tempo limite.')); return; }
+        try{
+          const statusRes = await fetch(`/api/status?jobId=${jobId}`);
+          const status = await statusRes.json();
+          if(status.photos[photoNum]){
+            clearInterval(poll);
+            const url = status.photos[photoNum];
+            state.imgs[i] = {url, name:`${state.code}-foto${photoNum}.jpg`};
+            showPhotoImediata(i, url, photoNum);
+            bar.style.width='100%';ptext.textContent='Pronto!';
+            resolve();
+          }
+          if(status.status === 'failed'){ clearInterval(poll); reject(new Error('Erro no processamento.')); }
+        }catch(e){ console.warn(e); }
+      }, 4000);
+    });
+
     await decrementCredits(1);
-    showResults();
   }catch(e){
-    const msg = e.message.includes('Falha na função') || e.message.includes('timeout') || e.message.includes('504')
-      ? '⚠️ Nossos servidores estão sobrecarregados no momento. Aguarde alguns minutos e tente novamente.'
-      : 'Erro ao gerar foto '+(i+1)+': '+e.message;
-    error.textContent=msg;
-    showResults();
+    error.textContent='Não foi possível gerar as fotos. Tente novamente em alguns instantes.';
+    // Restaura o card anterior se tiver
+    const skeletons = grid.querySelectorAll('.skeleton');
+    skeletons.forEach(s => {
+      const card = document.createElement('div');
+      card.className = 'res res-animate';
+      card.innerHTML = `<div style="width:100%;aspect-ratio:1;background:var(--line);border-radius:18px;display:grid;place-items:center;color:var(--muted);font-size:12px">Erro ao gerar</div>`;
+      grid.replaceChild(card, s);
+    });
   }
   finally{setTimeout(()=>progress.style.display='none',500)}
 }
@@ -2231,16 +2279,24 @@ function showToast(msg, color){
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), 3000);
 }
-function openImgPreview(b64, idx){
-  const src = 'data:image/jpeg;base64,'+b64;
-  document.getElementById('imgPreviewSrc').src = src;
-  document.getElementById('imgPreviewDl').onclick = ()=>downloadByIdx(idx);
+function openImgPreview(src, idx, type){
+  const imgSrc = type === 'url' ? src : 'data:image/jpeg;base64,'+src;
+  document.getElementById('imgPreviewSrc').src = imgSrc;
+  document.getElementById('imgPreviewDl').onclick = () => {
+    const item = state.imgs[idx];
+    if(item?.url) downloadUrl(item.url, item.name);
+    else if(item?.b64) download(idx);
+  };
   document.getElementById('imgPreviewModal').classList.add('open');
 }
 function closeImgPreview(){
   document.getElementById('imgPreviewModal').classList.remove('open');
 }
-function downloadByIdx(idx){ download(idx); }
+function downloadByIdx(idx){
+  const item = state.imgs[idx];
+  if(item?.url) downloadUrl(item.url, item.name);
+  else download(idx);
+}
 </script>
 
 </body>
