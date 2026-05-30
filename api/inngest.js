@@ -208,7 +208,75 @@ async function gerarFoto(prompt, imageBase64, descricao = '', retries = 3) {
   }
 }
 
-const gerarFotos = inngest.createFunction(
+// ── LIMPEZA AUTOMÁTICA DE JOBS ANTIGOS (24H) ─────────────
+async function limparJobsAntigos() {
+  try {
+    const projectId = process.env.FIREBASE_PROJECT_ID;
+    const bucket = `${projectId}.firebasestorage.app`;
+    const vinte4h = Date.now() - (24 * 60 * 60 * 1000);
+
+    // Busca jobs com mais de 24h no Firestore
+    const res = await fetch(
+      `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:runQuery`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          structuredQuery: {
+            from: [{ collectionId: 'jobs' }],
+            where: {
+              fieldFilter: {
+                field: { fieldPath: 'createdAt' },
+                op: 'LESS_THAN',
+                value: { integerValue: vinte4h.toString() }
+              }
+            },
+            limit: 50
+          }
+        })
+      }
+    );
+
+    const data = await res.json();
+    if (!Array.isArray(data)) return;
+
+    for (const item of data) {
+      if (!item.document) continue;
+      const jobId = item.document.name.split('/').pop();
+      const fields = item.document.fields || {};
+
+      // Deleta fotos do Storage
+      for (let n = 1; n <= 3; n++) {
+        if (fields[`photo_${n}`]?.stringValue) {
+          const fileName = encodeURIComponent(`jobs/${jobId}/photo_${n}.jpg`);
+          await fetch(
+            `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${fileName}`,
+            { method: 'DELETE' }
+          ).catch(() => {});
+        }
+      }
+
+      // Deleta documento do Firestore
+      await fetch(
+        `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/jobs/${jobId}`,
+        { method: 'DELETE' }
+      ).catch(() => {});
+    }
+
+    console.log(`Limpeza: ${data.filter(i => i.document).length} jobs removidos`);
+  } catch (e) {
+    console.error('Erro na limpeza:', e.message);
+  }
+}
+
+// ── FUNÇÃO INNGEST DE LIMPEZA (roda diariamente) ──────────
+const limparStorage = inngest.createFunction(
+  { id: 'limpar-storage', retries: 1 },
+  { cron: '0 3 * * *' }, // Todo dia às 3h da manhã
+  async () => {
+    await limparJobsAntigos();
+  }
+);
   { id: 'gerar-fotos', retries: 2, timeouts: { finish: '10m' } },
   { event: 'vitrio/gerar' },
   async ({ event, step }) => {
@@ -252,6 +320,6 @@ const gerarFotos = inngest.createFunction(
 
 module.exports = serve({
   client: inngest,
-  functions: [gerarFotos],
+  functions: [gerarFotos, limparStorage],
   signingKey: process.env.INNGEST_SIGNING_KEY,
 });
