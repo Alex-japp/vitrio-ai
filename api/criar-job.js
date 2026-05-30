@@ -1,3 +1,10 @@
+const { Inngest } = require('inngest');
+
+const inngest = new Inngest({
+  id: 'vitrio-ai',
+  eventKey: process.env.INNGEST_EVENT_KEY,
+});
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -11,8 +18,6 @@ module.exports = async function handler(req, res) {
   }
 
   const firebaseProjectId = process.env.FIREBASE_PROJECT_ID;
-  const inngestKey = process.env.INNGEST_EVENT_KEY;
-
   const jobId = `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
   try {
@@ -39,30 +44,18 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ error: 'Erro Firestore: ' + err });
     }
 
-    // Dispara evento no Inngest
-    // Chave vai na URL — precisa de encodeURIComponent por causa dos caracteres especiais (+, /)
-    const encodedKey = encodeURIComponent(inngestKey);
-    const inngestRes = await fetch(`https://inn.gs/e/${encodedKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: 'vitrio/gerar',
-        data: {
-          jobId,
-          imageBase64,
-          prompts,
-          selectedPhotos,
-          userId: userId || '',
-          code: code || ''
-        }
-      })
+    // Envia evento via SDK do Inngest — cuida da autenticação automaticamente
+    await inngest.send({
+      name: 'vitrio/gerar',
+      data: {
+        jobId,
+        imageBase64,
+        prompts,
+        selectedPhotos,
+        userId: userId || '',
+        code: code || ''
+      }
     });
-
-    if (!inngestRes.ok) {
-      const err = await inngestRes.text();
-      console.error('Inngest erro:', inngestRes.status, err);
-      return res.status(500).json({ error: 'Erro Inngest: ' + err });
-    }
 
     return res.status(200).json({ jobId });
 
