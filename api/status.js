@@ -24,9 +24,10 @@ module.exports = async function handler(req, res) {
       photos: {}
     };
 
+    // Fotos agora são URLs do Firebase Storage
     [1, 2, 3].forEach(n => {
       if (fields[`photo_${n}`]?.stringValue) {
-        result.photos[n] = fields[`photo_${n}`].stringValue;
+        result.photos[n] = fields[`photo_${n}`].stringValue; // URL
       }
     });
 
