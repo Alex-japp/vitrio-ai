@@ -1284,7 +1284,7 @@ function showPhotoImediata(idx, url, photoNum){
   if(targetSlot){
     const card = document.createElement('div');
     card.className = 'res res-animate';
-    card.innerHTML = `<img src="${url}" class="loading" style="cursor:zoom-in" onclick="openImgPreview('${url}',${idx},'url')" onload="this.classList.remove('loading')"><button class="regen-btn" onclick="regenerate(${idx})" title="Gerar novamente">${regenSvg}</button><button class="dl-btn" onclick="downloadUrl('${url}','${state.code}-foto${photoNum}.jpg')">Baixar</button>`;
+    card.innerHTML = `<div style="position:relative;aspect-ratio:1;overflow:hidden;border-radius:18px 18px 0 0"><img src="${url}" style="width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in" onclick="openImgPreview('${url}',${idx},'url')"><button class="regen-btn" onclick="regenerate(${idx})" title="Gerar novamente">${regenSvg}</button></div><button class="dl-btn" onclick="downloadUrl('${url}','${state.code}-foto${photoNum}.jpg')">Baixar</button>`;
     grid.replaceChild(card, targetSlot);
   }
 }
@@ -1292,7 +1292,7 @@ function showPhotoImediata(idx, url, photoNum){
 function showResults(){
   if(resultsPlaceholder) resultsPlaceholder.style.display='none';
   grid.setAttribute('data-qty',state.selectedPhotos.length);
-  grid.innerHTML=state.imgs.map((im,i)=>`<div class="res res-animate"><img src="data:image/jpeg;base64,${im.b64}" class="loading" style="cursor:zoom-in" onclick="openImgPreview('${im.b64}',${i})" onload="this.classList.remove('loading')"><button class="regen-btn" onclick="regenerate(${i})" title="Gerar novamente">${regenSvg}</button><button class="dl-btn" onclick="download(${i})">Baixar</button></div>`).join('');
+  grid.innerHTML=state.imgs.map((im,i)=>`<div class="res res-animate"><div style="position:relative;aspect-ratio:1;overflow:hidden;border-radius:18px 18px 0 0"><img src="${im.url||'data:image/jpeg;base64,'+im.b64}" style="width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in" onclick="openImgPreview('${im.url||im.b64}',${i},'${im.url?'url':'b64'}')"><button class="regen-btn" onclick="regenerate(${i})" title="Gerar novamente">${regenSvg}</button></div><button class="dl-btn" onclick="${im.url?`downloadUrl('${im.url}','${im.name}')`:`download(${i})`}">Baixar</button></div>`).join('');
   results.style.display='block';
 }
 
