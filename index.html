@@ -5,7 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Vitrio AI</title>
 <meta name="color-scheme" content="only light">
-<style>:root{color-scheme:light only}html,body{background:#F8F7FF!important;color:#1C1C1C!important}</style>
+<style>
+:root{color-scheme:only light}
+html,body{background:#F8F7FF!important;color:#1C1C1C!important}
+@media(prefers-color-scheme:dark){
+  html,body{background:#F8F7FF!important;color:#1C1C1C!important}
+  :root{
+    --bg:#F8F7FF!important;--card:#FFFFFF!important;--ink:#1C1C1C!important;
+    --muted:#77758A!important;--line:#EAEAF2!important;--soft:#EEE9FF!important;
+  }
+}
+</style>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%237B3FF2'/><stop offset='100%25' stop-color='%234D7BFF'/></linearGradient></defs><rect width='32' height='32' rx='8' fill='url(%23g)'/><text x='16' y='22' font-size='22' fill='white' text-anchor='middle' font-family='Arial,sans-serif'>◇</text></svg>">
 <link rel="manifest" href="/manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -1058,6 +1068,7 @@ async function generate(){
   genBtn.disabled=true;bar.style.width='5%';ptext.textContent='Enviando para processamento...';
   // Skeleton loading
   const skeletonCount = state.selectedPhotos.length;
+  grid.setAttribute('data-qty', skeletonCount);
   grid.innerHTML = Array(skeletonCount).fill('<div class="skeleton"></div>').join('');
   results.style.display='block';
   if(resultsPlaceholder) resultsPlaceholder.style.display='none';
