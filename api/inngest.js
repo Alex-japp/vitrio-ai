@@ -6,6 +6,62 @@ const inngest = new Inngest({
   eventKey: process.env.INNGEST_EVENT_KEY,
 });
 
+// ── SALVA IMAGEM NO FIREBASE STORAGE E RETORNA URL ──────
+async function salvarImagem(jobId, photoNum, b64) {
+  const firebaseApiKey = process.env.FIREBASE_API_KEY;
+  const projectId = process.env.FIREBASE_PROJECT_ID;
+  const fileName = `jobs/${jobId}/photo_${photoNum}.jpg`;
+  const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${projectId}.appspot.com/o/${encodeURIComponent(fileName)}?uploadType=media`;
+
+  // Converte base64 para buffer
+  const buffer = Buffer.from(b64, 'base64');
+
+  const res = await fetch(uploadUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'image/jpeg' },
+    body: buffer
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Storage upload falhou: ${err}`);
+  }
+
+  // Retorna URL pública da imagem
+  const url = `https://firebasestorage.googleapis.com/v0/b/${projectId}.appspot.com/o/${encodeURIComponent(fileName)}?alt=media`;
+  return url;
+}
+
+// ── ATUALIZA CAMPOS ESPECÍFICOS SEM SOBRESCREVER ─────────
+async function updateJob(jobId, updates) {
+  const fields = {};
+  const fieldPaths = [];
+
+  Object.entries(updates).forEach(([k, v]) => {
+    const fieldName = (k === 'status' || k === 'updatedAt') ? k : `photo_${k}`;
+    fieldPaths.push(fieldName);
+    if (k === 'status') fields[fieldName] = { stringValue: v };
+    else if (k === 'updatedAt') fields[fieldName] = { integerValue: v.toString() };
+    else fields[fieldName] = { stringValue: v }; // URL da imagem
+  });
+
+  const maskParams = fieldPaths.map(f => `updateMask.fieldPaths=${encodeURIComponent(f)}`).join('&');
+
+  const res = await fetch(
+    `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents/jobs/${jobId}?${maskParams}`,
+    {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields })
+    }
+  );
+
+  if (!res.ok) {
+    const err = await res.text();
+    console.error('updateJob erro:', res.status, err);
+  }
+}
+
 async function analisarPeca(imageBase64) {
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -76,37 +132,6 @@ async function gerarFoto(prompt, imageBase64, descricao = '', retries = 3) {
   return img.result;
 }
 
-// ── ATUALIZA CAMPOS ESPECÍFICOS SEM SOBRESCREVER O DOCUMENTO ──
-async function updateJob(jobId, updates) {
-  const fields = {};
-  const fieldPaths = [];
-
-  Object.entries(updates).forEach(([k, v]) => {
-    const fieldName = (k === 'status' || k === 'updatedAt') ? k : `photo_${k}`;
-    fieldPaths.push(fieldName);
-    if (k === 'status') fields[fieldName] = { stringValue: v };
-    else if (k === 'updatedAt') fields[fieldName] = { integerValue: v.toString() };
-    else fields[fieldName] = { stringValue: v };
-  });
-
-  // updateMask garante que só os campos especificados são atualizados
-  const maskParams = fieldPaths.map(f => `updateMask.fieldPaths=${encodeURIComponent(f)}`).join('&');
-
-  const res = await fetch(
-    `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents/jobs/${jobId}?${maskParams}`,
-    {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fields })
-    }
-  );
-
-  if (!res.ok) {
-    const err = await res.text();
-    console.error('updateJob erro:', res.status, err);
-  }
-}
-
 const gerarFotos = inngest.createFunction(
   { id: 'gerar-fotos', retries: 2, timeouts: { finish: '10m' } },
   { event: 'vitrio/gerar' },
@@ -119,26 +144,29 @@ const gerarFotos = inngest.createFunction(
     });
     const descricao = montarDescricao(analise);
 
-    let photo1 = null;
+    let photo1B64 = null;
     if (selectedPhotos.includes(1)) {
-      photo1 = await step.run('foto-1', async () => {
+      photo1B64 = await step.run('foto-1', async () => {
         const b64 = await gerarFoto(prompts[1], imageBase64, descricao);
-        await updateJob(jobId, { 1: b64, updatedAt: Date.now() });
-        return b64;
+        const url = await salvarImagem(jobId, 1, b64);
+        await updateJob(jobId, { 1: url, updatedAt: Date.now() });
+        return b64; // retorna b64 para usar como referência nas fotos 2 e 3
       });
     }
 
-    const ref = photo1 || imageBase64;
+    const ref = photo1B64 || imageBase64;
     if (selectedPhotos.includes(2)) {
       await step.run('foto-2', async () => {
         const b64 = await gerarFoto(prompts[2], ref, descricao);
-        await updateJob(jobId, { 2: b64, updatedAt: Date.now() });
+        const url = await salvarImagem(jobId, 2, b64);
+        await updateJob(jobId, { 2: url, updatedAt: Date.now() });
       });
     }
     if (selectedPhotos.includes(3)) {
       await step.run('foto-3', async () => {
         const b64 = await gerarFoto(prompts[3], ref, descricao);
-        await updateJob(jobId, { 3: b64, updatedAt: Date.now() });
+        const url = await salvarImagem(jobId, 3, b64);
+        await updateJob(jobId, { 3: url, updatedAt: Date.now() });
       });
     }
 
