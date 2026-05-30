@@ -1,10 +1,26 @@
 const { Inngest } = require('inngest');
 const { serve } = require('inngest/next');
+const sharp = require('sharp');
 
 const inngest = new Inngest({
   id: 'vitrio-ai',
   eventKey: process.env.INNGEST_EVENT_KEY,
 });
+
+// ── COMPRIME IMAGEM PARA 300-500KB ───────────────────────
+async function comprimirImagem(b64) {
+  try {
+    const buffer = Buffer.from(b64, 'base64');
+    const comprimido = await sharp(buffer)
+      .resize(1024, 1024, { fit: 'inside', withoutEnlargement: true })
+      .jpeg({ quality: 82, progressive: true })
+      .toBuffer();
+    return comprimido.toString('base64');
+  } catch(e) {
+    console.warn('Compressão falhou, usando original:', e.message);
+    return b64;
+  }
+}
 
 // ── SALVA IMAGEM NO FIREBASE STORAGE E RETORNA URL ──────
 async function salvarImagem(jobId, photoNum, b64) {
@@ -14,7 +30,9 @@ async function salvarImagem(jobId, photoNum, b64) {
   const bucket = `${projectId}.firebasestorage.app`;
   const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(fileName)}?uploadType=media`;
 
-  const buffer = Buffer.from(b64, 'base64');
+  // Comprime para 300-500KB antes de salvar
+  const b64Comprimido = await comprimirImagem(b64);
+  const buffer = Buffer.from(b64Comprimido, 'base64');
 
   const res = await fetch(uploadUrl, {
     method: 'POST',
