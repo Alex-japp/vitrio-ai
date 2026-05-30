@@ -101,34 +101,93 @@ function montarDescricao(analise) {
   return p.length > 0 ? `\nCaracterísticas: ${p.join(', ')}.` : '';
 }
 
-async function gerarFoto(prompt, imageBase64, descricao = '', retries = 3) {
-  const response = await fetch('https://api.openai.com/v1/responses', {
+// ── FALLBACK: FLUX Redux Dev via Replicate ───────────────
+async function gerarFLUX(prompt, imageBase64) {
+  if (!process.env.REPLICATE_API_KEY) throw new Error('REPLICATE_API_KEY não configurada.');
+
+  const startRes = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-redux-dev/predictions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      'Authorization': `Bearer ${process.env.REPLICATE_API_KEY}`,
+      'Prefer': 'wait'
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
-      input: [{
-        role: 'user',
-        content: [
-          { type: 'input_image', image_url: `data:image/png;base64,${imageBase64}` },
-          { type: 'input_text', text: `Reproduza EXATAMENTE este produto. Aplique: ${prompt + descricao}` }
-        ]
-      }],
-      tools: [{ type: 'image_generation', size: '1024x1024' }]
+      input: {
+        redux_image: `data:image/jpeg;base64,${imageBase64}`,
+        prompt: prompt,
+        num_outputs: 1,
+        aspect_ratio: '1:1',
+        output_format: 'webp',
+        output_quality: 90
+      }
     })
   });
-  if (response.status === 429 && retries > 0) {
-    await new Promise(r => setTimeout(r, 15000));
-    return gerarFoto(prompt, imageBase64, descricao, retries - 1);
+
+  if (!startRes.ok) throw new Error(`FLUX erro: ${startRes.status}`);
+  const prediction = await startRes.json();
+
+  if (prediction.output && prediction.output[0]) {
+    const res = await fetch(prediction.output[0]);
+    const buffer = await res.arrayBuffer();
+    return Buffer.from(buffer).toString('base64');
   }
-  if (!response.ok) throw new Error(`OpenAI ${response.status}`);
-  const data = await response.json();
-  const img = data.output?.find(o => o.type === 'image_generation_call');
-  if (!img) throw new Error('Imagem não gerada');
-  return img.result;
+
+  const pollUrl = prediction.urls?.get;
+  if (!pollUrl) throw new Error('FLUX: URL de polling não encontrada.');
+
+  for (let i = 0; i < 30; i++) {
+    await new Promise(r => setTimeout(r, 3000));
+    const pollRes = await fetch(pollUrl, {
+      headers: { 'Authorization': `Bearer ${process.env.REPLICATE_API_KEY}` }
+    });
+    const poll = await pollRes.json();
+    if (poll.status === 'succeeded' && poll.output?.[0]) {
+      const res = await fetch(poll.output[0]);
+      const buffer = await res.arrayBuffer();
+      return Buffer.from(buffer).toString('base64');
+    }
+    if (poll.status === 'failed') throw new Error('FLUX: geração falhou.');
+  }
+  throw new Error('FLUX: timeout no polling.');
+}
+
+async function gerarFoto(prompt, imageBase64, descricao = '', retries = 3) {
+  try {
+    const response = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        input: [{
+          role: 'user',
+          content: [
+            { type: 'input_image', image_url: `data:image/png;base64,${imageBase64}` },
+            { type: 'input_text', text: `Reproduza EXATAMENTE este produto. Aplique: ${prompt + descricao}` }
+          ]
+        }],
+        tools: [{ type: 'image_generation', size: '1024x1024' }]
+      })
+    });
+
+    if (response.status === 429 && retries > 0) {
+      await new Promise(r => setTimeout(r, 15000));
+      return gerarFoto(prompt, imageBase64, descricao, retries - 1);
+    }
+
+    if (!response.ok) throw new Error(`OpenAI ${response.status}`);
+    const data = await response.json();
+    const img = data.output?.find(o => o.type === 'image_generation_call');
+    if (!img) throw new Error('Imagem não gerada');
+    return img.result;
+
+  } catch (openaiError) {
+    console.warn('OpenAI falhou, tentando FLUX:', openaiError.message);
+    return gerarFLUX(prompt, imageBase64);
+  }
 }
 
 const gerarFotos = inngest.createFunction(
