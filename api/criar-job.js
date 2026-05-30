@@ -44,16 +44,16 @@ module.exports = async function handler(req, res) {
     }
 
     // Dispara evento no Inngest — URL correta
-    const inngestRes = await fetch('https://api.inngest.com/e/v1', {
+    const inngestRes = await fetch('https://inn.gs/e/v1', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${inngestKey}`
       },
-      body: JSON.stringify([{
+      body: JSON.stringify({
         name: 'vitrio/gerar',
         data: { jobId, imageBase64, prompts, selectedPhotos, userId: userId || '', code: code || '' }
-      }])
+      })
     });
 
     if (!inngestRes.ok) {
