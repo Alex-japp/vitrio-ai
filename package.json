@@ -2,6 +2,9 @@
   "name": "vitrio-ai",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": "20.x"
+  },
   "dependencies": {
     "inngest": "^3.0.0"
   }
