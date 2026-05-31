@@ -4,14 +4,21 @@
   "description": "Gerador de fotos profissionais para semijoias",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FAF7F2",
+  "background_color": "#14141A",
   "theme_color": "#7B3FF2",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%237B3FF2'/><stop offset='100%' stop-color='%234D7BFF'/></linearGradient></defs><rect width='192' height='192' rx='40' fill='url(%23g)'/><path d='M96 32 L160 80 L96 160 L32 80 Z' fill='white'/></svg>",
+      "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
