@@ -418,9 +418,9 @@ button,input,textarea{font-family:inherit}
       <input id="regEmail" class="input" type="email" placeholder="Email" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')register()">
       <input id="regPass" class="input" type="password" placeholder="Senha (mínimo 6 caracteres)" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')register()">
       <input id="regWhatsapp" class="input" type="tel" placeholder="WhatsApp — ex: 11999998888" required>
-      <div style="display:flex;align-items:flex-start;gap:10px;margin:14px 0 4px;background:#F8F7FF;border:1px solid #EAEAF2;border-radius:12px;padding:12px">
+      <div style="display:flex;align-items:flex-start;gap:10px;margin:14px 0 4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px">
         <input type="checkbox" id="regTerms" style="margin-top:2px;width:18px;height:18px;accent-color:#7B61FF;cursor:pointer;flex-shrink:0">
-        <label for="regTerms" style="font-size:12px;color:#1C1C1C;cursor:pointer;line-height:1.5">Li e aceito os <button onclick="openTerms()" style="background:none;border:none;color:#7B61FF;font-weight:700;cursor:pointer;font-size:12px;padding:0;text-decoration:underline">Termos de Uso e Política de Privacidade</button>, incluindo a política de não reembolso de créditos e responsabilidade pelo uso das imagens geradas.</label>
+        <label for="regTerms" style="font-size:12px;color:var(--ink);cursor:pointer;line-height:1.5">Li e aceito os <button onclick="openTerms()" style="background:none;border:none;color:#7B61FF;font-weight:700;cursor:pointer;font-size:12px;padding:0;text-decoration:underline">Termos de Uso e Política de Privacidade</button>, incluindo a política de não reembolso de créditos e responsabilidade pelo uso das imagens geradas.</label>
       </div>
       <button class="btn btn-main" onclick="register()">✦ Criar conta grátis</button>
       <div style="background:linear-gradient(135deg,rgba(212,175,55,.15),rgba(123,63,242,.12));border:1.5px solid rgba(212,175,55,.5);border-radius:16px;padding:14px 16px;margin-top:14px;text-align:center">
@@ -651,7 +651,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.2.2';
+const APP_VERSION = '1.2.3';
 
 async function checkAppVersion(){
   try{
@@ -1408,18 +1408,28 @@ function downloadUrl(url, name){
   fetch(url)
     .then(r => r.blob())
     .then(blob => {
+      const mime = blob.type || 'image/jpeg';
+      const blobUrl = URL.createObjectURL(new Blob([blob], {type: mime}));
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = name;
+      a.href = blobUrl;
+      a.download = name.endsWith('.jpg') || name.endsWith('.jpeg') ? name : name + '.jpg';
+      a.style.display = 'none';
+      document.body.appendChild(a);
       a.click();
-      URL.revokeObjectURL(a.href);
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+      }, 300);
     })
     .catch(() => {
       const a = document.createElement('a');
       a.href = url;
       a.download = name;
       a.target = '_blank';
+      a.style.display = 'none';
+      document.body.appendChild(a);
       a.click();
+      setTimeout(() => document.body.removeChild(a), 300);
     });
 }
 
