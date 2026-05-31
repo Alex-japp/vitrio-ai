@@ -124,7 +124,9 @@ button,input,textarea{font-family:inherit}
 .skeleton{background:linear-gradient(90deg,#f0f0f5 25%,#e8e8f0 50%,#f0f0f5 75%);background-size:936px 100%;animation:shimmer 2s infinite linear;border-radius:18px 18px 0 0;aspect-ratio:1}
 .skeleton-card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 4px 16px rgba(28,28,28,.06)}
 .skeleton-btn{height:38px;background:var(--line);border-radius:0 0 18px 18px}
-.res img{width:100%;aspect-ratio:1;object-fit:cover;display:block;transition:opacity .3s ease}
+.res img{width:100%;aspect-ratio:1;object-fit:cover;display:block;transition:opacity .4s ease}
+@keyframes imgFadeIn{from{opacity:0;transform:scale(1.03)}to{opacity:1;transform:scale(1)}}
+.res .img-wrap img{animation:imgFadeIn .45s ease forwards}
 .res img.loading{opacity:0}
 .res .dl-btn{width:100%;border:0;background:var(--grad);color:#fff;font-size:10px;font-weight:800;padding:10px 3px;cursor:pointer;transition:all .2s ease}
 .res .dl-btn:hover{opacity:.9}
@@ -199,11 +201,16 @@ button,input,textarea{font-family:inherit}
 .chip-svg{width:22px;height:22px;stroke:var(--purple);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:.2s}
 .chip.active .chip-svg{stroke:#fff}
 .opt-tag{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:10px}
+.obs-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.obs-toggle .obs-arrow{font-size:12px;color:var(--muted);transition:transform .2s ease;display:inline-block}
+.obs-toggle.open .obs-arrow{transform:rotate(180deg)}
+.obs-body{overflow:hidden;max-height:0;transition:max-height .3s ease,opacity .25s ease;opacity:0}
+.obs-body.open{max-height:200px;opacity:1}
 /* SELETOR DE FOTOS COM CHECKBOXES */
 .photo-selector{margin-top:18px}
 .photo-selector .label{margin-bottom:10px}
 .check-all-wrap{margin-bottom:8px}
-.check-label{display:flex;align-items:center;gap:10px;cursor:pointer;padding:11px 14px;border-radius:12px;border:1.5px solid var(--line);background:#fff;margin-bottom:6px;font-weight:700;font-size:14px;transition:.2s;user-select:none}
+.check-label{display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:#FAFAFE;margin-bottom:6px;font-weight:600;font-size:13px;transition:.2s;user-select:none}
 .check-label:hover{border-color:var(--purple);color:var(--purple);background:var(--hover)}
 .check-label input[type="checkbox"]{width:18px;height:18px;accent-color:var(--purple);cursor:pointer;flex-shrink:0}
 .check-label.checked{border-color:var(--purple);color:var(--purple);background:rgba(123,97,255,.06)}
@@ -216,6 +223,8 @@ button,input,textarea{font-family:inherit}
 .reorder-btns .icon-btn{padding:4px 6px;font-size:14px;line-height:1}
 .reorder-btns .icon-btn:disabled{opacity:.25;cursor:not-allowed}
 /* Firebase sync indicator */
+.theme-btn{width:36px;height:36px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:16px;cursor:pointer;display:grid;place-items:center;transition:.2s;flex-shrink:0}
+.theme-btn:hover{border-color:var(--purple);background:var(--hover)}
 .sync-badge{position:fixed;bottom:90px;right:16px;background:rgba(17,18,39,.75);color:#fff;font-size:11px;padding:6px 12px;border-radius:20px;z-index:30;display:none;gap:6px;align-items:center}
 .sync-badge.show{display:flex}
 .sync-dot{width:8px;height:8px;border-radius:50%;background:#4ade80;animation:pulse 1s infinite}
@@ -266,6 +275,43 @@ button,input,textarea{font-family:inherit}
   .outline:hover{transform:none}
 }
 @media(max-width:380px){.name{font-size:23px}.chip{min-width:78px}.row{flex-direction:column}.content{padding:18px 14px}.card{padding:15px}}
+/* Tema forçado claro */
+[data-theme="light"]{
+  --bg:#F8F7FF!important;--card:#FFFFFF!important;--ink:#1C1C1C!important;--muted:#77758A!important;
+  --line:#EAEAF2!important;--hover:#EEE9FF!important;--shadow:0 10px 30px rgba(28,28,28,.06)!important;
+}
+[data-theme="light"] html,[data-theme="light"] body{background:#F8F7FF!important;color:#1C1C1C!important}
+[data-theme="light"] .phone{background:rgba(255,255,255,.72)!important;box-shadow:0 0 0 1px #EAEAF2!important}
+[data-theme="light"] .header{background:rgba(255,255,255,.92)!important;border-color:#EAEAF2!important}
+[data-theme="light"] .card{background:#fff!important;border-color:#EAEAF2!important}
+[data-theme="light"] .chip{background:#fff!important;border-color:#EAEAF2!important;color:#1C1C1C!important}
+[data-theme="light"] .input,.textarea,[data-theme="light"] .textarea{background:#fff!important;border-color:#EAEAF2!important;color:#1C1C1C!important}
+[data-theme="light"] .res{background:#fff!important;border-color:#EAEAF2!important}
+[data-theme="light"] .bottom{background:rgba(255,255,255,.96)!important;border-color:#EAEAF2!important}
+[data-theme="light"] .menu-dropdown{background:#fff!important;border-color:#EAEAF2!important}
+[data-theme="light"] .settings{background:#fff!important}
+/* Tema forçado escuro */
+[data-theme="dark"]{
+  --bg:#14141A!important;--card:#232336!important;--ink:#FFFFFF!important;--muted:#B8B8C7!important;
+  --line:#303045!important;--hover:rgba(123,97,255,.1)!important;--shadow:0 10px 30px rgba(0,0,0,.18)!important;
+}
+[data-theme="dark"] html,[data-theme="dark"] body{background:#14141A!important;color:#FFFFFF!important}
+[data-theme="dark"] .phone{background:rgba(20,20,26,.92)!important;box-shadow:0 0 0 1px #303045!important}
+[data-theme="dark"] .header{background:rgba(20,20,26,.96)!important;border-color:#303045!important}
+[data-theme="dark"] .card{background:#232336!important;border-color:#303045!important}
+[data-theme="dark"] .chip{background:#232336!important;border-color:#303045!important;color:#B8B8C7!important}
+[data-theme="dark"] .input,[data-theme="dark"] .textarea{background:#1C1C2E!important;border-color:#303045!important;color:#FFFFFF!important}
+[data-theme="dark"] .res{background:#232336!important;border-color:#303045!important}
+[data-theme="dark"] .bottom{background:rgba(18,18,24,.97)!important;border-color:#303045!important}
+[data-theme="dark"] .menu-dropdown{background:#232336!important;border-color:#303045!important}
+[data-theme="dark"] .menu-dropdown button{color:#FFFFFF!important}
+[data-theme="dark"] .settings{background:#14141A!important}
+[data-theme="dark"] .check-label{background:#232336!important;border-color:#303045!important;color:#FFFFFF!important}
+[data-theme="dark"] .check-label.checked{background:rgba(123,97,255,.10)!important;border-color:rgba(123,97,255,.28)!important;color:#C8B8FF!important}
+[data-theme="dark"] .outline{background:#232336!important;border-color:#303045!important;color:#FFFFFF!important}
+[data-theme="dark"] .auth-wrap,[data-theme="dark"] .auth-card{background:#1E1E30!important;border-color:#3A3A52!important}
+[data-theme="dark"] .skeleton{background:linear-gradient(90deg,#232336 25%,#2A2A45 50%,#232336 75%)!important;background-size:936px 100%!important}
+[data-theme="dark"] .res .img-wrap{background:#1C1C2E!important}
 @media(prefers-color-scheme:dark){
   :root{
     --bg:#14141A;--card:#232336;--ink:#FFFFFF;--muted:#B8B8C7;
@@ -407,6 +453,7 @@ button,input,textarea{font-family:inherit}
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
     <span id="creditsCount">15</span> fotos
   </div>
+  <button id="themeBtn" class="theme-btn" onclick="cycleTheme()" title="Alternar tema" aria-label="Tema">🌙</button>
   <button id="avatarBtn" class="avatar-btn" onclick="toggleMenu(event)" aria-label="Perfil">
     <div id="avatarInner" class="avatar-inner">◇</div>
   </button>
@@ -516,9 +563,14 @@ button,input,textarea{font-family:inherit}
         </div>
       </div>
       <div class="field">
-        <label class="label">Observações do produto <span class="opt-tag">(opcional)</span></label>
-        <textarea id="obs" class="textarea" maxlength="100" placeholder="Ex: dourado, destaque as pedras, fundo claro, sem corrente..." oninput="state.obs=this.value.trim();updateObsCounter(this)"></textarea>
-        <div style="text-align:right;font-size:11px;color:var(--muted);margin-top:4px"><span id="obsCount">0</span>/100 caracteres</div>
+        <label class="label obs-toggle" id="obsToggle" onclick="toggleObs()">
+          <span>Observações do produto <span class="opt-tag">(opcional)</span></span>
+          <span class="obs-arrow">▼</span>
+        </label>
+        <div class="obs-body" id="obsBody">
+          <textarea id="obs" class="textarea" maxlength="100" placeholder="Ex: dourado, destaque as pedras, fundo claro, sem corrente..." oninput="state.obs=this.value.trim();updateObsCounter(this)"></textarea>
+          <div style="text-align:right;font-size:11px;color:var(--muted);margin-top:4px"><span id="obsCount">0</span>/100 caracteres</div>
+        </div>
       </div>
     </section>
     <!-- SELETOR DE FOTOS -->
@@ -620,7 +672,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.1.4';
+const APP_VERSION = '1.1.5';
 
 async function checkAppVersion(){
   try{
@@ -1221,6 +1273,7 @@ async function generate(){
     await decrementCredits(photos.length);
     addCount();
     showToast('✓ Fotos geradas com sucesso!');
+    scrollToResults();
     if((currentUserData?.credits||0) === 0) setTimeout(()=>showZeroCreditsPopup(), 1500);
     else setTimeout(()=>showAjusteFino(), 1000);
   }catch(e){
@@ -1499,7 +1552,54 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{window.location.reload();});
 }
 
+// ── TEMA CLARO / ESCURO / AUTOMÁTICO ─────────────────
+let themeMode = localStorage.getItem('vitrio_theme') || 'auto';
+function applyTheme(){
+  const root = document.documentElement;
+  const btn = document.getElementById('themeBtn');
+  if(themeMode === 'light'){
+    root.setAttribute('data-theme','light');
+    root.style.colorScheme = 'light';
+    if(btn) btn.textContent = '☀️';
+  } else if(themeMode === 'dark'){
+    root.setAttribute('data-theme','dark');
+    root.style.colorScheme = 'dark';
+    if(btn) btn.textContent = '🌙';
+  } else {
+    root.removeAttribute('data-theme');
+    root.style.colorScheme = 'light dark';
+    if(btn) btn.textContent = '⚙️';
+  }
+}
+function cycleTheme(){
+  const order = ['auto','light','dark'];
+  const idx = order.indexOf(themeMode);
+  themeMode = order[(idx+1) % order.length];
+  localStorage.setItem('vitrio_theme', themeMode);
+  applyTheme();
+  const labels = {auto:'Automático (sistema)', light:'Modo claro', dark:'Modo escuro'};
+  showToast('🎨 ' + labels[themeMode], '#5B3FE8');
+}
+applyTheme();
+
 function scrollChips(dir){document.getElementById('chips').scrollBy({left:dir*260,behavior:'smooth'});}
+
+function toggleObs(){
+  const body = document.getElementById('obsBody');
+  const toggle = document.getElementById('obsToggle');
+  body.classList.toggle('open');
+  toggle.classList.toggle('open');
+}
+
+function scrollToResults(){
+  if(window.innerWidth >= 900) return; // desktop não precisa
+  const results = document.getElementById('results');
+  if(results){
+    setTimeout(()=>{
+      results.scrollIntoView({behavior:'smooth', block:'start'});
+    }, 300);
+  }
+}
 
 // ============================
 // ADMIN — GERENCIAR USUÁRIOS
