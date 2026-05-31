@@ -267,6 +267,7 @@ const limparStorage = inngest.createFunction(
     await limparJobsAntigos();
   }
 );
+const gerarFotos = inngest.createFunction(
   { id: 'gerar-fotos', retries: 2, timeouts: { finish: '10m' } },
   { event: 'vitrio/gerar' },
   async ({ event, step }) => {
