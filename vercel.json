@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/inngest.js": {
+      "maxDuration": 300
+    },
+    "api/criar-job.js": {
+      "maxDuration": 30
+    },
+    "api/status.js": {
+      "maxDuration": 30
+    }
+  }
+}
