@@ -205,7 +205,7 @@ button,input,textarea{font-family:inherit}
 .obs-toggle .obs-arrow{font-size:12px;color:var(--muted);transition:transform .2s ease;display:inline-block}
 .obs-toggle.open .obs-arrow{transform:rotate(180deg)}
 .obs-body{overflow:hidden;max-height:0;transition:max-height .3s ease,opacity .25s ease;opacity:0}
-.obs-body.open{max-height:200px;opacity:1}
+.obs-body.open{max-height:160px;opacity:1}
 /* SELETOR DE FOTOS COM CHECKBOXES */
 .photo-selector{margin-top:18px}
 .photo-selector .label{margin-bottom:10px}
@@ -236,12 +236,12 @@ button,input,textarea{font-family:inherit}
   .head-row{max-width:100%}
   .desk-header-stats{display:flex!important}
   .menu-dropdown{right:32px}
-  .content{display:grid;grid-template-columns:17% 1fr 32%;grid-template-rows:auto;gap:0 24px;padding:24px 32px;max-width:100%;align-items:start;}
+  .content{display:grid;grid-template-columns:240px 1fr 35%;grid-template-rows:auto;gap:0 24px;padding:24px 32px;max-width:100%;align-items:start;}
   .sidebar-group{grid-column:1;grid-row:1;position:sticky;top:88px;padding-right:20px;border-right:1px solid var(--line);}
   .sidebar-group .label{margin-top:0}
   .sidebar-group .chips-wrap{position:static;margin:0 0 8px;display:block;justify-content:flex-start;}
   .sidebar-group .chips{flex-direction:column;overflow:visible;padding:0;gap:3px;justify-content:flex-start;}
-  .sidebar-group .chip{min-width:auto;width:100%;display:flex;align-items:center;gap:8px;padding:7px 10px;text-align:left;border-radius:10px;transform:none;font-size:12px;}
+  .sidebar-group .chip{min-width:auto;width:100%;display:flex;align-items:center;gap:8px;padding:0 10px;height:44px;text-align:left;border-radius:10px;transform:none;font-size:12px;}
   .sidebar-group .chip.active{transform:none;background:rgba(108,59,255,.08);color:var(--purple);border-color:var(--purple);border-left:3px solid #6C3BFF;box-shadow:none}
   .sidebar-group .chip .ico{margin:0;min-width:28px;width:28px;height:28px;border-radius:8px;font-size:14px;}
   .sidebar-group .chip-arrow{display:none}
@@ -262,7 +262,7 @@ button,input,textarea{font-family:inherit}
   .results-group .grid{grid-template-columns:1fr 1fr;gap:8px;}
   .results-group .btn-main{margin-top:12px;font-size:12px;min-height:40px;}
   .results-group .label{margin-top:0;display:flex;align-items:center;justify-content:space-between;}
-  .results-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:var(--muted);text-align:center;gap:16px;background:linear-gradient(160deg,#FFFFFF 50%,rgba(123,97,255,.04) 100%);border-radius:24px;border:1px solid var(--line);padding:32px 24px}
+  .results-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:220px;color:var(--muted);text-align:center;gap:12px;background:linear-gradient(160deg,#FFFFFF 50%,rgba(123,97,255,.04) 100%);border-radius:24px;border:1px solid var(--line);padding:24px}
   .results-placeholder .ph-icon{font-size:44px;color:var(--purple);opacity:.7;animation:float 3s ease-in-out infinite;}
   @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
   .results-placeholder p{font-size:13px;line-height:1.7;max-width:200px;}
@@ -667,7 +667,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.2.5';
+const APP_VERSION = '1.2.6';
 
 async function checkAppVersion(){
   try{
@@ -937,6 +937,8 @@ auth.onAuthStateChanged(async (user) => {
       if(usersTabBtn) usersTabBtn.classList.remove('hidden');
       const dashTabBtn = document.getElementById('dashTabBtn');
       if(dashTabBtn) dashTabBtn.classList.remove('hidden');
+      const adminBtn = document.getElementById('adminMenuBtn');
+      if(adminBtn) adminBtn.style.display = '';
     }
     if(!currentUserData?.isAdmin){
       if(!currentUserData?.tourDone){
