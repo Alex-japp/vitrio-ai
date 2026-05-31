@@ -618,7 +618,7 @@ button,input,textarea{font-family:inherit}
 </div>
 <div id="settings" class="settings phone"><header class="cfg-head"><button class="dark-btn" onclick="closeSettings()">←</button><div class="cfg-title">CONFIGURAÇÕES</div><button class="dark-btn" onclick="closeSettings()">✓</button></header><div class="tabs"><button class="tab on" onclick="tab('cats',this)">Categorias</button><button id="promptsTabBtn" class="tab" onclick="tab('prompts',this)">Prompts</button><button class="tab" onclick="tab('general',this)">Geral</button><button id="dashTabBtn" class="tab hidden" onclick="tab('dash',this);loadDashboard()">Dashboard</button><button id="usersTabBtn" class="tab hidden" onclick="tab('users',this)">Usuários</button></div><main class="cfg-body"><section id="catsTab"><h3>Suas categorias</h3><p class="cfg-sub">Gerencie as categorias dos seus produtos</p><div id="catList"></div><button class="add" onclick="editCat()">+ Nova Categoria</button><button onclick="updateAllIcons()" style="width:100%;height:48px;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;margin-top:8px">◇ Atualizar ícone padrão de todas as categorias</button></section><section id="promptsTab" class="hidden"><h3>Prompts por categoria</h3><p class="cfg-sub">Edite os prompts que guiam cada tipo de foto.</p><div id="promptList"></div></section><section id="generalTab" class="hidden"><h3>Uso do app</h3><p class="cfg-sub">Controle simples para teste beta.</p><div class="counter"><div class="count-card"><div id="cntP" class="num">0</div><small>Produtos</small></div><div class="count-card"><div id="cntI" class="num">0</div><small>Imagens</small></div></div>
 </div>
-<button class="danger" onclick="logout()">Sair com segurança</button></section><section id="dashTab" class="hidden">
+</section><section id="dashTab" class="hidden">
   <h3>Dashboard</h3>
   <p class="cfg-sub">Visão geral do negócio em tempo real.</p>
   <div id="dashContent">
@@ -651,7 +651,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.2.1';
+const APP_VERSION = '1.2.2';
 
 async function checkAppVersion(){
   try{
