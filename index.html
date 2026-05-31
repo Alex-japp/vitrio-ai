@@ -116,7 +116,9 @@ button,input,textarea{font-family:inherit}
 .res .img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
 .res:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(28,28,28,.10);border-color:rgba(123,97,255,.2)}
 @keyframes shimmer{0%{background-position:-468px 0}100%{background-position:468px 0}}
-.skeleton{background:linear-gradient(90deg,#f0f0f5 25%,#e8e8f0 50%,#f0f0f5 75%);background-size:936px 100%;animation:shimmer 1.4s infinite linear;border-radius:18px;aspect-ratio:1}
+.skeleton{background:linear-gradient(90deg,#f0f0f5 25%,#e8e8f0 50%,#f0f0f5 75%);background-size:936px 100%;animation:shimmer 2s infinite linear;border-radius:18px 18px 0 0;aspect-ratio:1}
+.skeleton-card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 4px 16px rgba(28,28,28,.06)}
+.skeleton-btn{height:38px;background:var(--line);border-radius:0 0 18px 18px}
 .res img{width:100%;aspect-ratio:1;object-fit:cover;display:block;transition:opacity .3s ease}
 .res img.loading{opacity:0}
 .res .dl-btn{width:100%;border:0;background:var(--grad);color:#fff;font-size:10px;font-weight:800;padding:10px 3px;cursor:pointer;transition:all .2s ease}
@@ -281,6 +283,7 @@ button,input,textarea{font-family:inherit}
   .progress{background:#232336!important;border-color:#303045!important}
   .bar{background:#1C1C2E!important}
   .skeleton{background:linear-gradient(90deg,#232336 25%,#2A2A45 50%,#232336 75%)!important;background-size:936px 100%!important}
+  .skeleton-btn{background:#303045!important}
   .res{background:#232336!important;border-color:#303045!important}
   .res .img-wrap{background:#1C1C2E!important}
   .outline{background:#232336!important;border-color:#303045!important;color:#FFFFFF!important}
@@ -608,7 +611,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.1.1';
 
 async function checkAppVersion(){
   try{
@@ -1164,7 +1167,7 @@ async function generate(){
   // Skeleton loading
   const skeletonCount = state.selectedPhotos.length;
   grid.setAttribute('data-qty', skeletonCount);
-  grid.innerHTML = Array(skeletonCount).fill('<div class="skeleton"></div>').join('');
+  grid.innerHTML = Array(skeletonCount).fill('<div class="skeleton-card"><div class="skeleton"></div><div class="skeleton-btn"></div></div>').join('');
   results.style.display='block';
   if(resultsPlaceholder) resultsPlaceholder.style.display='none';
 
@@ -1295,11 +1298,12 @@ async function regenerate(i){
   error.textContent='';progress.style.display='block';bar.style.width='10%';ptext.textContent='Gerando foto...';
 
   // Coloca skeleton só na foto que está sendo regerada — mantém as outras
-  const cards=document.querySelectorAll('.res, .skeleton');
+  const cards=document.querySelectorAll('.res, .skeleton-card, .skeleton');
   const targetCard = cards[i];
   if(targetCard){
     const skeleton = document.createElement('div');
-    skeleton.className = 'skeleton';
+    skeleton.className = 'skeleton-card';
+    skeleton.innerHTML = '<div class="skeleton"></div><div class="skeleton-btn"></div>';
     grid.replaceChild(skeleton, targetCard);
   }
 
@@ -1358,7 +1362,7 @@ async function regenerate(i){
   }catch(e){
     error.textContent='Não foi possível gerar as fotos. Tente novamente em alguns instantes.';
     // Restaura o card anterior se tiver
-    const skeletons = grid.querySelectorAll('.skeleton');
+    const skeletons = grid.querySelectorAll('.skeleton-card, .skeleton');
     skeletons.forEach(s => {
       const card = document.createElement('div');
       card.className = 'res res-animate';
