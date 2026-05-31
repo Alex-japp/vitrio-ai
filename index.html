@@ -111,8 +111,13 @@ button,input,textarea{font-family:inherit}
 .res-animate:nth-child(1){animation-delay:.05s}
 .res-animate:nth-child(2){animation-delay:.12s}
 .res-animate:nth-child(3){animation-delay:.19s}
-.res{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:visible;box-shadow:0 4px 16px rgba(28,28,28,.06);position:relative;transition:all .2s ease}
-.res .img-wrap{position:relative;width:100%;aspect-ratio:1;overflow:hidden;border-radius:18px 18px 0 0;background:var(--line);display:block}
+
+/* ━━━ FIX: overflow:hidden para conter o botão Baixar dentro do card ━━━ */
+.res{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 4px 16px rgba(28,28,28,.06);position:relative;transition:all .2s ease}
+
+/* ━━━ FIX: img-wrap com min-height para card não ficar fininho antes de carregar ━━━ */
+.res .img-wrap{position:relative;width:100%;aspect-ratio:1;overflow:hidden;border-radius:18px 18px 0 0;background:var(--line);display:block;min-height:100px}
+
 .res .img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
 .res:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(28,28,28,.10);border-color:rgba(123,97,255,.2)}
 @keyframes shimmer{0%{background-position:-468px 0}100%{background-position:468px 0}}
@@ -319,7 +324,8 @@ button,input,textarea{font-family:inherit}
   .cfg-link{border-color:rgba(212,175,55,.4)!important;color:#D4AF37!important;background:transparent!important}
   .danger{border-color:rgba(255,80,80,.4)!important;background:transparent!important}
   .check-label{background:#232336!important;border-color:#303045!important;color:#FFFFFF!important}
-  .check-label.checked{background:rgba(123,97,255,.12)!important;border-color:rgba(123,97,255,.4)!important;color:#A08AFF!important}
+  /* ━━━ FIX: check-label dark mode menos intenso ━━━ */
+  .check-label.checked{background:rgba(123,97,255,.10)!important;border-color:rgba(123,97,255,.28)!important;color:#C8B8FF!important}
   .credits-badge{background:rgba(123,97,255,.15)!important;border-color:rgba(123,97,255,.3)!important;color:#A08AFF!important}
   .credits-badge.low{background:rgba(230,126,0,.12)!important;border-color:rgba(230,126,0,.3)!important;color:#F0A040!important}
   .credits-badge.empty{background:rgba(255,60,60,.1)!important;border-color:rgba(255,60,60,.3)!important}
@@ -637,7 +643,6 @@ function showUpdatePopup(){
 }
 
 function forceUpdate(){
-  // Salva versão ANTES de recarregar
   if(window._serverVersion){
     localStorage.setItem('vitrio_version', window._serverVersion);
   }
@@ -658,7 +663,6 @@ function showSync(show){syncBadge.classList.toggle('show',show)}
 let currentUser = null;
 let currentUserData = null;
 
-// Tabs de login/cadastro
 function authTab(name, btn){
   document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('on'));
   document.querySelectorAll('.auth-screen').forEach(s=>s.classList.remove('on'));
@@ -666,7 +670,6 @@ function authTab(name, btn){
   document.getElementById(name==='login'?'loginScreen':'registerScreen').classList.add('on');
 }
 
-// Login com Google
 async function loginGoogle(){
   try{
     const provider = new firebase.auth.GoogleAuthProvider();
@@ -676,7 +679,6 @@ async function loginGoogle(){
   }
 }
 
-// Login com email/senha
 async function loginEmail(){
   const email = document.getElementById('loginEmail').value.trim();
   const pass = document.getElementById('loginPass').value;
@@ -691,7 +693,6 @@ async function loginEmail(){
   }
 }
 
-// Cadastro
 async function register(){
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim();
@@ -708,7 +709,6 @@ async function register(){
   try{
     const cred = await auth.createUserWithEmailAndPassword(email, pass);
     await cred.user.updateProfile({displayName: name});
-    // Cria documento do usuário no Firestore
     await db.collection('users').doc(cred.user.uid).set({
       name, email, whatsapp, plan:'teste', credits:15, totalCredits:15,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -719,7 +719,6 @@ async function register(){
   }
 }
 
-// Esqueci a senha
 async function forgotPassword(){
   const email = document.getElementById('loginEmail').value.trim();
   const err = document.getElementById('loginErr');
@@ -734,13 +733,11 @@ async function forgotPassword(){
   }
 }
 
-// Logout
 function logout(){
   auth.signOut();
   settings.style.display='none';
 }
 
-// Carrega dados do usuário
 async function loadUserData(uid){
   try{
     const snap = await db.collection('users').doc(uid).get();
@@ -766,13 +763,11 @@ async function loadUserData(uid){
   }
 }
 
-// Atualiza UI de créditos
 function updateCreditsUI(){
   if(!currentUserData) return;
   const credits = currentUserData.credits || 0;
   const badge = document.getElementById('creditsBadge');
   const count = document.getElementById('creditsCount');
-  // Atualiza avatar
   updateAvatar();
   if(currentUserData.isAdmin){
     if(badge){badge.className='admin-badge';badge.innerHTML='👑 Admin ◇';badge.style.cursor='default';}
@@ -794,7 +789,6 @@ function updateCreditsUI(){
       if(credits <= 5) badge.classList.add('low');
     }
   }
-  // Notificação saldo baixo
   const lowBanner = document.getElementById('lowCreditsBanner');
   const lowCount = document.getElementById('lowCreditsCount');
   if(lowBanner && !currentUserData.isAdmin){
@@ -853,14 +847,12 @@ async function uploadAvatar(input){
   reader.readAsDataURL(file);
 }
 
-// Decrementa créditos após geração
 async function decrementCredits(qty){
   if(!currentUser || !currentUserData) return;
   const newCredits = Math.max(0, (currentUserData.credits||0) - qty);
   currentUserData.credits = newCredits;
   updateCreditsUI();
   await db.collection('users').doc(currentUser.uid).update({credits: newCredits});
-  // Aviso saldo baixo — aparece 1x quando chegar em 10 fotos
   if(newCredits <= 10 && newCredits > 0){
     const key = `vitrio_lowcredits_${currentUser.uid}_${Math.floor(newCredits/10)}`;
     if(!localStorage.getItem(key)){
@@ -881,7 +873,6 @@ function showLowCreditsWarning(credits){
   setTimeout(()=>{ if(bar.parentNode) bar.remove(); }, 8000);
 }
 
-// Auth state listener
 auth.onAuthStateChanged(async (user) => {
   if(user){
     currentUser = user;
@@ -891,14 +882,12 @@ auth.onAuthStateChanged(async (user) => {
     await loadFromFirebase();
     render();
     checkAppVersion();
-    // Mostra painel admin se for admin
     if(currentUserData?.isAdmin){
       if(promptsTabBtn) promptsTabBtn.style.display='';
       if(usersTabBtn) usersTabBtn.classList.remove('hidden');
       const dashTabBtn = document.getElementById('dashTabBtn');
       if(dashTabBtn) dashTabBtn.classList.remove('hidden');
     }
-    // Onboarding para novos usuários
     if(!currentUserData?.onboardingDone && !currentUserData?.isAdmin){
       setTimeout(()=>openOnboarding(), 600);
     }
@@ -938,10 +927,8 @@ function applyCodeConfig(){
   if(codeInput){
     const field = codeInput.closest('.field');
     const optTag = field?.querySelector('.opt-tag');
-    const lbl = field?.querySelector('.label');
     if(optTag) optTag.style.display = appConfig.codeRequired ? 'none' : 'inline';
   }
-  // Atualiza toggle visual
   const toggle = document.getElementById('codeRequiredToggle');
   const slider = document.getElementById('codeRequiredSlider');
   const dot = document.getElementById('codeSliderDot');
@@ -995,24 +982,11 @@ async function loadDashboard(){
 
     content.innerHTML = `
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
-        <div class="count-card">
-          <div class="num">${total}</div>
-          <small>Total clientes</small>
-        </div>
-        <div class="count-card">
-          <div class="num">${ativos}</div>
-          <small>Clientes ativos</small>
-        </div>
-        <div class="count-card">
-          <div class="num">${totalFotos}</div>
-          <small>Fotos geradas</small>
-        </div>
-        <div class="count-card">
-          <div class="num">${totalProdutos}</div>
-          <small>Produtos</small>
-        </div>
+        <div class="count-card"><div class="num">${total}</div><small>Total clientes</small></div>
+        <div class="count-card"><div class="num">${ativos}</div><small>Clientes ativos</small></div>
+        <div class="count-card"><div class="num">${totalFotos}</div><small>Fotos geradas</small></div>
+        <div class="count-card"><div class="num">${totalProdutos}</div><small>Produtos</small></div>
       </div>
-
       <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px">
         <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Distribuição por plano</div>
         ${Object.entries(planCount).map(([plan,count])=>`
@@ -1021,7 +995,6 @@ async function loadDashboard(){
             <span style="font-size:13px;font-weight:800;color:var(--purple)">${count} cliente${count!==1?'s':''}</span>
           </div>`).join('')}
       </div>
-
       <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px">
         <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Alertas</div>
         <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F5F4F0">
@@ -1033,13 +1006,11 @@ async function loadDashboard(){
           <span style="font-size:13px;font-weight:800;color:#E67E00">${creditosBaixos} cliente${creditosBaixos!==1?'s':''}</span>
         </div>
       </div>
-
       <div style="background:linear-gradient(135deg,rgba(123,97,255,.08),rgba(108,59,255,.05));border:1px solid rgba(123,97,255,.2);border-radius:18px;padding:16px;text-align:center">
         <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Receita estimada</div>
         <div style="font-size:32px;font-weight:900;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent">R$${receitaEst}</div>
         <div style="font-size:11px;color:var(--muted);margin-top:4px">Baseado nos planos ativos</div>
       </div>
-
       <button onclick="loadDashboard()" style="width:100%;height:44px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;margin-top:12px">↻ Atualizar</button>
     `;
   }catch(e){
@@ -1065,12 +1036,11 @@ async function saveCountToFirebase(){
 // APP
 // ============================
 const FB='https://docs.google.com/forms/d/e/1FAIpQLScwQ1g4VlZUOz0mAQ2OSwRG0lVtxhEPE1mHg50DGkHPzO6gpA/viewform';
-// ⬇️ COLOQUE SEU NÚMERO DE WHATSAPP AQUI (somente números, com DDD e DDI ex: 5537999999999)
 const WHATSAPP_NUMBER = '5537999096812';
 const defaults=[['Anéis'],['Brincos'],['Colares'],['Pulseiras'],['Pingentes']].map((x,i)=>({id:'c'+i,name:x[0],icon:'',p1:'Foto profissional em fundo branco, estilo catálogo premium.',p2:'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:'Close detalhado mostrando brilho, textura e acabamento da peça.'}));
 let cats=defaults, editId=null, editMode='cat';
 let state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],selectedPhotos:[1,2,3]};
-let appConfig={codeRequired:true}; // código do produto obrigatório por padrão
+let appConfig={codeRequired:true};
 
 async function init(){
   if(promptsTabBtn) promptsTabBtn.style.display='none';
@@ -1094,19 +1064,14 @@ const catIcons = {
 };
 
 function getCatIcon(cat){
-  // Se tem ícone SVG personalizado, usa ele direto
   if(cat.icon && cat.icon.startsWith('<svg')) return cat.icon;
-  // Se tem emoji ou texto customizado (não ✦ e não ◇), usa como span
   if(cat.icon && cat.icon !== '✦' && cat.icon !== '◇'){
     return `<span style="font-size:20px">${cat.icon}</span>`;
   }
-  // Se ◇ ou sem ícone → usa SVG losango padrão (ignora mapa por nome)
   if(cat.icon === '◇') return `<svg class="chip-svg" viewBox="0 0 24 24"><path d="M12 2L22 12L12 22L2 12Z"/></svg>`;
-  // Tenta encontrar por nome
   for(const key of Object.keys(catIcons)){
     if(cat.name.toLowerCase().includes(key.toLowerCase())) return catIcons[key];
   }
-  // Padrão: losango da marca
   return `<svg class="chip-svg" viewBox="0 0 24 24"><path d="M12 2L22 12L12 22L2 12Z"/></svg>`;
 }
 
@@ -1143,14 +1108,12 @@ async function compressImage(b64, mime, maxSize=1024, quality=0.85){
     img.onload = () => {
       const canvas = document.createElement('canvas');
       let w = img.width, h = img.height;
-      // Redimensiona se maior que maxSize
       if(w > maxSize || h > maxSize){
         if(w > h){ h = Math.round(h * maxSize / w); w = maxSize; }
         else { w = Math.round(w * maxSize / h); h = maxSize; }
       }
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      // JPEG com qualidade controlada — muito menor que PNG
       const dataUrl = canvas.toDataURL('image/jpeg', quality);
       resolve(dataUrl.split(',')[1]);
     };
@@ -1167,7 +1130,6 @@ async function generate(){
   error.textContent='';progress.style.display='block';
   if(window.innerWidth<900)results.style.display='none';
   genBtn.disabled=true;bar.style.width='5%';ptext.textContent='Enviando para processamento...';
-  // Skeleton loading
   const skeletonCount = state.selectedPhotos.length;
   grid.setAttribute('data-qty', skeletonCount);
   grid.innerHTML = Array(skeletonCount).fill('<div class="skeleton-card"><div class="skeleton"></div><div class="skeleton-btn"></div></div>').join('');
@@ -1177,8 +1139,6 @@ async function generate(){
   try{
     const pngB64 = await compressImage(state.b64, state.mime, 1024, 0.85);
     const photos = state.selectedPhotos;
-
-    // Monta prompts para cada foto selecionada
     const prompts = {};
     photos.forEach(photoNum => {
       const customPrompts = currentUserData?.customPrompts;
@@ -1192,7 +1152,6 @@ async function generate(){
       prompts[photoNum] = catPrompt + (state.obs ? '\nObservações: '+state.obs : '');
     });
 
-    // Cria o job no Inngest
     bar.style.width='10%';ptext.textContent='Iniciando geração...';
     const jobRes = await fetch('/api/criar-job', {
       method: 'POST',
@@ -1209,14 +1168,13 @@ async function generate(){
     if(!jobRes.ok) throw new Error('Falha ao criar job');
     const { jobId } = await jobRes.json();
 
-    // Polling — verifica status a cada 4 segundos
     state.imgs = [];
     const fotosMostradas = new Set();
     const nomes = {1:'Analisando e gerando foto 1...', 2:'Gerando foto com modelo...', 3:'Gerando close detalhe...'};
 
     await new Promise((resolve, reject) => {
       let tentativas = 0;
-      const maxTentativas = 120; // 8 minutos máximo
+      const maxTentativas = 120;
 
       const poll = setInterval(async () => {
         tentativas++;
@@ -1230,7 +1188,6 @@ async function generate(){
           const statusRes = await fetch(`/api/status?jobId=${jobId}`);
           const status = await statusRes.json();
 
-          // Mostra fotos assim que ficam prontas
           photos.forEach((photoNum, idx) => {
             if(status.photos[photoNum] && !fotosMostradas.has(photoNum)){
               fotosMostradas.add(photoNum);
@@ -1244,13 +1201,11 @@ async function generate(){
             }
           });
 
-          // Job completo
           if(status.status === 'completed' || fotosMostradas.size === photos.length){
             clearInterval(poll);
             resolve();
           }
 
-          // Job falhou
           if(status.status === 'failed'){
             clearInterval(poll);
             reject(new Error('Não foi possível gerar as fotos. Tente novamente em alguns instantes.'));
@@ -1300,7 +1255,6 @@ async function regenerate(i){
   const photoNum=i+1;
   error.textContent='';progress.style.display='block';bar.style.width='10%';ptext.textContent='Gerando foto...';
 
-  // Coloca skeleton só na foto que está sendo regerada — mantém as outras
   const cards=document.querySelectorAll('.res, .skeleton-card, .skeleton');
   const targetCard = cards[i];
   if(targetCard){
@@ -1322,7 +1276,6 @@ async function regenerate(i){
     }
     let prompt = catPrompt + (state.obs ? '\nObservações: '+state.obs : '');
 
-    // Cria job para regenerar só essa foto
     bar.style.width='20%';ptext.textContent='Enviando para processamento...';
     const prompts = { [photoNum]: prompt };
     const jobRes = await fetch('/api/criar-job', {
@@ -1339,7 +1292,6 @@ async function regenerate(i){
     if(!jobRes.ok) throw new Error('Falha ao criar job');
     const { jobId } = await jobRes.json();
 
-    // Polling
     await new Promise((resolve, reject) => {
       let tentativas = 0;
       const poll = setInterval(async () => {
@@ -1364,7 +1316,6 @@ async function regenerate(i){
     await decrementCredits(1);
   }catch(e){
     error.textContent='Não foi possível gerar as fotos. Tente novamente em alguns instantes.';
-    // Restaura o card anterior se tiver
     const skeletons = grid.querySelectorAll('.skeleton-card, .skeleton');
     skeletons.forEach(s => {
       const card = document.createElement('div');
@@ -1381,7 +1332,6 @@ const regenSvg=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stro
 function showPhotoImediata(idx, url, photoNum){
   results.style.display='block';
   if(resultsPlaceholder) resultsPlaceholder.style.display='none';
-  // Garante data-qty correto antes de substituir qualquer slot
   grid.setAttribute('data-qty', state.selectedPhotos.length);
   const slots = grid.children;
   const targetSlot = slots[idx];
@@ -1444,12 +1394,10 @@ function toggleMenu(e){e.stopPropagation();menuDropdown.classList.toggle('hidden
 function closeMenu(){menuDropdown.classList.add('hidden')}
 document.addEventListener('click',function(){closeMenu()});
 
-// Settings - só admin acessa
 async function openAdmin(){
   if(currentUser && !currentUserData?.isAdmin){
     await loadUserData(currentUser.uid);
   }
-  // Verifica admin pelo Firestore ou backend
   let isAdmin = currentUserData?.isAdmin === true;
   if(!isAdmin && currentUser?.email){
     try{
@@ -1513,7 +1461,6 @@ function toggleAll(cb){
     state.selectedPhotos=[1,2,3];
     [1,2,3].forEach(n=>{const c=document.getElementById('check'+n);if(c){c.checked=true;document.getElementById('label'+n)?.classList.add('checked');}});
   } else {
-    // Mostra individuais SEM chamar updateSelection para evitar auto-fechar
     individual.classList.remove('hidden');
     state.selectedPhotos=[1,2,3];
   }
@@ -1532,7 +1479,6 @@ function updateSelection(){
     const allChecked=state.selectedPhotos.length===3;
     ca.checked=allChecked;
     document.getElementById('labelAll')?.classList.toggle('checked',allChecked);
-    // Auto-fecha os individuais quando todos estão marcados
     if(allChecked && individual) individual.classList.add('hidden');
   }
   ready();
@@ -1558,7 +1504,7 @@ function scrollChips(dir){document.getElementById('chips').scrollBy({left:dir*26
 // ============================
 // ADMIN — GERENCIAR USUÁRIOS
 // ============================
-let allUsers = []; // cache para exportação CSV
+let allUsers = [];
 
 function getPromptStatus(u){
   if(!u.onboardingData) return {label:'⚪ Sem onboarding', cls:'ps-none'};
@@ -1796,44 +1742,31 @@ init();
       <button onclick="closeTerms()" style="width:38px;height:38px;border-radius:12px;border:1px solid #E8E2D6;background:#fff;font-size:20px;cursor:pointer;display:grid;place-items:center">×</button>
     </div>
     <div style="font-size:12px;color:#444;line-height:1.9">
-
       <div style="background:#F0EDFF;border-radius:12px;padding:14px 16px;margin-bottom:20px;font-size:12px;color:#3C2C8A;font-weight:600">
         ⚠️ Pontos mais importantes: fotos disponíveis por 24h — baixe na hora. Créditos utilizados não são reembolsáveis. Você é responsável pelo uso das imagens geradas.
       </div>
-
       <div style="font-weight:900;color:#111;font-size:13px;margin-bottom:6px">1. Identificação</div>
       <p>O <strong>Vitrio AI</strong> é operado pela <strong>STARNEL SEMIJOIAS</strong>, sediada em Divinópolis, MG. Contato: starnelsemijoias@gmail.com</p>
-
       <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">2. O serviço e a natureza da IA</div>
       <p>O Vitrio AI gera fotografias profissionais de semijoias utilizando Inteligência Artificial. Os resultados são de <strong>natureza probabilística e variável</strong> — a mesma imagem pode gerar resultados diferentes a cada geração. Variações em fidelidade, cores, texturas e proporções são inerentes à tecnologia e <strong>não constituem defeito do serviço</strong>.</p>
-
       <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">3. Créditos e política de não reembolso</div>
       <p>Cada geração consome créditos independentemente do resultado. <strong>Créditos utilizados não são reembolsáveis</strong>, incluindo casos de resultado insatisfatório, desistência após início da geração ou encerramento da conta. Créditos vencidos também não são reembolsados. Exceção: falha técnica comprovada e exclusiva da plataforma, analisada caso a caso.</p>
-
       <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">4. Armazenamento das imagens — ATENÇÃO</div>
       <p>As imagens geradas ficam disponíveis por <strong>até 24 horas</strong>. Após esse prazo são <strong>excluídas automaticamente e de forma permanente</strong>, sem possibilidade de recuperação. É responsabilidade exclusiva do usuário realizar o download dentro do prazo.</p>
-
       <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">5. Propriedade e responsabilidade pelo uso das imagens</div>
-      <p>As imagens geradas pertencem ao usuário. O Vitrio AI não reivindica direitos sobre elas e não as utiliza para treinamento de IA. O <strong>usuário é o único responsável</strong> pelo uso, divulgação e consequências jurídicas das imagens, incluindo eventual violação de direitos de terceiros, uso enganoso ao consumidor ou uso indevido.</p>
-
+      <p>As imagens geradas pertencem ao usuário. O Vitrio AI não reivindica direitos sobre elas e não as utiliza para treinamento de IA. O <strong>usuário é o único responsável</strong> pelo uso, divulgação e consequências jurídicas das imagens.</p>
       <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">6. Usos proibidos</div>
-      <p>É vedado utilizar o Vitrio AI para: gerar imagens de produtos falsificados; induzir consumidores ao erro; violar direitos autorais, marcas ou direitos de imagem de terceiros; qualquer finalidade ilícita. A violação implica suspensão imediata da conta sem reembolso.</p>
-
+      <p>É vedado utilizar o Vitrio AI para: gerar imagens de produtos falsificados; induzir consumidores ao erro; violar direitos autorais, marcas ou direitos de imagem de terceiros; qualquer finalidade ilícita.</p>
       <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">7. Limitação de responsabilidade</div>
-      <p>A responsabilidade total do Vitrio AI está limitada ao valor dos créditos não utilizados na conta. Não respondemos por danos indiretos, lucros cessantes, perda de dados ou falhas de serviços de terceiros (OpenAI, Firebase, Vercel, Replicate).</p>
-
+      <p>A responsabilidade total do Vitrio AI está limitada ao valor dos créditos não utilizados na conta. Não respondemos por danos indiretos, lucros cessantes, perda de dados ou falhas de serviços de terceiros.</p>
       <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">8. Privacidade e proteção de dados (LGPD)</div>
-      <p>Em conformidade com a Lei nº 13.709/2018 (LGPD). Coletamos: <strong>nome e email</strong> (cadastro), <strong>WhatsApp</strong> (suporte), <strong>fotos de produtos</strong> (processadas para geração, não armazenadas permanentemente). Seus dados não são vendidos nem compartilhados para fins comerciais. Os serviços de terceiros utilizados (OpenAI, Firebase, Vercel, Replicate) estão localizados nos EUA e possuem seus próprios termos de privacidade. Você pode solicitar acesso, correção ou exclusão dos seus dados pelo e-mail de contato.</p>
-
+      <p>Em conformidade com a Lei nº 13.709/2018 (LGPD). Coletamos: <strong>nome e email</strong> (cadastro), <strong>WhatsApp</strong> (suporte), <strong>fotos de produtos</strong> (processadas para geração, não armazenadas permanentemente). Seus dados não são vendidos nem compartilhados para fins comerciais.</p>
       <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">9. Disponibilidade do serviço</div>
       <p>O Vitrio AI não garante disponibilidade ininterrupta. Interrupções para manutenção ou por falhas de terceiros não geram direito a reembolso ou indenização.</p>
-
       <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">10. Cancelamento</div>
-      <p>O usuário pode cancelar sua conta a qualquer momento. Créditos remanescentes não são reembolsados em cancelamento voluntário. Violações aos termos podem resultar em suspensão imediata sem reembolso.</p>
-
+      <p>O usuário pode cancelar sua conta a qualquer momento. Créditos remanescentes não são reembolsados em cancelamento voluntário.</p>
       <div style="font-weight:900;color:#111;font-size:13px;margin:16px 0 6px">11. Foro e lei aplicável</div>
-      <p>Estes Termos são regidos pela legislação brasileira (CDC, LGPD, Marco Civil da Internet). Foro eleito: Comarca de Divinópolis, MG.</p>
-
+      <p>Estes Termos são regidos pela legislação brasileira. Foro eleito: Comarca de Divinópolis, MG.</p>
       <div style="margin-top:20px;padding-top:16px;border-top:1px solid #E8E2D6;font-size:11px;color:#aaa;text-align:center">
         Vitrio AI · Versão 2.0 · Última atualização: 30 de maio de 2026
       </div>
@@ -1855,48 +1788,25 @@ function closeTerms(){document.getElementById('termsModal').style.display='none'
       <button onclick="closePlans()" style="width:38px;height:38px;border-radius:12px;border:1px solid #E8E2D6;background:#fff;font-size:20px;cursor:pointer;display:grid;place-items:center">×</button>
     </div>
     <div style="font-size:13px;color:#888;margin-bottom:20px">Créditos não expiram · Sem mensalidade · Sem cartão</div>
-
     <div style="display:flex;flex-direction:column;gap:10px">
-
-      <!-- STARTER -->
       <div class="plan-card" onclick="buyPlan('Starter','30 fotos','R$19')">
         <div class="plan-info"><div class="plan-name">Starter</div><div class="plan-desc">30 fotos · 90 dias</div></div>
-        <div style="display:flex;align-items:center;gap:12px">
-          <div class="plan-price">R$19</div>
-          <div class="plan-btn">Quero este</div>
-        </div>
+        <div style="display:flex;align-items:center;gap:12px"><div class="plan-price">R$19</div><div class="plan-btn">Quero este</div></div>
       </div>
-
-      <!-- PRO -->
       <div class="plan-card plan-featured" onclick="buyPlan('Pro','100 fotos','R$39')">
         <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--grad);color:#fff;font-size:10px;font-weight:800;padding:3px 14px;border-radius:20px;white-space:nowrap;letter-spacing:.05em">⭐ MAIS POPULAR</div>
         <div class="plan-info"><div class="plan-name" style="color:var(--purple)">Pro</div><div class="plan-desc">100 fotos · 90 dias</div></div>
-        <div style="display:flex;align-items:center;gap:12px">
-          <div class="plan-price" style="color:var(--purple)">R$39</div>
-          <div class="plan-btn plan-btn-featured">Quero este</div>
-        </div>
+        <div style="display:flex;align-items:center;gap:12px"><div class="plan-price" style="color:var(--purple)">R$39</div><div class="plan-btn plan-btn-featured">Quero este</div></div>
       </div>
-
-      <!-- BUSINESS -->
       <div class="plan-card" onclick="buyPlan('Business','200 fotos','R$69')">
         <div class="plan-info"><div class="plan-name">Business</div><div class="plan-desc">200 fotos · 90 dias</div></div>
-        <div style="display:flex;align-items:center;gap:12px">
-          <div class="plan-price">R$69</div>
-          <div class="plan-btn">Quero este</div>
-        </div>
+        <div style="display:flex;align-items:center;gap:12px"><div class="plan-price">R$69</div><div class="plan-btn">Quero este</div></div>
       </div>
-
-      <!-- PREMIUM -->
       <div class="plan-card" onclick="buyPlan('Premium','300 fotos','R$89')">
         <div class="plan-info"><div class="plan-name">Premium</div><div class="plan-desc">300 fotos · 90 dias</div></div>
-        <div style="display:flex;align-items:center;gap:12px">
-          <div class="plan-price">R$89</div>
-          <div class="plan-btn">Quero este</div>
-        </div>
+        <div style="display:flex;align-items:center;gap:12px"><div class="plan-price">R$89</div><div class="plan-btn">Quero este</div></div>
       </div>
-
     </div>
-
     <div style="background:#F3F0FF;border-radius:14px;padding:12px 16px;margin-top:16px;text-align:center">
       <div style="font-size:12px;color:var(--purple);font-weight:700">💬 Ao clicar em "Quero este" você será direcionado ao WhatsApp para finalizar</div>
     </div>
@@ -1927,7 +1837,6 @@ function buyPlan(name, fotos, preco){
 <!-- MODAL ONBOARDING -->
 <div id="onboardingModal" style="display:none;position:fixed;inset:0;background:rgba(17,18,39,.7);z-index:300;align-items:center;justify-content:center;padding:20px">
   <div style="width:min(100%,480px);background:#fff;border-radius:28px;padding:32px 28px;box-shadow:0 30px 80px rgba(17,18,39,.2);position:relative;max-height:90vh;overflow-y:auto">
-
     <div id="ob0" class="ob-screen">
       <div style="text-align:center;margin-bottom:24px">
         <div style="width:72px;height:72px;border-radius:22px;background:linear-gradient(135deg,#7B3FF2,#4D7BFF);display:grid;place-items:center;margin:0 auto 16px;font-size:32px;color:#fff">◇</div>
@@ -1936,7 +1845,6 @@ function buyPlan(name, fotos, preco){
       </div>
       <button class="btn btn-main" onclick="closeOnboarding()">✦ Quero testar agora!</button>
     </div>
-
     <div id="ob1" class="ob-screen" style="display:none">
       <div class="ob-step">1 de 7 · Ajuste fino</div>
       <div class="ob-title">O que você vende?</div>
@@ -1956,7 +1864,6 @@ function buyPlan(name, fotos, preco){
       </div>
       <button class="btn btn-main" onclick="obNext(2,'ob1opts')" style="margin-top:20px">Proximo</button>
     </div>
-
     <div id="ob2" class="ob-screen" style="display:none">
       <div class="ob-step">2 de 7 · Ajuste fino</div>
       <div class="ob-title">Quais fotos quer gerar?</div>
@@ -1969,7 +1876,6 @@ function buyPlan(name, fotos, preco){
       </div>
       <button class="btn btn-main" onclick="obNext(3,'ob2opts')" style="margin-top:20px">Proximo</button>
     </div>
-
     <div id="ob3" class="ob-screen" style="display:none">
       <div class="ob-step">3 de 7 · Ajuste fino</div>
       <div class="ob-title">Cor predominante</div>
@@ -1990,7 +1896,6 @@ function buyPlan(name, fotos, preco){
       </div>
       <button class="btn btn-main" onclick="obNext(4,'ob3cor','ob3estilo')" style="margin-top:20px">Proximo</button>
     </div>
-
     <div id="ob4" class="ob-screen" style="display:none">
       <div class="ob-step">4 de 7 · Ajuste fino</div>
       <div class="ob-title">Fundo preferido</div>
@@ -2017,7 +1922,6 @@ function buyPlan(name, fotos, preco){
       </div>
       <button class="btn btn-main" onclick="obNext(5,'ob4fundo','ob4brilho','ob4acabamento')" style="margin-top:20px">Proximo</button>
     </div>
-
     <div id="ob5" class="ob-screen" style="display:none">
       <div class="ob-step">5 de 7 · Ajuste fino</div>
       <div class="ob-title">Foco principal</div>
@@ -2043,7 +1947,6 @@ function buyPlan(name, fotos, preco){
       </div>
       <button class="btn btn-main" onclick="obNext(6,'ob5foco','ob5estilo','ob5idade')" style="margin-top:20px">Proximo</button>
     </div>
-
     <div id="ob6" class="ob-screen" style="display:none">
       <div class="ob-step">6 de 7 · Ajuste fino</div>
       <div class="ob-title">Como deseja posicionar as pecas?</div>
@@ -2058,7 +1961,6 @@ function buyPlan(name, fotos, preco){
       </div>
       <button class="btn btn-main" onclick="obNext(7,'ob6opts')" style="margin-top:20px">Proximo</button>
     </div>
-
     <div id="ob7" class="ob-screen" style="display:none">
       <div class="ob-step">7 de 7 · Ajuste fino</div>
       <div class="ob-title">Algum detalhe especial?</div>
@@ -2066,7 +1968,6 @@ function buyPlan(name, fotos, preco){
       <textarea id="obExtras" style="background:#FAFAF8;border:1.5px solid var(--line);border-radius:12px;padding:12px;font-size:13px;color:#111;width:100%;outline:none;min-height:100px;resize:none;font-family:inherit;margin-bottom:16px" placeholder="Ex: corrente veneziana, pedras mais brilhantes, mostrar fecho..."></textarea>
       <button class="btn btn-main" onclick="obFinish()">Enviar</button>
     </div>
-
     <div id="ob8" class="ob-screen" style="display:none;text-align:center">
       <div style="font-size:40px;margin-bottom:16px">🤖</div>
       <div style="font-size:17px;font-weight:900;margin-bottom:8px">Configurando sua conta...</div>
@@ -2075,17 +1976,14 @@ function buyPlan(name, fotos, preco){
         <div id="obBar" style="height:100%;background:linear-gradient(135deg,#7B3FF2,#4D7BFF);width:0%;transition:width .5s;border-radius:2px"></div>
       </div>
     </div>
-
     <div id="ob9" class="ob-screen" style="display:none;text-align:center">
       <div style="font-size:48px;margin-bottom:16px">🎉</div>
       <div style="font-size:20px;font-weight:900;margin-bottom:8px">Tudo pronto!</div>
       <div style="font-size:13px;color:#888;margin-bottom:24px;line-height:1.6">Seus prompts foram personalizados.<br>Agora suas fotos vao ficar ainda melhores!</div>
       <button class="btn btn-main" onclick="closeOnboarding()">Comecar agora!</button>
     </div>
-
   </div>
 </div>
-
 
 <!-- POPUP CRÉDITOS ZERADOS -->
 <div id="zeroCreditsPopup" style="display:none;position:fixed;inset:0;background:rgba(17,18,39,.7);z-index:250;align-items:center;justify-content:center;padding:20px">
@@ -2212,7 +2110,6 @@ function closeZeroCredits(){document.getElementById('zeroCreditsPopup').style.di
 <!-- MODAL GERENCIAR PROMPTS DO USUÁRIO -->
 <div id="userPromptsModal" style="display:none;position:fixed;inset:0;background:rgba(17,18,39,.7);z-index:300;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto">
   <div style="width:min(100%,700px);background:#fff;border-radius:28px;padding:28px;box-shadow:0 30px 80px rgba(17,18,39,.2);margin:auto">
-
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
       <div>
         <div style="font-size:17px;font-weight:900" id="upModalName">Cliente</div>
@@ -2220,42 +2117,31 @@ function closeZeroCredits(){document.getElementById('zeroCreditsPopup').style.di
       </div>
       <button onclick="closeUserPrompts()" style="width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:#fff;font-size:20px;cursor:pointer;display:grid;place-items:center">×</button>
     </div>
-
-    <!-- RESPOSTAS ONBOARDING -->
     <div id="upOnboarding" style="background:#F9F8F5;border-radius:16px;padding:16px;margin-bottom:20px">
       <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Respostas do ajuste fino</div>
       <div id="upOnboardingContent" style="font-size:13px;color:var(--muted)">Sem respostas ainda.</div>
     </div>
-
-    <!-- PROMPTS POR CATEGORIA -->
     <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Prompts personalizados por categoria</div>
     <div id="upPromptsContent"></div>
-
-    <!-- BOTÕES -->
     <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
       <button id="upBtnGenerate" class="btn btn-main" onclick="generateUserPrompts()" style="flex:1">🤖 Gerar rascunho com IA</button>
       <button id="upBtnApprove" class="btn btn-main" onclick="approveUserPrompts()" style="flex:1;background:linear-gradient(135deg,#1A6B3A,#2E9954)">✅ Aprovar e ativar</button>
       <button id="upBtnDefault" onclick="revertToDefault()" style="height:52px;padding:0 18px;border-radius:16px;border:1.5px solid var(--line);background:#fff;color:#666;font-weight:700;font-size:13px;cursor:pointer;width:100%">↩️ Voltar para padrão</button>
     </div>
-
   </div>
 </div>
 
 <script>
 let currentUpUid = null;
 let currentUpUser = null;
-let upPrompts = {}; // { catId: { p1, p2, p3 } }
+let upPrompts = {};
 
 async function openUserPrompts(uid){
   currentUpUid = uid;
   currentUpUser = allUsers.find(u=>u.uid===uid);
   if(!currentUpUser) return;
-
-  // Preenche header
   document.getElementById('upModalName').textContent = currentUpUser.name || 'Sem nome';
   document.getElementById('upModalEmail').textContent = currentUpUser.email || '';
-
-  // Preenche respostas do onboarding
   const ob = currentUpUser.onboardingData;
   const obContent = document.getElementById('upOnboardingContent');
   if(ob){
@@ -2280,15 +2166,9 @@ async function openUserPrompts(uid){
   } else {
     obContent.innerHTML = '<span style="color:var(--muted);font-size:13px">Cliente ainda não preencheu o ajuste fino.</span>';
   }
-
-  // Carrega prompts existentes
   upPrompts = {};
   const savedPrompts = currentUpUser.customPrompts || {};
-
-  // Mostra TODAS as categorias do admin
   const catsToShow = cats;
-
-  // Renderiza campos de prompts por categoria
   const container = document.getElementById('upPromptsContent');
   container.innerHTML = catsToShow.map(cat=>{
     const saved = savedPrompts[cat.id] || {};
@@ -2314,7 +2194,6 @@ async function openUserPrompts(uid){
       </div>
     </div>`;
   }).join('');
-
   document.getElementById('userPromptsModal').style.display='flex';
 }
 
@@ -2361,8 +2240,6 @@ Responda APENAS com JSON válido:
     const text = data.content?.[0]?.text||'';
     const clean = text.replace(/```json|```/g,'').trim();
     const generated = JSON.parse(clean);
-
-    // Preenche os campos
     cats.forEach(cat=>{
       if(generated[cat.id]){
         upPrompts[cat.id] = generated[cat.id];
@@ -2391,7 +2268,6 @@ async function approveUserPrompts(){
       customPrompts: upPrompts,
       customPromptsApproved: true
     });
-    // Atualiza cache local
     const u = allUsers.find(u=>u.uid===currentUpUid);
     if(u){ u.customPrompts=upPrompts; u.customPromptsApproved=true; }
     alert('✅ Prompts aprovados e ativados para o cliente!');
@@ -2456,6 +2332,7 @@ function downloadByIdx(idx){
   else download(idx);
 }
 </script>
+
 <!-- POPUP ATUALIZAÇÃO -->
 <div id="updatePopup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;padding:20px">
   <div style="background:#fff;border-radius:24px;padding:32px 28px;max-width:340px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.3)">
