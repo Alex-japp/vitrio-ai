@@ -74,7 +74,7 @@ button,input,textarea{font-family:inherit}
 .btn-main:disabled{background:#D0CDE8;box-shadow:none;cursor:not-allowed;transform:none}.err{height:18px;font-size:12px;color:#c23;margin-top:10px}
 .app{display:none}
 .header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);padding:16px 28px;box-shadow:0 4px 16px rgba(28,28,28,.04)}
-.head-row{display:flex;align-items:center;justify-content:space-between;max-width:760px;margin:0 auto}.mini-logo{display:flex;align-items:center;gap:14px}.mini-mark{width:62px;height:62px;border-radius:20px;background:var(--grad);display:grid;place-items:center;color:#fff;box-shadow:0 10px 24px rgba(123,63,242,.30);font-size:30px}.name{font-family:Georgia,serif;font-size:32px;letter-spacing:.14em;line-height:1}.name span{color:var(--gold)}.caption{font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);margin-top:4px}
+.head-row{display:flex;align-items:center;justify-content:space-between;max-width:760px;margin:0 auto}.desk-header-stats{display:none;align-items:center;gap:6px}.desk-stat-badge{display:flex;align-items:center;gap:6px;background:rgba(123,97,255,.06);border:1px solid rgba(123,97,255,.15);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:var(--muted)}.desk-stat-badge span{font-weight:800;color:var(--purple)}.mini-logo{display:flex;align-items:center;gap:14px}.mini-mark{width:62px;height:62px;border-radius:20px;background:var(--grad);display:grid;place-items:center;color:#fff;box-shadow:0 10px 24px rgba(123,63,242,.30);font-size:30px}.name{font-family:Georgia,serif;font-size:32px;letter-spacing:.14em;line-height:1}.name span{color:var(--gold)}.caption{font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);margin-top:4px}
 .menu-btn{border:0;background:transparent;color:var(--ink);cursor:pointer;padding:8px;display:grid;place-items:center;border-radius:12px;transition:.2s}
 .menu-btn:hover{color:var(--purple);background:rgba(123,63,242,.06)}
 .avatar-btn{width:42px;height:42px;border-radius:50%;border:2.5px solid var(--line);background:transparent;padding:0;cursor:pointer;overflow:hidden;transition:.2s;flex-shrink:0}
@@ -234,8 +234,9 @@ button,input,textarea{font-family:inherit}
   .app{padding-bottom:24px}
   .header{padding:16px 40px}
   .head-row{max-width:100%}
+  .desk-header-stats{display:flex!important}
   .menu-dropdown{right:32px}
-  .content{display:grid;grid-template-columns:230px 1fr 310px;grid-template-rows:auto;gap:0 28px;padding:32px 40px;max-width:100%;align-items:start;}
+  .content{display:grid;grid-template-columns:20% 1fr 32%;grid-template-rows:auto;gap:0 24px;padding:24px 32px;max-width:100%;align-items:start;}
   .sidebar-group{grid-column:1;grid-row:1;position:sticky;top:88px;padding-right:20px;border-right:1px solid var(--line);}
   .sidebar-group .label{margin-top:0}
   .sidebar-group .chips-wrap{position:static;margin:0 0 8px;display:block;justify-content:flex-start;}
@@ -244,19 +245,22 @@ button,input,textarea{font-family:inherit}
   .sidebar-group .chip.active{transform:none;background:rgba(108,59,255,.08);color:var(--purple);border-color:var(--purple);border-left:3px solid #6C3BFF;box-shadow:none}
   .sidebar-group .chip .ico{margin:0;min-width:36px;width:36px;height:36px;border-radius:10px;font-size:18px;}
   .sidebar-group .chip-arrow{display:none}
-  .desk-stats{display:block;margin-top:24px;padding-top:20px;border-top:1px solid var(--line);}
+  .desk-stats{display:none!important}
   .desk-stats .label{margin-top:0;margin-bottom:14px}
   .desk-stat-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:13px;color:var(--muted);border-bottom:1px solid rgba(232,226,214,.5);}
   .desk-stat-row:last-child{border-bottom:none}
   .desk-stat-num{font-size:22px;font-weight:950;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;}
   .form-group{grid-column:2;grid-row:1;}
   .form-group .card{margin-top:0}
-  .results-group{grid-column:3;grid-row:1;position:sticky;top:88px;padding-left:20px;border-left:1px solid var(--line);}
+  .form-group .btn-main{margin-top:12px!important}
+  .form-group .photo-selector{margin-top:12px}
+  .results-group{grid-column:3;grid-row:1;position:sticky;top:88px;max-height:calc(100vh - 108px);overflow-y:auto;padding-left:20px;border-left:1px solid var(--line);scrollbar-width:none;}
+  .results-group::-webkit-scrollbar{display:none}
   .results-group .results{display:block!important;margin-top:0;}
   .results-group .results .card{box-shadow:none;border:none;padding:0;margin-top:0;background:transparent;}
-  .results-group .grid{grid-template-columns:1fr 1fr;gap:10px;}
-  .results-group .btn-main{margin-top:12px;font-size:12px;min-height:46px;}
-  .results-group .label{margin-top:0}
+  .results-group .grid{grid-template-columns:1fr 1fr;gap:8px;}
+  .results-group .btn-main{margin-top:12px;font-size:12px;min-height:40px;}
+  .results-group .label{margin-top:0;display:flex;align-items:center;justify-content:space-between;}
   .results-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:var(--muted);text-align:center;gap:16px;background:linear-gradient(160deg,#FFFFFF 50%,rgba(123,97,255,.04) 100%);border-radius:24px;border:1px solid var(--line);padding:32px 24px}
   .results-placeholder .ph-icon{font-size:44px;color:var(--purple);opacity:.7;animation:float 3s ease-in-out infinite;}
   @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
@@ -354,6 +358,7 @@ button,input,textarea{font-family:inherit}
   #obExtras{background:#1C1C2E!important;border-color:#303045!important;color:#FFFFFF!important}
   .btn-main{background:linear-gradient(135deg,#7B61FF,#5F3DFF)!important}
   .btn-main:hover:not(:disabled){box-shadow:0 14px 30px rgba(123,97,255,.25)!important}
+  .desk-stat-badge{background:rgba(123,97,255,.1)!important;border-color:rgba(123,97,255,.2)!important}
 }
 
 /* ── TOUR ONBOARDING ─────────────────────────────── */
@@ -435,6 +440,16 @@ button,input,textarea{font-family:inherit}
 <div id="app" class="app phone">
 <header class="header"><div class="head-row"><div class="mini-logo"><div class="mini-mark">◇</div><div><div class="name">VITRIO <span>AI</span></div><div class="caption">Gerador de fotos</div></div></div>
 <div style="display:flex;align-items:center;gap:10px">
+  <div class="desk-header-stats">
+    <div class="desk-stat-badge">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span id="headerCntI">0</span> imagens
+    </div>
+    <div class="desk-stat-badge">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      <span id="headerCntP">0</span> produtos
+    </div>
+  </div>
   <div id="creditsBadge" class="credits-badge" onclick="if((currentUserData?.credits||0)===0)openPlans()" style="cursor:default">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
     <span id="creditsCount">15</span> fotos
@@ -609,7 +624,7 @@ button,input,textarea{font-family:inherit}
     <section id="results" class="results">
       <div class="card">
         <div id="grid" class="grid"></div>
-        <button class="btn btn-main" onclick="resetForm()">+ Novo produto</button>
+        <button onclick="resetForm()" style="width:100%;margin-top:10px;height:42px;border-radius:14px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;transition:.2s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--purple)'" onmouseout="this.style.borderColor='var(--line)';this.style.color='var(--muted)'">+ Novo produto</button>
       </div>
     </section>
   </div>
@@ -651,7 +666,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.2.3';
+const APP_VERSION = '1.2.4';
 
 async function checkAppVersion(){
   try{
@@ -1133,6 +1148,8 @@ function render(){
   cntP.textContent=p; cntI.textContent=im;
   if(deskCntP) deskCntP.textContent=p;
   if(deskCntI) deskCntI.textContent=im;
+  const hP=document.getElementById('headerCntP'); if(hP) hP.textContent=p;
+  const hI=document.getElementById('headerCntI'); if(hI) hI.textContent=im;
   ready();
 }
 
