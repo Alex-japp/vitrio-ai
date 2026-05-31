@@ -1,25 +1,15 @@
 const { Inngest } = require('inngest');
 const { serve } = require('inngest/next');
-const sharp = require('sharp');
 
 const inngest = new Inngest({
   id: 'vitrio-ai',
   eventKey: process.env.INNGEST_EVENT_KEY,
 });
 
-// ── COMPRIME IMAGEM PARA 300-500KB ───────────────────────
+// ── COMPRESSÃO SIMPLES SEM SHARP ─────────────────────────
 async function comprimirImagem(b64) {
-  try {
-    const buffer = Buffer.from(b64, 'base64');
-    const comprimido = await sharp(buffer)
-      .resize(1024, 1024, { fit: 'inside', withoutEnlargement: true })
-      .jpeg({ quality: 82, progressive: true })
-      .toBuffer();
-    return comprimido.toString('base64');
-  } catch(e) {
-    console.warn('Compressão falhou, usando original:', e.message);
-    return b64;
-  }
+  // Por enquanto retorna sem compressão — sharp será reativado futuramente
+  return b64;
 }
 
 // ── SALVA IMAGEM NO FIREBASE STORAGE E RETORNA URL ──────
