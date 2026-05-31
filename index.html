@@ -236,15 +236,16 @@ button,input,textarea{font-family:inherit}
   .head-row{max-width:100%}
   .desk-header-stats{display:flex!important}
   .menu-dropdown{right:32px}
-  .content{display:grid;grid-template-columns:20% 1fr 32%;grid-template-rows:auto;gap:0 24px;padding:24px 32px;max-width:100%;align-items:start;}
+  .content{display:grid;grid-template-columns:17% 1fr 32%;grid-template-rows:auto;gap:0 24px;padding:24px 32px;max-width:100%;align-items:start;}
   .sidebar-group{grid-column:1;grid-row:1;position:sticky;top:88px;padding-right:20px;border-right:1px solid var(--line);}
   .sidebar-group .label{margin-top:0}
   .sidebar-group .chips-wrap{position:static;margin:0 0 8px;display:block;justify-content:flex-start;}
-  .sidebar-group .chips{flex-direction:column;overflow:visible;padding:0;gap:6px;justify-content:flex-start;}
-  .sidebar-group .chip{min-width:auto;width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;text-align:left;border-radius:14px;transform:none;}
+  .sidebar-group .chips{flex-direction:column;overflow:visible;padding:0;gap:3px;justify-content:flex-start;}
+  .sidebar-group .chip{min-width:auto;width:100%;display:flex;align-items:center;gap:8px;padding:7px 10px;text-align:left;border-radius:10px;transform:none;font-size:12px;}
   .sidebar-group .chip.active{transform:none;background:rgba(108,59,255,.08);color:var(--purple);border-color:var(--purple);border-left:3px solid #6C3BFF;box-shadow:none}
-  .sidebar-group .chip .ico{margin:0;min-width:36px;width:36px;height:36px;border-radius:10px;font-size:18px;}
+  .sidebar-group .chip .ico{margin:0;min-width:28px;width:28px;height:28px;border-radius:8px;font-size:14px;}
   .sidebar-group .chip-arrow{display:none}
+  .sidebar-group .chip .chip-svg{width:16px;height:16px;}
   .desk-stats{display:none!important}
   .desk-stats .label{margin-top:0;margin-bottom:14px}
   .desk-stat-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:13px;color:var(--muted);border-bottom:1px solid rgba(232,226,214,.5);}
@@ -666,7 +667,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.2.4';
+const APP_VERSION = '1.2.5';
 
 async function checkAppVersion(){
   try{
