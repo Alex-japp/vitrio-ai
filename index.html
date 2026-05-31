@@ -355,6 +355,30 @@ button,input,textarea{font-family:inherit}
   .btn-main{background:linear-gradient(135deg,#7B61FF,#5F3DFF)!important}
   .btn-main:hover:not(:disabled){box-shadow:0 14px 30px rgba(123,97,255,.25)!important}
 }
+
+/* ── TOUR ONBOARDING ─────────────────────────────── */
+#tourOverlay{position:fixed;inset:0;z-index:600;pointer-events:none}
+#tourOverlay.active{pointer-events:all}
+.tour-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;transition:opacity .3s ease}
+.tour-highlight{position:fixed;z-index:601;border-radius:14px;box-shadow:0 0 0 4px rgba(123,97,255,.8),0 0 0 9999px rgba(0,0,0,.7);transition:all .35s cubic-bezier(.4,0,.2,1);pointer-events:none}
+.tour-tooltip{position:fixed;z-index:602;background:#fff;border-radius:18px;padding:18px 20px;box-shadow:0 20px 50px rgba(0,0,0,.25);width:min(280px,calc(100vw - 32px));transition:all .35s cubic-bezier(.4,0,.2,1)}
+.tour-tooltip .t-step{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7B61FF;margin-bottom:6px}
+.tour-tooltip .t-title{font-size:15px;font-weight:800;color:#1C1C1C;margin-bottom:6px}
+.tour-tooltip .t-desc{font-size:13px;color:#77758A;line-height:1.6;margin-bottom:14px}
+.tour-tooltip .t-footer{display:flex;align-items:center;justify-content:space-between}
+.tour-dots{display:flex;gap:5px;align-items:center}
+.tour-dot{width:6px;height:6px;border-radius:50%;background:#EAEAF2;transition:.2s}
+.tour-dot.on{width:16px;border-radius:3px;background:#7B61FF}
+.tour-btn{background:linear-gradient(135deg,#7B61FF,#5F3DFF);color:#fff;border:none;border-radius:12px;padding:8px 18px;font-size:13px;font-weight:800;cursor:pointer;transition:.2s}
+.tour-btn:hover{opacity:.9;transform:translateY(-1px)}
+.tour-arrow{position:fixed;z-index:602;width:12px;height:12px;background:#fff;transform:rotate(45deg);transition:all .35s cubic-bezier(.4,0,.2,1)}
+@media(prefers-color-scheme:dark){
+  .tour-tooltip{background:#232336!important}
+  .tour-tooltip .t-title{color:#FFFFFF!important}
+  .tour-tooltip .t-desc{color:#B8B8C7!important}
+  .tour-arrow{background:#232336!important}
+  .tour-dot{background:#303045!important}
+}
 </style>
 </head>
 <body>
@@ -627,7 +651,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.1.9';
+const APP_VERSION = '1.2.0';
 
 async function checkAppVersion(){
   try{
@@ -898,8 +922,12 @@ auth.onAuthStateChanged(async (user) => {
       const dashTabBtn = document.getElementById('dashTabBtn');
       if(dashTabBtn) dashTabBtn.classList.remove('hidden');
     }
-    if(!currentUserData?.onboardingDone && !currentUserData?.isAdmin){
-      setTimeout(()=>openOnboarding(), 600);
+    if(!currentUserData?.isAdmin){
+      if(!currentUserData?.tourDone){
+        setTimeout(()=>startTour(), 800);
+      } else if(!currentUserData?.onboardingDone){
+        setTimeout(()=>openOnboarding(), 600);
+      }
     }
   } else {
     currentUser = null;
@@ -2381,6 +2409,175 @@ function downloadByIdx(idx){
     <button onclick="forceUpdate()" style="width:100%;height:52px;background:linear-gradient(135deg,#7B61FF,#6C3BFF);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;letter-spacing:.03em">✨ Atualizar agora</button>
   </div>
 </div>
+
+
+<!-- TOUR ONBOARDING -->
+<div id="tourOverlay">
+  <div class="tour-highlight" id="tourHighlight" style="display:none"></div>
+  <div class="tour-arrow" id="tourArrow" style="display:none"></div>
+  <div class="tour-tooltip" id="tourTooltip" style="display:none">
+    <div class="t-step" id="tourStep"></div>
+    <div class="t-title" id="tourTitle"></div>
+    <div class="t-desc" id="tourDesc"></div>
+    <div class="t-footer">
+      <div class="tour-dots" id="tourDots"></div>
+      <button class="tour-btn" id="tourBtn" onclick="tourNext()"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TOUR_STEPS = [
+  {
+    title: 'Escolha a categoria',
+    desc: 'Selecione o tipo do seu produto — brinco, anel, colar e mais. A IA usa isso para gerar a foto certa.',
+    target: 'chips',
+    position: 'bottom'
+  },
+  {
+    title: 'Código do produto',
+    desc: 'Digite o código da peça. Ele será usado para nomear as fotos geradas automaticamente.',
+    target: 'code',
+    position: 'bottom'
+  },
+  {
+    title: 'Envie a foto',
+    desc: 'Tire ou selecione uma foto do produto. Quanto mais nítida, melhor o resultado da IA.',
+    target: 'upload',
+    position: 'bottom'
+  },
+  {
+    title: 'Gere as fotos!',
+    desc: 'Com tudo preenchido, clique aqui e a IA vai criar fotos profissionais em segundos.',
+    target: 'genBtn',
+    position: 'top'
+  },
+  {
+    title: 'Suas fotos aparecem aqui ✦',
+    desc: 'Após a geração, as fotos profissionais aparecem nesta área. Clique para ampliar ou baixar.',
+    target: 'resultsPlaceholder',
+    position: 'top'
+  }
+];
+
+let tourCurrent = 0;
+
+function tourGetRect(id){
+  const el = document.getElementById(id);
+  if(!el) return null;
+  const r = el.getBoundingClientRect();
+  return {top:r.top, left:r.left, width:r.width, height:r.height, bottom:r.bottom};
+}
+
+function tourPosition(){
+  const step = TOUR_STEPS[tourCurrent];
+  const r = tourGetRect(step.target);
+  if(!r) return;
+
+  const pad = 8;
+  const hl = document.getElementById('tourHighlight');
+  const tt = document.getElementById('tourTooltip');
+  const arrow = document.getElementById('tourArrow');
+
+  // Highlight
+  hl.style.display = 'block';
+  hl.style.top = (r.top - pad) + 'px';
+  hl.style.left = (r.left - pad) + 'px';
+  hl.style.width = (r.width + pad*2) + 'px';
+  hl.style.height = (r.height + pad*2) + 'px';
+
+  // Tooltip
+  tt.style.display = 'block';
+  arrow.style.display = 'block';
+  const ttW = Math.min(280, window.innerWidth - 32);
+  const ttH = 160;
+  const margin = 16;
+
+  let ttTop, ttLeft, arTop, arLeft;
+
+  if(step.position === 'bottom'){
+    ttTop = r.bottom + pad + 16;
+    // Se sai da tela embaixo, coloca em cima
+    if(ttTop + ttH > window.innerHeight - margin) ttTop = r.top - pad - ttH - 16;
+    arTop = ttTop - 6;
+  } else {
+    ttTop = r.top - pad - ttH - 16;
+    if(ttTop < margin) ttTop = r.bottom + pad + 16;
+    arTop = ttTop + ttH - 6;
+  }
+
+  ttLeft = r.left + r.width/2 - ttW/2;
+  if(ttLeft < margin) ttLeft = margin;
+  if(ttLeft + ttW > window.innerWidth - margin) ttLeft = window.innerWidth - ttW - margin;
+
+  tt.style.top = ttTop + 'px';
+  tt.style.left = ttLeft + 'px';
+  tt.style.width = ttW + 'px';
+
+  arLeft = r.left + r.width/2 - 6;
+  if(arLeft < ttLeft + 12) arLeft = ttLeft + 12;
+  if(arLeft > ttLeft + ttW - 24) arLeft = ttLeft + ttW - 24;
+  arrow.style.left = arLeft + 'px';
+  arrow.style.top = arTop + 'px';
+}
+
+function tourRender(){
+  const step = TOUR_STEPS[tourCurrent];
+  const total = TOUR_STEPS.length;
+
+  document.getElementById('tourStep').textContent = 'Passo ' + (tourCurrent+1) + ' de ' + total;
+  document.getElementById('tourTitle').textContent = step.title;
+  document.getElementById('tourDesc').textContent = step.desc;
+
+  const btn = document.getElementById('tourBtn');
+  btn.textContent = tourCurrent === total-1 ? 'Começar! ✦' : 'Próximo →';
+
+  const dots = document.getElementById('tourDots');
+  dots.innerHTML = TOUR_STEPS.map((_,i) =>
+    `<div class="tour-dot ${i===tourCurrent?'on':''}"></div>`
+  ).join('');
+
+  tourPosition();
+}
+
+function tourNext(){
+  if(tourCurrent < TOUR_STEPS.length - 1){
+    tourCurrent++;
+    tourRender();
+  } else {
+    tourEnd();
+  }
+}
+
+function tourEnd(){
+  document.getElementById('tourOverlay').classList.remove('active');
+  document.getElementById('tourHighlight').style.display = 'none';
+  document.getElementById('tourTooltip').style.display = 'none';
+  document.getElementById('tourArrow').style.display = 'none';
+  // Salva no Firestore
+  if(currentUser){
+    db.collection('users').doc(currentUser.uid).update({tourDone:true}).catch(()=>{});
+    if(currentUserData) currentUserData.tourDone = true;
+  }
+  // Abre ajuste fino após o tour
+  if(!currentUserData?.onboardingDone && !currentUserData?.isAdmin){
+    setTimeout(()=>openOnboarding(), 400);
+  }
+}
+
+function startTour(){
+  tourCurrent = 0;
+  document.getElementById('tourOverlay').classList.add('active');
+  // Scrolla para o topo para garantir posicionamento correto
+  window.scrollTo({top:0,behavior:'smooth'});
+  setTimeout(()=>tourRender(), 300);
+}
+
+// Reposiciona no resize
+window.addEventListener('resize', ()=>{
+  if(document.getElementById('tourOverlay').classList.contains('active')) tourPosition();
+});
+</script>
 
 </body>
 </html>
