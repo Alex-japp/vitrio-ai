@@ -651,7 +651,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.2.0';
+const APP_VERSION = '1.2.1';
 
 async function checkAppVersion(){
   try{
@@ -924,7 +924,17 @@ auth.onAuthStateChanged(async (user) => {
     }
     if(!currentUserData?.isAdmin){
       if(!currentUserData?.tourDone){
-        setTimeout(()=>startTour(), 800);
+        // Usuário existente (já fez onboarding ou já tem fotos geradas) → pula tour
+        const isExisting = currentUserData?.onboardingDone || (localStorage.getItem('cntI') && parseInt(localStorage.getItem('cntI')) > 0);
+        if(isExisting){
+          db.collection('users').doc(currentUser.uid).update({tourDone:true}).catch(()=>{});
+          if(currentUserData) currentUserData.tourDone = true;
+          if(!currentUserData?.onboardingDone){
+            setTimeout(()=>openOnboarding(), 600);
+          }
+        } else {
+          setTimeout(()=>startTour(), 800);
+        }
       } else if(!currentUserData?.onboardingDone){
         setTimeout(()=>openOnboarding(), 600);
       }
@@ -2471,6 +2481,14 @@ function tourGetRect(id){
 
 function tourPosition(){
   const step = TOUR_STEPS[tourCurrent];
+  const el = document.getElementById(step.target);
+  if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
+  // Aguarda o scroll antes de calcular posição
+  setTimeout(()=>tourPositionCalc(), 350);
+}
+
+function tourPositionCalc(){
+  const step = TOUR_STEPS[tourCurrent];
   const r = tourGetRect(step.target);
   if(!r) return;
 
@@ -2568,9 +2586,8 @@ function tourEnd(){
 function startTour(){
   tourCurrent = 0;
   document.getElementById('tourOverlay').classList.add('active');
-  // Scrolla para o topo para garantir posicionamento correto
-  window.scrollTo({top:0,behavior:'smooth'});
-  setTimeout(()=>tourRender(), 300);
+  window.scrollTo({top:0,behavior:'instant'});
+  tourRender();
 }
 
 // Reposiciona no resize
