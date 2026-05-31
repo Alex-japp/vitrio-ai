@@ -4,14 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Vitrio AI</title>
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
 <style>
-:root{color-scheme:light!important}
-*{forced-color-adjust:none!important;-webkit-forced-color-adjust:none!important}
-html,body,#root,.app,main{
-  background:#F8F7FF!important;
-  color:#1C1C1C!important;
-}
+:root{color-scheme:light dark}
 </style>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%237B3FF2'/><stop offset='100%25' stop-color='%234D7BFF'/></linearGradient></defs><rect width='32' height='32' rx='8' fill='url(%23g)'/><text x='16' y='22' font-size='22' fill='white' text-anchor='middle' font-family='Arial,sans-serif'>◇</text></svg>">
 <link rel="manifest" href="/manifest.json">
@@ -264,6 +259,82 @@ button,input,textarea{font-family:inherit}
   .outline:hover{transform:none}
 }
 @media(max-width:380px){.name{font-size:23px}.chip{min-width:78px}.row{flex-direction:column}.content{padding:18px 14px}.card{padding:15px}}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#14141A;--card:#232336;--ink:#FFFFFF;--muted:#B8B8C7;
+    --line:#303045;--soft:rgba(123,97,255,.15);--hover:rgba(123,97,255,.1);
+    --shadow:0 10px 30px rgba(0,0,0,.18);--shadow2:0 10px 25px rgba(123,97,255,.3);
+  }
+  html,body{background:#14141A!important;color:#FFFFFF!important}
+  body{background:#14141A!important}
+  .phone{background:rgba(20,20,26,.92)!important;box-shadow:0 0 0 1px #303045!important}
+  .header{background:rgba(20,20,26,.96)!important;border-color:#303045!important}
+  .bottom{background:rgba(18,18,24,.97)!important;border-color:#303045!important}
+  .card{background:#232336!important;border-color:#303045!important}
+  .input,.textarea{background:#1C1C2E!important;border-color:#303045!important;color:#FFFFFF!important}
+  .input::placeholder,.textarea::placeholder{color:#8A8AA0!important}
+  .chip{background:#232336!important;border-color:#303045!important;color:#B8B8C7!important}
+  .chip.active{background:linear-gradient(135deg,#7B61FF,#5F3DFF)!important;color:#fff!important;border-color:transparent!important}
+  .chip .ico{background:rgba(123,97,255,.12)!important}
+  .upload{background:linear-gradient(180deg,rgba(123,97,255,.04),transparent)!important;border-color:rgba(123,97,255,.3)!important}
+  .upload:hover{border-color:rgba(123,97,255,.7)!important;background:linear-gradient(180deg,rgba(123,97,255,.07),transparent)!important}
+  .progress{background:#232336!important;border-color:#303045!important}
+  .bar{background:#1C1C2E!important}
+  .skeleton{background:linear-gradient(90deg,#232336 25%,#2A2A45 50%,#232336 75%)!important;background-size:936px 100%!important}
+  .res{background:#232336!important;border-color:#303045!important}
+  .res .img-wrap{background:#1C1C2E!important}
+  .outline{background:#232336!important;border-color:#303045!important;color:#FFFFFF!important}
+  .outline:hover{background:rgba(123,97,255,.1)!important;border-color:rgba(123,97,255,.4)!important}
+  .menu-dropdown{background:#232336!important;border-color:#303045!important}
+  .menu-dropdown button{color:#FFFFFF!important}
+  .menu-dropdown button:hover{background:rgba(123,97,255,.1)!important}
+  .menu-dropdown button:not(:last-child){border-color:#303045!important}
+  .menu-profile{background:#1C1C2E!important;border-color:#303045!important}
+  .sheet{background:#232336!important;color:#FFFFFF!important}
+  .access,.auth-wrap{background:#14141A!important}
+  .access-card,.auth-card{background:#232336!important;border-color:#303045!important}
+  .auth-tabs{background:#1C1C2E!important}
+  .auth-tab.on{background:#232336!important;color:#A08AFF!important}
+  .auth-tab{color:#8A8AA0!important}
+  .google-btn{background:#1C1C2E!important;border-color:#303045!important;color:#FFFFFF!important}
+  .google-btn:hover{border-color:rgba(123,97,255,.5)!important}
+  .forgot-link{color:#A08AFF!important}
+  .divider{color:#8A8AA0!important}
+  .divider::before,.divider::after{background:#303045!important}
+  .settings{background:#14141A!important}
+  .cfg-head{background:rgba(20,20,26,.96)!important;border-color:#303045!important;color:#FFFFFF!important}
+  .cfg-title{color:#FFFFFF!important}
+  .dark-btn{background:#232336!important;border-color:#303045!important;color:#FFFFFF!important}
+  .tabs{background:#14141A!important;border-color:#303045!important}
+  .tab{color:#8A8AA0!important}
+  .tab.on{color:#A08AFF!important;border-color:#A08AFF!important}
+  .cat-row,.user-row,.count-card{background:#232336!important;border-color:#303045!important}
+  .add{border-color:#A08AFF!important;color:#A08AFF!important;background:transparent!important}
+  .cfg-link{border-color:rgba(212,175,55,.4)!important;color:#D4AF37!important;background:transparent!important}
+  .danger{border-color:rgba(255,80,80,.4)!important;background:transparent!important}
+  .check-label{background:#232336!important;border-color:#303045!important;color:#FFFFFF!important}
+  .check-label.checked{background:rgba(123,97,255,.12)!important;border-color:rgba(123,97,255,.4)!important;color:#A08AFF!important}
+  .credits-badge{background:rgba(123,97,255,.15)!important;border-color:rgba(123,97,255,.3)!important;color:#A08AFF!important}
+  .credits-badge.low{background:rgba(230,126,0,.12)!important;border-color:rgba(230,126,0,.3)!important;color:#F0A040!important}
+  .credits-badge.empty{background:rgba(255,60,60,.1)!important;border-color:rgba(255,60,60,.3)!important}
+  .admin-badge{background:rgba(212,175,55,.12)!important;border-color:rgba(212,175,55,.3)!important}
+  .img-preview-close{background:#232336!important;color:#FFFFFF!important}
+  .sync-badge{background:rgba(20,20,26,.9)!important}
+  .results-placeholder{background:#232336!important;border-color:#303045!important}
+  .user-actions select,.add-credits-wrap input{background:#1C1C2E!important;border-color:#303045!important;color:#FFFFFF!important}
+  .btn-toggle{background:rgba(123,97,255,.15)!important;color:#A08AFF!important}
+  .btn-toggle.inactive{background:rgba(255,80,80,.12)!important;color:#ff7070!important}
+  .plan-card{background:#232336!important;border-color:#303045!important}
+  .plan-card:hover{border-color:rgba(123,97,255,.5)!important;box-shadow:0 10px 30px rgba(0,0,0,.18)!important}
+  .plan-featured{border-color:rgba(123,97,255,.6)!important}
+  .plan-btn{background:rgba(123,97,255,.15)!important;color:#A08AFF!important}
+  .ob-opt{background:#1C1C2E!important;color:#B8B8C7!important}
+  .ob-opt:hover{border-color:rgba(123,97,255,.4)!important;background:rgba(123,97,255,.1)!important}
+  .ob-opt.selected{background:rgba(123,97,255,.15)!important;border-color:rgba(123,97,255,.5)!important;color:#A08AFF!important}
+  #obExtras{background:#1C1C2E!important;border-color:#303045!important;color:#FFFFFF!important}
+  .btn-main{background:linear-gradient(135deg,#7B61FF,#5F3DFF)!important}
+  .btn-main:hover:not(:disabled){box-shadow:0 14px 30px rgba(123,97,255,.25)!important}
+}
 </style>
 </head>
 <body>
@@ -537,7 +608,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.0.9';
+const APP_VERSION = '1.1.0';
 
 async function checkAppVersion(){
   try{
