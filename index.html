@@ -223,14 +223,12 @@ button,input,textarea{font-family:inherit}
 .reorder-btns .icon-btn{padding:4px 6px;font-size:14px;line-height:1}
 .reorder-btns .icon-btn:disabled{opacity:.25;cursor:not-allowed}
 /* Firebase sync indicator */
-.theme-btn{width:36px;height:36px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:16px;cursor:pointer;display:grid;place-items:center;transition:.2s;flex-shrink:0}
-.theme-btn:hover{border-color:var(--purple);background:var(--hover)}
 .sync-badge{position:fixed;bottom:90px;right:16px;background:rgba(17,18,39,.75);color:#fff;font-size:11px;padding:6px 12px;border-radius:20px;z-index:30;display:none;gap:6px;align-items:center}
 .sync-badge.show{display:flex}
 .sync-dot{width:8px;height:8px;border-radius:50%;background:#4ade80;animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .desk-stats{display:none}
-.results-placeholder{display:none}.results-placeholder.mobile-show{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;color:var(--muted);text-align:center;gap:12px;background:linear-gradient(160deg,#FFFFFF 50%,rgba(123,97,255,.04) 100%);border-radius:24px;border:1px solid var(--line);padding:24px;margin-top:10px}
+.results-placeholder{display:none}.results-placeholder.mobile-show{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:180px;color:var(--muted);text-align:center;gap:12px;background:linear-gradient(160deg,#FFFFFF 50%,rgba(123,97,255,.04) 100%);border-radius:24px;border:1px solid var(--line);padding:24px;margin-top:10px}.results-placeholder.mobile-show .ph-icon{font-size:56px!important}
 @media(min-width:900px){
   .phone{max-width:100%;width:100%}
   .app{padding-bottom:24px}
@@ -275,45 +273,6 @@ button,input,textarea{font-family:inherit}
   .outline:hover{transform:none}
 }
 @media(max-width:380px){.name{font-size:23px}.chip{min-width:78px}.row{flex-direction:column}.content{padding:18px 14px}.card{padding:15px}}
-/* Tema forçado claro */
-[data-theme="light"]{
-  --bg:#F8F7FF!important;--card:#FFFFFF!important;--ink:#1C1C1C!important;--muted:#77758A!important;
-  --line:#EAEAF2!important;--hover:#EEE9FF!important;--shadow:0 10px 30px rgba(28,28,28,.06)!important;
-}
-[data-theme="light"] html,[data-theme="light"] body{background:#F8F7FF!important;color:#1C1C1C!important}
-[data-theme="light"] .phone{background:rgba(255,255,255,.72)!important;box-shadow:0 0 0 1px #EAEAF2!important}
-[data-theme="light"] .header{background:rgba(255,255,255,.92)!important;border-color:#EAEAF2!important}
-[data-theme="light"] .card{background:#fff!important;border-color:#EAEAF2!important}
-[data-theme="light"] .chip{background:#fff!important;border-color:#EAEAF2!important;color:#1C1C1C!important}
-[data-theme="light"] .input,.textarea,[data-theme="light"] .textarea{background:#fff!important;border-color:#EAEAF2!important;color:#1C1C1C!important}
-[data-theme="light"] .res{background:#fff!important;border-color:#EAEAF2!important}
-[data-theme="light"] .bottom{background:rgba(255,255,255,.96)!important;border-color:#EAEAF2!important}
-[data-theme="light"] .menu-dropdown{background:#fff!important;border-color:#EAEAF2!important}
-[data-theme="light"] .settings{background:#fff!important}
-/* Tema forçado escuro */
-[data-theme="dark"]{
-  --bg:#14141A!important;--card:#232336!important;--ink:#FFFFFF!important;--muted:#B8B8C7!important;
-  --line:#303045!important;--hover:rgba(123,97,255,.1)!important;--shadow:0 10px 30px rgba(0,0,0,.18)!important;
-}
-[data-theme="dark"] html,[data-theme="dark"] body{background:#14141A!important;color:#FFFFFF!important}
-[data-theme="dark"] .phone{background:rgba(20,20,26,.92)!important;box-shadow:0 0 0 1px #303045!important}
-[data-theme="dark"] .header{background:rgba(20,20,26,.96)!important;border-color:#303045!important}
-[data-theme="dark"] .card{background:#232336!important;border-color:#303045!important}
-[data-theme="dark"] .chip{background:#232336!important;border-color:#303045!important;color:#B8B8C7!important}
-[data-theme="dark"] .input,[data-theme="dark"] .textarea{background:#1C1C2E!important;border-color:#303045!important;color:#FFFFFF!important}
-[data-theme="dark"] .res{background:#232336!important;border-color:#303045!important}
-[data-theme="dark"] .bottom{background:rgba(18,18,24,.97)!important;border-color:#303045!important}
-[data-theme="dark"] .menu-dropdown{background:#232336!important;border-color:#303045!important}
-[data-theme="dark"] .menu-dropdown button{color:#FFFFFF!important}
-[data-theme="dark"] .settings{background:#14141A!important}
-[data-theme="dark"] .check-label{background:#232336!important;border-color:#303045!important;color:#FFFFFF!important}
-[data-theme="dark"] .check-label.checked{background:rgba(123,97,255,.10)!important;border-color:rgba(123,97,255,.28)!important;color:#C8B8FF!important}
-[data-theme="dark"] .outline{background:#232336!important;border-color:#303045!important;color:#FFFFFF!important}
-[data-theme="dark"] .upload{background:linear-gradient(180deg,rgba(20,20,26,.95) 0%,rgba(123,97,255,.06) 100%)!important;border-color:rgba(123,97,255,.3)!important}
-[data-theme="dark"] .upload:hover{background:linear-gradient(180deg,rgba(20,20,26,.95) 0%,rgba(123,97,255,.10) 100%)!important}
-[data-theme="dark"] .auth-wrap,[data-theme="dark"] .auth-card{background:#1E1E30!important;border-color:#3A3A52!important}
-[data-theme="dark"] .skeleton{background:linear-gradient(90deg,#232336 25%,#2A2A45 50%,#232336 75%)!important;background-size:936px 100%!important}
-[data-theme="dark"] .res .img-wrap{background:#1C1C2E!important}
 @media(prefers-color-scheme:dark){
   :root{
     --bg:#14141A;--card:#232336;--ink:#FFFFFF;--muted:#B8B8C7;
@@ -634,16 +593,7 @@ button,input,textarea{font-family:inherit}
 
 </div>
 <div id="settings" class="settings phone"><header class="cfg-head"><button class="dark-btn" onclick="closeSettings()">←</button><div class="cfg-title">CONFIGURAÇÕES</div><button class="dark-btn" onclick="closeSettings()">✓</button></header><div class="tabs"><button class="tab on" onclick="tab('cats',this)">Categorias</button><button id="promptsTabBtn" class="tab" onclick="tab('prompts',this)">Prompts</button><button class="tab" onclick="tab('general',this)">Geral</button><button id="dashTabBtn" class="tab hidden" onclick="tab('dash',this);loadDashboard()">Dashboard</button><button id="usersTabBtn" class="tab hidden" onclick="tab('users',this)">Usuários</button></div><main class="cfg-body"><section id="catsTab"><h3>Suas categorias</h3><p class="cfg-sub">Gerencie as categorias dos seus produtos</p><div id="catList"></div><button class="add" onclick="editCat()">+ Nova Categoria</button><button onclick="updateAllIcons()" style="width:100%;height:48px;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;margin-top:8px">◇ Atualizar ícone padrão de todas as categorias</button></section><section id="promptsTab" class="hidden"><h3>Prompts por categoria</h3><p class="cfg-sub">Edite os prompts que guiam cada tipo de foto.</p><div id="promptList"></div></section><section id="generalTab" class="hidden"><h3>Uso do app</h3><p class="cfg-sub">Controle simples para teste beta.</p><div class="counter"><div class="count-card"><div id="cntP" class="num">0</div><small>Produtos</small></div><div class="count-card"><div id="cntI" class="num">0</div><small>Imagens</small></div></div>
-<div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 18px;margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 8px 20px rgba(17,18,39,.04)">
-  <div><div style="font-weight:800;font-size:14px">Código do produto</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Exigir preenchimento do código</div></div>
-  <label style="position:relative;display:inline-flex;cursor:pointer">
-    <input type="checkbox" id="codeRequiredToggle" onchange="toggleCodeRequired(this.checked)" style="opacity:0;width:0;height:0;position:absolute">
-    <div id="codeRequiredSlider" style="width:46px;height:26px;background:#ddd;border-radius:13px;transition:.2s;position:relative"><div style="position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 2px 4px rgba(0,0,0,.2)" id="codeSliderDot"></div></div>
-  </label>
-</div>
-<div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 18px;margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 8px 20px rgba(17,18,39,.04)">
-  <div><div style="font-weight:800;font-size:14px">Tema do app</div><div style="font-size:12px;color:var(--muted);margin-top:2px" id="themeLabel">Automático (sistema)</div></div>
-  <button onclick="cycleTheme()" id="themeBtn" style="width:48px;height:48px;border-radius:14px;border:1px solid var(--line);background:var(--hover);font-size:22px;cursor:pointer">⚙️</button>
+<button onclick="cycleTheme()" id="themeBtn" style="width:48px;height:48px;border-radius:14px;border:1px solid var(--line);background:var(--hover);font-size:22px;cursor:pointer">⚙️</button>
 </div>
 <button class="cfg-link" onclick="feedback()">💬 Enviar feedback</button><button class="cfg-link" onclick="openTerms()" style="border-color:var(--purple);color:var(--purple)">📜 Termos de Uso e Privacidade</button><button class="danger" onclick="logout()">Sair com segurança</button></section><section id="dashTab" class="hidden">
   <h3>Dashboard</h3>
@@ -678,7 +628,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.1.7';
+const APP_VERSION = '1.1.8';
 
 async function checkAppVersion(){
   try{
@@ -1102,6 +1052,7 @@ let appConfig={codeRequired:true};
 
 async function init(){
   if(promptsTabBtn) promptsTabBtn.style.display='none';
+  localStorage.removeItem('vitrio_theme');
   render();
   applyCodeConfig();
   if(resultsPlaceholder && window.innerWidth<900) resultsPlaceholder.classList.add('mobile-show');
@@ -1561,40 +1512,7 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{window.location.reload();});
 }
 
-// ── TEMA CLARO / ESCURO / AUTOMÁTICO ─────────────────
-let themeMode = localStorage.getItem('vitrio_theme') || 'auto';
-function applyTheme(){
-  const root = document.documentElement;
-  const btn = document.getElementById('themeBtn');
-  if(themeMode === 'light'){
-    root.setAttribute('data-theme','light');
-    root.style.colorScheme = 'light';
-    if(btn) btn.textContent = '☀️';
-  } else if(themeMode === 'dark'){
-    root.setAttribute('data-theme','dark');
-    root.style.colorScheme = 'dark';
-    if(btn) btn.textContent = '🌙';
-  } else {
-    root.removeAttribute('data-theme');
-    root.style.colorScheme = 'light dark';
-    if(btn) btn.textContent = '⚙️';
-  }
-  const labels = {auto:'Automático (sistema)', light:'Modo claro', dark:'Modo escuro'};
-  const lbl = document.getElementById('themeLabel');
-  if(lbl) lbl.textContent = labels[themeMode];
-}
-function cycleTheme(){
-  const order = ['auto','light','dark'];
-  const idx = order.indexOf(themeMode);
-  themeMode = order[(idx+1) % order.length];
-  localStorage.setItem('vitrio_theme', themeMode);
-  applyTheme();
-  const labels = {auto:'Automático (sistema)', light:'Modo claro', dark:'Modo escuro'};
-  const lbl = document.getElementById('themeLabel');
-  if(lbl) lbl.textContent = labels[themeMode];
-  showToast('🎨 ' + labels[themeMode], '#5B3FE8');
-}
-applyTheme();
+
 
 function scrollChips(dir){document.getElementById('chips').scrollBy({left:dir*260,behavior:'smooth'});}
 
