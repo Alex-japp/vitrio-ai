@@ -1,5 +1,5 @@
 const { Inngest } = require('inngest');
-const { serve } = require('inngest/next');
+const { serve } = require('inngest/express');
 
 const inngest = new Inngest({
   id: 'vitrio-ai',
