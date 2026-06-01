@@ -101,7 +101,7 @@ button,input,textarea{font-family:inherit}
 .upload.has-img{padding:0;border-style:solid;border-color:rgba(123,97,255,.3);transform:none;box-shadow:none}
 .upload-success{position:absolute;top:12px;left:12px;background:rgba(26,107,58,.9);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;display:none;animation:fadeInUp .25s ease}
 .upload.has-img .upload-success{display:block}.upload img{width:100%;height:100%;max-height:280px;object-fit:contain;display:block}.remove-photo{display:none;position:absolute;right:14px;top:14px;width:42px;height:42px;border:0;border-radius:50%;background:rgba(28,28,28,.75);color:#fff;font-size:22px;font-weight:900;cursor:pointer;box-shadow:0 8px 24px rgba(28,28,28,.22);z-index:3;outline:none;-webkit-tap-highlight-color:transparent}.upload.has-img .remove-photo{display:grid;place-items:center}.remove-photo:hover{background:#ff4f4f}.remove-photo:focus{outline:none}
-.camera-dot{width:82px;height:82px;margin:0 auto 14px;border-radius:50%;background:rgba(123,97,255,.08);border:1px solid rgba(123,97,255,.15);display:grid;place-items:center;font-size:34px}.upload strong{font-size:17px}.upload small{display:block;color:var(--muted);margin-top:8px}.row{display:flex;gap:18px}.outline{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:14px;height:58px;font-weight:700;cursor:pointer;color:var(--ink);box-shadow:0 4px 12px rgba(28,28,28,.04);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s ease}.outline:hover{border-color:var(--purple);color:var(--purple);background:var(--hover);transform:translateY(-1px)}.secure{text-align:center;font-size:12px;color:var(--muted);margin-top:14px}.progress{display:none;background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px 24px;margin-top:18px;box-shadow:var(--shadow);text-align:center}
+.camera-dot{width:82px;height:82px;margin:0 auto 14px;border-radius:50%;background:rgba(123,97,255,.08);border:1px solid rgba(123,97,255,.15);display:grid;place-items:center;font-size:34px}.upload strong{font-size:17px}.upload small{display:block;color:var(--muted);margin-top:8px}.row{display:flex;gap:18px}.outline{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:14px;height:58px;font-weight:700;cursor:pointer;color:var(--ink);box-shadow:0 4px 12px rgba(28,28,28,.04);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s ease}.outline:hover{border-color:var(--purple);color:var(--purple);background:var(--hover);transform:translateY(-1px)}.secure{text-align:center;font-size:12px;color:var(--muted);margin-top:14px}.progress{display:none!important;background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px 24px;margin-top:18px;box-shadow:var(--shadow);text-align:center}
 .progress-icon{width:64px;height:64px;border-radius:50%;background:rgba(123,97,255,.08);border:2px solid rgba(123,97,255,.15);display:grid;place-items:center;margin:0 auto 16px;font-size:28px;animation:pulseIcon 2s ease-in-out infinite}
 @keyframes pulseIcon{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(123,97,255,.2)}50%{transform:scale(1.06);box-shadow:0 0 0 8px rgba(123,97,255,.0)}}
 .bar{height:5px;background:#EAEAF2;border-radius:9px;overflow:hidden;margin-top:16px}.bar span{display:block;height:100%;width:0;background:var(--grad);transition:.5s ease;border-radius:9px}
@@ -277,16 +277,18 @@ button,input,textarea{font-family:inherit}
   }
   .sidebar-group .chip .ico{
     margin:0!important;
-    min-width:20px!important;
-    width:20px!important;
-    height:20px!important;
-    border-radius:6px!important;
+    min-width:18px!important;
+    width:18px!important;
+    height:18px!important;
+    border-radius:5px!important;
     font-size:12px!important;
     flex-shrink:0!important;
-    display:flex!important;
+    display:inline-flex!important;
     align-items:center!important;
     justify-content:center!important;
     background:transparent!important;
+    padding:0!important;
+    line-height:1!important;
   }
   .sidebar-group .chip.active .ico{background:transparent!important;color:var(--purple)!important;}
   .sidebar-group .chip .chip-name{
@@ -751,7 +753,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.3.5';
+const APP_VERSION = '1.3.6';
 
 async function checkAppVersion(){
   try{
@@ -1257,7 +1259,8 @@ function render(){
   catList.innerHTML=cats.map((c,idx)=>`<div class="cat-row"><div class="cat-badge">${c.icon||'◇'}</div><div class="cat-info"><strong>${c.name}</strong><small>Categoria cadastrada</small></div><div class="reorder-btns"><button class="icon-btn" onclick="moveCat('${c.id}',-1)" ${idx===0?'disabled':''}>↑</button><button class="icon-btn" onclick="moveCat('${c.id}',1)" ${idx===cats.length-1?'disabled':''}>↓</button></div><button class="icon-btn" onclick="editCatInfo('${c.id}')">✎</button><button class="icon-btn" onclick="delCat('${c.id}')">🗑</button></div>`).join('');
   promptList.innerHTML=cats.map(c=>`<div class="cat-row"><div class="cat-badge">${c.icon||'◇'}</div><div class="cat-info"><strong>${c.name}</strong><div class="prm-preview"><div class="prm-line"><b>Foto 1:</b> ${(c.p1||'').slice(0,54)}...</div><div class="prm-line"><b>Foto 2:</b> ${(c.p2||'').slice(0,54)}...</div><div class="prm-line"><b>Foto 3:</b> ${(c.p3||'').slice(0,54)}...</div></div></div><button class="icon-btn" onclick="editPrompt('${c.id}')">✎</button></div>`).join('');
   const p=localStorage.getItem('cntP')||0, im=localStorage.getItem('cntI')||0;
-  cntP.textContent=p; cntI.textContent=im;
+  if(typeof cntP !== "undefined" && cntP) cntP.textContent=p;
+  if(typeof cntI !== "undefined" && cntI) cntI.textContent=im;
   if(deskCntP) deskCntP.textContent=p;
   if(deskCntI) deskCntI.textContent=im;
   const hP=document.getElementById('headerCntP'); if(hP) hP.textContent=p;
@@ -1306,7 +1309,7 @@ async function generate(){
     if((currentUserData?.credits||0) === 0) showZeroCreditsPopup();
     return;
   }
-  error.textContent='';progress.style.display='block';
+  error.textContent='';
   if(window.innerWidth<900)results.style.display='none';
   genBtn.disabled=true;
   const _qty = state.selectedPhotos.length;
@@ -1433,7 +1436,7 @@ async function generate(){
   }
   finally{
     setTimeout(()=>{
-      progress.style.display='none';
+      // progress removido — barra no botão
       const bp2 = document.getElementById('btnProgress');
       const gt2 = document.getElementById('genBtnText');
       if(bp2) bp2.style.width = '0%';
@@ -1462,7 +1465,7 @@ async function regenerate(i){
     error.textContent='⚠️ Créditos insuficientes!';return;
   }
   const photoNum=i+1;
-  error.textContent='';progress.style.display='block';bar.style.width='10%';ptext.textContent='Gerando foto...';
+  error.textContent='';
 
   const cards=document.querySelectorAll('.res, .skeleton-card, .skeleton');
   const targetCard = cards[i];
@@ -1533,7 +1536,7 @@ async function regenerate(i){
       grid.replaceChild(card, s);
     });
   }
-  finally{setTimeout(()=>progress.style.display='none',500)}
+  finally{}
 }
 
 const regenSvg=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>`;
