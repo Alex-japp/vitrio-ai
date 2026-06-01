@@ -1,5 +1,5 @@
 const { Inngest } = require('inngest');
-const { validateFirebaseToken, getUserFromFirestore } = require('./auth-helper');
+const { validateFirebaseToken, getUserFromFirestore, getServiceAccountToken } = require('./auth-helper');
 
 const inngest = new Inngest({
   id: 'vitrio-ai',
@@ -12,6 +12,62 @@ const ALLOWED_ORIGINS = [
   'http://localhost:3000',
   'http://localhost:5500'
 ];
+
+const RATE_LIMIT = 20;        // máximo de requisições
+const RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hora em ms
+
+// ── Rate limiting via Firestore ──────────────────────────
+async function checkRateLimit(uid, accessToken) {
+  const now = Date.now();
+  const windowStart = now - RATE_WINDOW_MS;
+  const docUrl = `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents/ratelimit/${uid}`;
+
+  // Lê o documento atual
+  const getRes = await fetch(docUrl, {
+    headers: { 'Authorization': `Bearer ${accessToken}` }
+  });
+
+  let requests = [];
+  if (getRes.ok) {
+    const data = await getRes.json();
+    const raw = data.fields?.requests?.arrayValue?.values || [];
+    // Filtra só as requisições dentro da janela de 1 hora
+    requests = raw
+      .map(v => parseInt(v.integerValue || '0'))
+      .filter(ts => ts > windowStart);
+  }
+
+  // Verifica limite
+  if (requests.length >= RATE_LIMIT) {
+    const oldest = Math.min(...requests);
+    const resetIn = Math.ceil((oldest + RATE_WINDOW_MS - now) / 60000);
+    return { allowed: false, resetIn, count: requests.length };
+  }
+
+  // Adiciona timestamp atual
+  requests.push(now);
+
+  // Salva de volta no Firestore
+  await fetch(docUrl, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify({
+      fields: {
+        requests: {
+          arrayValue: {
+            values: requests.map(ts => ({ integerValue: ts.toString() }))
+          }
+        },
+        updatedAt: { integerValue: now.toString() }
+      }
+    })
+  });
+
+  return { allowed: true, count: requests.length };
+}
 
 module.exports = async function handler(req, res) {
   // ── CORS ─────────────────────────────────────────────
@@ -32,7 +88,6 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ error: 'Não autorizado: ' + e.message });
   }
 
-  // UID vem do token — ignora qualquer userId do body
   const uid = authUser.uid;
 
   // ── Buscar dados do usuário no Firestore ─────────────
@@ -47,7 +102,6 @@ module.exports = async function handler(req, res) {
     return res.status(403).json({ error: 'Conta inativa. Entre em contato com o suporte.' });
   }
 
-  // ── Verificar créditos (admin é isento) ──────────────
   const isAdmin = userData.isAdmin?.booleanValue === true;
   const { imageBase64, prompts, selectedPhotos, code } = req.body;
 
@@ -55,6 +109,7 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Dados incompletos' });
   }
 
+  // ── Verificar créditos (admin é isento) ──────────────
   if (!isAdmin) {
     const credits = parseInt(userData.credits?.integerValue || '0');
     const photosRequested = Array.isArray(selectedPhotos) ? selectedPhotos.length : 1;
@@ -65,6 +120,22 @@ module.exports = async function handler(req, res) {
         credits,
         required: photosRequested
       });
+    }
+  }
+
+  // ── Rate limiting (admin é isento) ───────────────────
+  if (!isAdmin) {
+    try {
+      const accessToken = await getServiceAccountToken();
+      const rateCheck = await checkRateLimit(uid, accessToken);
+      if (!rateCheck.allowed) {
+        return res.status(429).json({
+          error: `Limite de ${RATE_LIMIT} gerações por hora atingido. Tente novamente em ${rateCheck.resetIn} minuto(s).`
+        });
+      }
+    } catch (e) {
+      console.error('Erro rate limit:', e.message);
+      // Se o rate limit falhar, deixa passar — não bloqueia o usuário
     }
   }
 
@@ -85,7 +156,7 @@ module.exports = async function handler(req, res) {
         body: JSON.stringify({
           fields: {
             status: { stringValue: 'pending' },
-            userId: { stringValue: uid }, // UID do token, não do body
+            userId: { stringValue: uid },
             code: { stringValue: code || '' },
             createdAt: { integerValue: Date.now().toString() },
             updatedAt: { integerValue: Date.now().toString() }
@@ -106,7 +177,7 @@ module.exports = async function handler(req, res) {
         imageBase64,
         prompts,
         selectedPhotos,
-        userId: uid, // UID do token
+        userId: uid,
         code: code || ''
       }
     });
