@@ -762,7 +762,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.3.8';
+const APP_VERSION = '1.3.9';
 
 async function checkAppVersion(){
   try{
@@ -885,8 +885,8 @@ async function loadUserData(uid){
     const snap = await db.collection('users').doc(uid).get({source:'server'});
     if(snap.exists){
       currentUserData = snap.data();
-      console.log('✅ Dados carregados do servidor:', currentUserData);
-      console.log('ADMIN CHECK — isAdmin raw value:', currentUserData.isAdmin, typeof currentUserData.isAdmin);
+      
+      
     } else {
       console.log('⚠️ Documento não existe, criando...');
       const user = auth.currentUser;
@@ -899,7 +899,7 @@ async function loadUserData(uid){
       };
       await db.collection('users').doc(uid).set(currentUserData);
     }
-    console.log('ADMIN CHECK — loadUserData concluído, isAdmin:', currentUserData?.isAdmin);
+    
     applyAdminVisibility(currentUserData?.isAdmin === true);
     updateCreditsUI();
     return currentUserData;
@@ -1210,21 +1210,32 @@ let cats=defaults, editId=null, editMode='cat';
 let state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],selectedPhotos:[1,2,3]};
 let appConfig={codeRequired:true};
 
+// ── FIREBASE ID TOKEN ────────────────────────────────
+async function getIdToken() {
+  if (!currentUser) return null;
+  try {
+    return await currentUser.getIdToken(false);
+  } catch(e) {
+    console.error('Erro ao obter token:', e.message);
+    return null;
+  }
+}
+
 // ── ADMIN VISIBILITY ─────────────────────────────────
 function applyAdminVisibility(isAdmin) {
   const btn = document.getElementById('adminMenuBtn');
   if(!btn) return;
-  console.log('ADMIN CHECK — applyAdminVisibility chamado com isAdmin:', isAdmin);
+  
   if(isAdmin === true){
     btn.style.setProperty('display', 'flex', 'important');
     btn.removeAttribute('hidden');
     btn.classList.remove('admin-only');
-    console.log('ADMIN CHECK — botão Configurações VISÍVEL');
+    
   } else {
     btn.style.setProperty('display', 'none', 'important');
     btn.setAttribute('hidden', '');
     btn.classList.add('admin-only');
-    console.log('ADMIN CHECK — botão Configurações OCULTO');
+    
   }
 }
 
@@ -1353,14 +1364,17 @@ async function generate(){
     });
 
     bar.style.width='10%';ptext.textContent='Iniciando geração...';
+    const _token = await getIdToken();
     const jobRes = await fetch('/api/criar-job', {
       method: 'POST',
-      headers: {'Content-Type':'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${_token}`
+      },
       body: JSON.stringify({
         imageBase64: pngB64,
         prompts,
         selectedPhotos: photos,
-        userId: currentUser?.uid || '',
         code: state.code
       })
     });
@@ -1385,7 +1399,7 @@ async function generate(){
         }
 
         try{
-          const statusRes = await fetch(`/api/status?jobId=${jobId}`);
+          const statusRes = await fetch(`/api/status?jobId=${jobId}`, {headers: {'Authorization': `Bearer ${_token}`}});
           const status = await statusRes.json();
 
           photos.forEach((photoNum, idx) => {
@@ -1499,14 +1513,17 @@ async function regenerate(i){
 
     bar.style.width='20%';ptext.textContent='Enviando para processamento...';
     const prompts = { [photoNum]: prompt };
+    const _regenToken = await getIdToken();
     const jobRes = await fetch('/api/criar-job', {
       method: 'POST',
-      headers: {'Content-Type':'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${_regenToken}`
+      },
       body: JSON.stringify({
         imageBase64: pngB64,
         prompts,
         selectedPhotos: [photoNum],
-        userId: currentUser?.uid || '',
         code: state.code
       })
     });
@@ -1519,7 +1536,7 @@ async function regenerate(i){
         tentativas++;
         if(tentativas > 90){ clearInterval(poll); reject(new Error('Tempo limite.')); return; }
         try{
-          const statusRes = await fetch(`/api/status?jobId=${jobId}`);
+          const statusRes = await fetch(`/api/status?jobId=${jobId}`, {headers: {'Authorization': `Bearer ${_token}`}});
           const status = await statusRes.json();
           if(status.photos[photoNum]){
             clearInterval(poll);
@@ -1639,12 +1656,12 @@ async function openAdmin(){
     if(currentUser) await loadUserData(currentUser.uid);
     // Verifica novamente após reload
     if(currentUserData?.isAdmin !== true){
-      console.warn('ADMIN CHECK — tentativa de acesso negada');
+      
       alert('Acesso restrito ao administrador.');
       return;
     }
   }
-  console.log('ADMIN CHECK — acesso permitido, abrindo configurações');
+  
   app.style.display='none';
   settings.style.display='block';
   if(promptsTabBtn) promptsTabBtn.style.display='';
@@ -2353,7 +2370,8 @@ Regras automaticas: metal liso sem porosidade, reflexos naturais, evitar deforma
 
 Responda APENAS com JSON valido, sem markdown:
 {"p1":"prompt catalogo fundo branco (400-700 chars)","p2":"prompt modelo usando (400-700 chars)","p3":"prompt close detalhe (400-700 chars)"}`;
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:req}]})});
+    const _obToken = await getIdToken();
+    const res=await fetch('/api/prompts',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${_obToken}`},body:JSON.stringify({prompt:req,maxTokens:1500})});
     const data=await res.json();
     const text=data.content?.[0]?.text||'';
     const clean=text.replace(/```json|```/g,'').trim();
@@ -2517,10 +2535,11 @@ Categorias: ${cats.map(c=>c.name).join(', ')}
 Responda APENAS com JSON válido:
 {${cats.map(c=>`"${c.id}":{"p1":"prompt catálogo (400-600 chars)","p2":"prompt modelo (400-600 chars)","p3":"prompt close (400-600 chars)"}`).join(',')}}`;
 
-    const res = await fetch('https://api.anthropic.com/v1/messages',{
+    const _adminToken = await getIdToken();
+    const res = await fetch('/api/prompts',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:req}]})
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${_adminToken}`},
+      body:JSON.stringify({prompt:req,maxTokens:4000})
     });
     const data = await res.json();
     const text = data.content?.[0]?.text||'';
