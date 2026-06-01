@@ -705,7 +705,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.3.1';
 
 async function checkAppVersion(){
   try{
@@ -825,10 +825,11 @@ function logout(){
 
 async function loadUserData(uid){
   try{
-    const snap = await db.collection('users').doc(uid).get();
+    const snap = await db.collection('users').doc(uid).get({source:'server'});
     if(snap.exists){
       currentUserData = snap.data();
-      console.log('✅ Dados carregados:', currentUserData);
+      console.log('✅ Dados carregados do servidor:', currentUserData);
+      console.log('ADMIN CHECK — isAdmin raw value:', currentUserData.isAdmin, typeof currentUserData.isAdmin);
     } else {
       console.log('⚠️ Documento não existe, criando...');
       const user = auth.currentUser;
