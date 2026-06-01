@@ -156,8 +156,8 @@ button,input,textarea{font-family:inherit}
 .img-preview-modal{position:fixed;inset:0;background:rgba(28,28,28,.85);z-index:400;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px)}
 .img-preview-modal.open{display:flex;animation:fadeIn .2s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.img-preview-inner{position:relative;max-width:min(90vw,600px);width:100%}
-.img-preview-inner img{width:100%;border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.4);display:block}
+.img-preview-inner{position:relative;max-width:min(80vw,560px);max-height:90vh;width:100%;overflow:hidden}
+.img-preview-inner img{width:100%;max-height:70vh;object-fit:contain;border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.4);display:block}
 .img-preview-close{position:absolute;top:-14px;right:-14px;width:36px;height:36px;border-radius:50%;background:#fff;border:none;font-size:18px;cursor:pointer;display:grid;place-items:center;box-shadow:0 4px 16px rgba(0,0,0,.2);font-weight:700;color:var(--ink)}
 .img-preview-dl{display:block;width:100%;margin-top:12px;height:48px;border-radius:14px;background:var(--grad);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.04em}
 .toast{position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-80px);background:#1A6B3A;color:#fff;border-radius:20px;padding:12px 24px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;z-index:999;box-shadow:0 8px 24px rgba(26,107,58,.3);transition:transform .35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}
@@ -335,7 +335,8 @@ button,input,textarea{font-family:inherit}
   .results-group::-webkit-scrollbar{display:none}
   .results-group .results{display:block!important;margin-top:0;}
   .results-group .results .card{box-shadow:none;border:none;padding:0;margin-top:0;background:transparent;}
-  .results-group .grid{grid-template-columns:1fr 1fr;gap:8px;}
+  .results-group .grid{grid-template-columns:1fr 1fr;gap:10px;}
+  .results-group .res .img-wrap{min-height:140px!important;}
   .results-group .grid[data-qty="3"] .res:nth-child(3){grid-column:1/3;}
   .results-group .grid[data-qty="3"] .res:nth-child(3) .img-wrap{aspect-ratio:1/1!important;}
   .results-group .grid[data-qty="3"] .res:nth-child(3) img{aspect-ratio:1/1!important;object-fit:cover!important;width:100%!important;}
@@ -770,7 +771,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.4.0';
+const APP_VERSION = '1.4.1';
 
 async function checkAppVersion(){
   try{
@@ -1142,10 +1143,13 @@ async function toggleCodeRequired(val){
 async function loadDashboard(){
   const content = document.getElementById('dashContent');
   if(!content) return;
+  if(currentUserData?.isAdmin !== true){ content.innerHTML='<p style="color:var(--muted);font-size:13px">Acesso restrito.</p>'; return; }
   content.innerHTML='<p style="color:var(--muted);font-size:13px">Carregando...</p>';
   try{
-    const snap = await db.collection('users').get();
-    const users = snap.docs.map(d=>({...d.data()}));
+    const _adminToken = await getIdToken();
+    const _adminRes = await fetch('/api/admin?action=users', {headers:{'Authorization':`Bearer ${_adminToken}`}});
+    if(!_adminRes.ok) throw new Error('Erro ao carregar dados');
+    const { users } = await _adminRes.json();
     const total = users.length;
     const ativos = users.filter(u=>u.active!==false && !u.isAdmin).length;
     const semCredito = users.filter(u=>!u.isAdmin&&(u.credits||0)===0).length;
@@ -1550,7 +1554,7 @@ async function regenerate(i){
             clearInterval(poll);
             const url = status.photos[photoNum];
             state.imgs[i] = {url, name:`${state.code}-foto${photoNum}.jpg`};
-            showPhotoImediata(i, url, photoNum);
+            showPhotoImediata(i, url, photoNum, 1);
             bar.style.width='100%';ptext.textContent='Pronto!';
             resolve();
           }
@@ -1575,7 +1579,7 @@ async function regenerate(i){
 
 const regenSvg=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>`;
 
-function showPhotoImediata(idx, url, photoNum){
+function showPhotoImediata(idx, url, photoNum, totalOverride){
   results.style.display='block';
   if(resultsPlaceholder) resultsPlaceholder.style.display='none';
   const total = state.selectedPhotos.length;
@@ -1592,8 +1596,9 @@ function showPhotoImediata(idx, url, photoNum){
   }
   // Atualiza badge
   const shown = document.querySelectorAll('#grid .res').length;
+  const badgeTotal = totalOverride || total;
   const badge = document.getElementById('resultsBadge');
-  if(badge){ badge.style.display=''; badge.textContent = shown+'/'+total; }
+  if(badge){ badge.style.display=''; badge.textContent = shown+'/'+badgeTotal; }
 }
 
 function showResults(){
@@ -1859,11 +1864,15 @@ function renderUserList(users){
 async function loadUsers(){
   const list = document.getElementById('userList');
   if(!list) return;
+  if(currentUserData?.isAdmin !== true){ list.innerHTML='<p style="color:var(--muted);font-size:13px">Acesso restrito.</p>'; return; }
   list.innerHTML='<p style="color:var(--muted);font-size:13px">Carregando...</p>';
   try{
-    const snap = await db.collection('users').orderBy('createdAt','desc').get();
-    if(snap.empty){list.innerHTML='<p style="color:var(--muted);font-size:13px">Nenhum usuário cadastrado ainda.</p>';return;}
-    allUsers = snap.docs.map(doc=>({uid:doc.id,...doc.data()}));
+    const _usersToken = await getIdToken();
+    const _usersRes = await fetch('/api/admin?action=users', {headers:{'Authorization':`Bearer ${_usersToken}`}});
+    if(!_usersRes.ok) throw new Error('Erro ao carregar usuários');
+    const { users: _usersData } = await _usersRes.json();
+    if(!_usersData.length){list.innerHTML='<p style="color:var(--muted);font-size:13px">Nenhum usuário cadastrado ainda.</p>';return;}
+    allUsers = _usersData;
     renderFilterBar();
     applyFilters();
   }catch(e){list.innerHTML='<p style="color:#c23">Erro ao carregar usuários: '+e.message+'</p>';}
