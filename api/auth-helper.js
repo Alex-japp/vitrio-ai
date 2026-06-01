@@ -93,4 +93,4 @@ async function getUserFromFirestore(uid) {
   return data.fields || null;
 }
 
-module.exports = { validateFirebaseToken, getUserFromFirestore };
+module.exports = { validateFirebaseToken, getUserFromFirestore, getServiceAccountToken };
