@@ -1,4 +1,4 @@
-const { validateFirebaseToken } = require('./auth-helper');
+const { validateFirebaseToken, getServiceAccountToken } = require('./auth-helper');
 
 const ALLOWED_ORIGINS = [
   'https://vitrio-ai.vercel.app',
@@ -28,13 +28,18 @@ module.exports = async function handler(req, res) {
 
   const uid = authUser.uid;
   const { jobId } = req.query;
-
   if (!jobId) return res.status(400).json({ error: 'jobId obrigatório' });
 
   try {
+    // ── Lê job com Service Account (bypassa regras do Firestore) ──
+    const accessToken = await getServiceAccountToken();
     const response = await fetch(
-      `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents/jobs/${jobId}`
+      `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents/jobs/${jobId}`,
+      {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      }
     );
+
     if (!response.ok) return res.status(404).json({ error: 'Job não encontrado' });
 
     const data = await response.json();
