@@ -486,15 +486,9 @@ button,input,textarea{font-family:inherit}
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
     <span id="creditsCount">15</span> fotos
   </div>
-  <div class="avatar-with-info" onclick="toggleMenu(event)" role="button" aria-label="Menu do usuário">
-    <button id="avatarBtn" class="avatar-btn" style="pointer-events:none" aria-label="Perfil">
-      <div id="avatarInner" class="avatar-inner">◇</div>
-    </button>
-    <div class="avatar-info" id="avatarInfo">
-      <div class="avatar-info-name" id="avatarInfoName">—</div>
-      <div class="avatar-info-plan" id="avatarInfoPlan">—</div>
-    </div>
-  </div>
+  <button id="avatarBtn" class="avatar-btn" onclick="toggleMenu(event)" aria-label="Perfil">
+    <div id="avatarInner" class="avatar-inner">◇</div>
+  </button>
 </div>
 
 </div></header>
@@ -703,7 +697,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.3.2';
+const APP_VERSION = '1.3.3';
 
 async function checkAppVersion(){
   try{
@@ -1598,7 +1592,7 @@ async function openAdmin(){
 function closeSettings(){settings.style.display='none';app.style.display='block';}
 function closeModal(id){document.getElementById(id).style.display='none';if(id==='catModal'){catName.style.display='block';catIcon.style.display='block';promptFields.style.display='block';editMode='cat';}}
 function tab(name,btn){
-  ['cats','prompts','general','users','terms'].forEach(n=>{const el=document.getElementById(n+'Tab');if(el)el.classList.add('hidden');});
+  ['cats','prompts','general','dash','users','terms'].forEach(n=>{const el=document.getElementById(n+'Tab');if(el)el.classList.add('hidden');});
   document.getElementById(name+'Tab').classList.remove('hidden');
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   btn?.classList.add('on');
