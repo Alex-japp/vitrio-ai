@@ -1,4 +1,4 @@
-A<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
@@ -1538,14 +1538,17 @@ async function regenerate(i){
     if(!jobRes.ok) throw new Error('Falha ao criar job');
     const { jobId } = await jobRes.json();
 
+    console.log('REGEN — iniciando polling para jobId:', jobId, 'photoNum:', photoNum);
     await new Promise((resolve, reject) => {
       let tentativas = 0;
       const poll = setInterval(async () => {
         tentativas++;
         if(tentativas > 120){ clearInterval(poll); reject(new Error('Tempo limite.')); return; }
         try{
-          const statusRes = await fetch(`/api/status?jobId=${jobId}`, {headers: {'Authorization': `Bearer ${_token}`}});
+          const statusRes = await fetch(`/api/status?jobId=${jobId}`, {headers: {'Authorization': `Bearer ${_regenToken}`}});
+          console.log('REGEN — status response:', statusRes.status);
           const status = await statusRes.json();
+          console.log('REGEN — status data:', status);
           if(status.photos[photoNum]){
             clearInterval(poll);
             const url = status.photos[photoNum];
