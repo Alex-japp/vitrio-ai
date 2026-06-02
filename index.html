@@ -1628,7 +1628,7 @@ function downloadUrl(url, name){
           canvas.toBlob(compressed => {
             if(compressed) resolve(compressed);
             else reject(new Error('Compressão falhou'));
-          }, 'image/jpeg', 0.85);
+          }, 'image/jpeg', 0.92);
         } catch(e) { reject(e); }
       };
       img.onerror = () => { URL.revokeObjectURL(blobUrl); reject(new Error('Imagem inválida')); };
