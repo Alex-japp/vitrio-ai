@@ -771,7 +771,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.4.4';
+const APP_VERSION = '1.4.5';
 
 async function checkAppVersion(){
   try{
@@ -1610,26 +1610,45 @@ function showResults(){
 
 function download(i){const canvas=document.createElement('canvas');const img=new Image();img.onload=()=>{canvas.width=img.width;canvas.height=img.height;canvas.getContext('2d').drawImage(img,0,0);const a=document.createElement('a');a.href=canvas.toDataURL('image/jpeg',0.95);a.download=state.imgs[i].name;a.click()};img.src=`data:image/png;base64,${state.imgs[i].b64}`;}
 function downloadUrl(url, name){
+  const fileName = name.endsWith('.jpg') || name.endsWith('.jpeg') ? name : name + '.jpg';
   fetch(url)
     .then(r => r.blob())
-    .then(blob => {
-      const mime = blob.type || 'image/jpeg';
-      const blobUrl = URL.createObjectURL(new Blob([blob], {type: mime}));
+    .then(blob => new Promise((resolve, reject) => {
+      const img = new Image();
+      const blobUrl = URL.createObjectURL(blob);
+      img.onload = () => {
+        try {
+          // Comprime via canvas para ~400-500KB
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          URL.revokeObjectURL(blobUrl);
+          canvas.toBlob(compressed => {
+            if(compressed) resolve(compressed);
+            else reject(new Error('Compressão falhou'));
+          }, 'image/jpeg', 0.85);
+        } catch(e) { reject(e); }
+      };
+      img.onerror = () => { URL.revokeObjectURL(blobUrl); reject(new Error('Imagem inválida')); };
+      img.src = blobUrl;
+    }))
+    .then(compressed => {
+      const finalUrl = URL.createObjectURL(compressed);
       const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = name.endsWith('.jpg') || name.endsWith('.jpeg') ? name : name + '.jpg';
+      a.href = finalUrl;
+      a.download = fileName;
       a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
-      setTimeout(() => {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(blobUrl);
-      }, 300);
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(finalUrl); }, 300);
     })
     .catch(() => {
+      // Fallback sem compressão
       const a = document.createElement('a');
       a.href = url;
-      a.download = name;
+      a.download = fileName;
       a.target = '_blank';
       a.style.display = 'none';
       document.body.appendChild(a);
