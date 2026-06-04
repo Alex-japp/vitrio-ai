@@ -772,7 +772,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.4.8';
+const APP_VERSION = '1.4.9';
 
 async function checkAppVersion(){
   try{
@@ -1346,12 +1346,12 @@ async function generate(){
   if(window.innerWidth<900)results.style.display='none';
   genBtn.disabled=true;
   const _qty = state.selectedPhotos.length;
-  showToast(`⏳ Gerando ${_qty} foto${_qty>1?'s':''}...`, '#5B3FE8');
+  showToast(`Gerando ${_qty} foto${_qty>1?'s':''}...`, '#5B3FE8');
   // Barra de progresso no botão
   const btnProg = document.getElementById('btnProgress');
   const genTxt = document.getElementById('genBtnText');
   if(btnProg) btnProg.style.width = '5%';
-  if(genTxt) genTxt.textContent = '⏳ Enviando para processamento...';
+  if(genTxt) genTxt.textContent = 'Enviando...';
   // Mantém progress card só no mobile
   if(window.innerWidth<900){ bar.style.width='5%'; ptext.textContent='Enviando para processamento...'; }
   const skeletonCount = state.selectedPhotos.length;
@@ -1438,7 +1438,7 @@ async function generate(){
               const progPct = 10 + (fotosMostradas.size / photos.length) * 85;
               if(bp) bp.style.width = progPct + '%';
               if(gt) gt.textContent = fotosMostradas.size < photos.length
-                ? `⏳ Gerando foto ${fotosMostradas.size + 1} de ${photos.length}...`
+                ? `Gerando foto ${fotosMostradas.size + 1} de ${photos.length}...`
                 : '✅ Fotos geradas!';
             }
           });
@@ -1604,7 +1604,7 @@ function showPhotoImediata(idx, url, photoNum, totalOverride){
   }
   // Atualiza badge
   const badgeTotal = totalOverride || total;
-  const shown = totalOverride ? 1 : document.querySelectorAll('#grid .res').length;
+  const shown = totalOverride ? photoNum : document.querySelectorAll('#grid .res').length;
   const badge = document.getElementById('resultsBadge');
   if(badge){ badge.style.display=''; badge.textContent = shown+'/'+badgeTotal; }
 }
@@ -2555,7 +2555,7 @@ function closeUserPrompts(){
 async function generateUserPrompts(){
   const btn = document.getElementById('upBtnGenerate');
   btn.disabled = true;
-  btn.textContent = '⏳ Gerando...';
+  btn.textContent = 'Gerando...';
   const ob = currentUpUser?.onboardingData;
   try{
     const req = `Você é especialista em fotografia de semijoias para e-commerce brasileiro.
@@ -2611,7 +2611,7 @@ Responda APENAS com JSON válido:
 async function approveUserPrompts(){
   const btn = document.getElementById('upBtnApprove');
   btn.disabled = true;
-  btn.textContent = '⏳ Salvando...';
+  btn.textContent = 'Salvando...';
   try{
     await db.collection('users').doc(currentUpUid).update({
       customPrompts: upPrompts,
