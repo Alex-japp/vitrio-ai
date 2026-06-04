@@ -331,7 +331,7 @@ button,input,textarea{font-family:inherit}
   .form-group .camera-dot{width:52px!important;height:52px!important;margin-bottom:8px!important}
   .form-group .upload strong{font-size:14px!important}
   .form-group .upload small{font-size:12px!important;margin-top:4px!important}
-  .results-group{grid-column:3;grid-row:1;position:sticky;top:88px;max-height:calc(100vh - 108px);overflow-y:auto;padding-left:20px;padding-right:0;border-left:1px solid var(--line);scrollbar-width:none;}
+  .results-group{grid-column:3;grid-row:1;position:sticky;top:88px;max-height:none;overflow-y:visible;padding-left:20px;padding-right:24px;border-left:1px solid var(--line);scrollbar-width:none;}
   .results-group::-webkit-scrollbar{display:none}
   .results-group .results{display:block!important;margin-top:0;}
   .results-group .results .card{box-shadow:none;border:none;padding:0;margin-top:0;background:transparent;}
@@ -772,7 +772,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.4.6';
+const APP_VERSION = '1.4.8';
 
 async function checkAppVersion(){
   try{
@@ -1356,7 +1356,14 @@ async function generate(){
   if(window.innerWidth<900){ bar.style.width='5%'; ptext.textContent='Enviando para processamento...'; }
   const skeletonCount = state.selectedPhotos.length;
   grid.setAttribute('data-qty', skeletonCount);
-  grid.innerHTML = Array(skeletonCount).fill('<div class="skeleton-card"><div class="skeleton"></div><div class="skeleton-btn"></div></div>').join('');
+  if(skeletonCount === 3 && window.innerWidth >= 900){
+    grid.innerHTML =
+      '<div class=\"skeleton-card\"><div class=\"skeleton\"></div><div class=\"skeleton-btn\"></div></div>' +
+      '<div class=\"skeleton-card\"><div class=\"skeleton\"></div><div class=\"skeleton-btn\"></div></div>' +
+      '<div class=\"skeleton-card\" style=\"grid-column:1/3\"><div class=\"skeleton\" style=\"aspect-ratio:1/1;border-radius:18px 18px 0 0\"></div><div class=\"skeleton-btn\"></div></div>';
+  } else {
+    grid.innerHTML = Array(skeletonCount).fill('<div class=\"skeleton-card\"><div class=\"skeleton\"></div><div class=\"skeleton-btn\"></div></div>').join('');
+  }
   results.style.display='block';
   if(resultsPlaceholder) resultsPlaceholder.style.display='none';
 
