@@ -788,7 +788,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.5.9';
+const APP_VERSION = '1.6.0';
 
 async function checkAppVersion(){
   try{
@@ -1274,8 +1274,9 @@ async function init(){
   render();
   applyCodeConfig();
   updatePhotosCount();
-  // No desktop abre o seletor de fotos por padrão
-  if(window.innerWidth >= 900){
+  // Abre seletor de fotos apenas na primeira visita
+  const photosSeenKey = 'vitrio_photos_seen';
+  if(!localStorage.getItem(photosSeenKey)){
     const pb = document.getElementById('photosBody');
     const pa = document.querySelector('#photosToggle .photos-arrow');
     if(pb){ pb.classList.add('open'); if(pa) pa.style.transform='rotate(180deg)'; }
@@ -1864,6 +1865,7 @@ function togglePhotos(){
   const isOpen = body.classList.contains('open');
   body.classList.toggle('open', !isOpen);
   if(arrow) arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+  localStorage.setItem('vitrio_photos_seen', '1');
 }
 function updatePhotosCount(){
   const count = state.selectedPhotos.length;
