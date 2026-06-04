@@ -788,7 +788,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.6.0';
+const APP_VERSION = '1.6.1';
 
 async function checkAppVersion(){
   try{
@@ -1280,6 +1280,7 @@ async function init(){
     const pb = document.getElementById('photosBody');
     const pa = document.querySelector('#photosToggle .photos-arrow');
     if(pb){ pb.classList.add('open'); if(pa) pa.style.transform='rotate(180deg)'; }
+    localStorage.setItem(photosSeenKey, '1');
   }
   if(resultsPlaceholder && window.innerWidth<900) resultsPlaceholder.classList.add('mobile-show');
 }
