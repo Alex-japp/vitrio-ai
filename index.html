@@ -772,7 +772,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.4.9';
+const APP_VERSION = '1.5.0';
 
 async function checkAppVersion(){
   try{
@@ -1510,14 +1510,25 @@ async function regenerate(i){
   const photoNum=i+1;
   error.textContent='';
 
-  const cards=document.querySelectorAll('.res, .skeleton-card, .skeleton');
-  const targetCard = cards[i];
+  // Substitui só o card correto dentro do #grid
+  const gridCards = grid.querySelectorAll('.res, .skeleton-card');
+  const targetCard = gridCards[i];
   if(targetCard){
     const skeleton = document.createElement('div');
     skeleton.className = 'skeleton-card';
     skeleton.innerHTML = '<div class="skeleton"></div><div class="skeleton-btn"></div>';
+    // Preserva grid-column do card original (foto 3 ocupa 2 colunas)
+    if(targetCard.style.gridColumn) skeleton.style.gridColumn = targetCard.style.gridColumn;
     grid.replaceChild(skeleton, targetCard);
   }
+
+  // Atualiza botão principal
+  const regenBtn = document.getElementById('genBtn');
+  const regenTxt = document.getElementById('genBtnText');
+  const regenProg = document.getElementById('btnProgress');
+  if(regenBtn) regenBtn.disabled = true;
+  if(regenTxt) regenTxt.textContent = `Gerando foto ${photoNum}/1...`;
+  if(regenProg) regenProg.style.width = '10%';
 
   try{
     const pngB64=await compressImage(state.b64,state.mime,1024,0.85);
@@ -1531,7 +1542,7 @@ async function regenerate(i){
     }
     let prompt = catPrompt + (state.obs ? '\nObservações: '+state.obs : '');
 
-    bar.style.width='20%';ptext.textContent='Enviando para processamento...';
+    if(regenProg) regenProg.style.width = '20%';
     const prompts = { [photoNum]: prompt };
     const _regenToken = await getIdToken();
     const jobRes = await fetch('/api/criar-job', {
@@ -1563,7 +1574,8 @@ async function regenerate(i){
             const url = status.photos[photoNum];
             state.imgs[i] = {url, name:`${state.code}-foto${photoNum}.jpg`};
             showPhotoImediata(i, url, photoNum, 1);
-            bar.style.width='100%';ptext.textContent='Pronto!';
+            if(regenProg) regenProg.style.width = '100%';
+            if(regenTxt) regenTxt.textContent = 'Foto gerada!';
             resolve();
           }
           if(status.status === 'failed'){ clearInterval(poll); reject(new Error('Erro no processamento.')); }
@@ -1574,15 +1586,23 @@ async function regenerate(i){
     await decrementCredits(1);
   }catch(e){
     error.textContent='Não foi possível gerar as fotos. Tente novamente em alguns instantes.';
-    const skeletons = grid.querySelectorAll('.skeleton-card, .skeleton');
-    skeletons.forEach(s => {
+    // Restaura o card com mensagem de erro — só o slot correto
+    const errorSlots = grid.querySelectorAll('.skeleton-card');
+    errorSlots.forEach(s => {
       const card = document.createElement('div');
       card.className = 'res res-animate';
+      if(s.style.gridColumn) card.style.gridColumn = s.style.gridColumn;
       card.innerHTML = `<div style="width:100%;aspect-ratio:1;background:var(--line);border-radius:18px;display:grid;place-items:center;color:var(--muted);font-size:12px">Erro ao gerar</div>`;
       grid.replaceChild(card, s);
     });
   }
-  finally{}
+  finally{
+    setTimeout(()=>{
+      if(regenBtn) regenBtn.disabled = false;
+      if(regenProg) regenProg.style.width = '0%';
+      if(regenTxt) regenTxt.textContent = '✦ Gerar fotos profissionais';
+    }, 1500);
+  }
 }
 
 const regenSvg=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>`;
