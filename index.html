@@ -790,7 +790,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.5.6';
+const APP_VERSION = '1.5.7';
 
 async function checkAppVersion(){
   try{
@@ -1276,17 +1276,7 @@ async function init(){
   render();
   applyCodeConfig();
   updatePhotosCount();
-  // Desktop: abre obs e fotos por padrão
-  if(window.innerWidth >= 900){
-    const obsBody = document.getElementById('obsBody');
-    const photosBody = document.getElementById('photosBody');
-    const obsArrow = document.querySelector('#obsToggle .obs-arrow');
-    const photosArrow = document.querySelector('#photosToggle .photos-arrow');
-    if(obsBody){ obsBody.style.maxHeight='200px'; obsBody.style.opacity='1'; }
-    if(photosBody){ photosBody.style.maxHeight='500px'; photosBody.style.opacity='1'; photosBody.setAttribute('data-open','1'); }
-    if(obsArrow) obsArrow.style.transform='rotate(180deg)';
-    if(photosArrow) photosArrow.style.transform='rotate(180deg)';
-  }
+  // Ambos começam recolhidos — usuário abre quando quiser
   if(resultsPlaceholder && window.innerWidth<900) resultsPlaceholder.classList.add('mobile-show');
 }
 
@@ -1861,14 +1851,16 @@ function scrollChips(dir){document.getElementById('chips').scrollBy({left:dir*26
 function toggleObs(){
   const body = document.getElementById('obsBody');
   const arrow = document.querySelector('#obsToggle .obs-arrow');
-  const isOpen = body.style.maxHeight && body.style.maxHeight !== '0px';
+  const isOpen = body.getAttribute('data-open') === '1';
   if(isOpen){
     body.style.maxHeight = '0px';
     body.style.opacity = '0';
+    body.setAttribute('data-open','0');
     if(arrow) arrow.style.transform = '';
   } else {
     body.style.maxHeight = '200px';
     body.style.opacity = '1';
+    body.setAttribute('data-open','1');
     if(arrow) arrow.style.transform = 'rotate(180deg)';
   }
 }
