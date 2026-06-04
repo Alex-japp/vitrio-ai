@@ -1,55 +1,35 @@
 const { Inngest } = require('inngest');
 const { serve } = require('inngest/express');
+const { getServiceAccountToken } = require('./auth-helper');
 
 const inngest = new Inngest({
   id: 'vitrio-ai',
   eventKey: process.env.INNGEST_EVENT_KEY,
 });
 
-// ── COMPRESSÃO SIMPLES SEM SHARP ─────────────────────────
-async function comprimirImagem(b64) {
-  // Por enquanto retorna sem compressão — sharp será reativado futuramente
-  return b64;
+const BUCKET = `${process.env.FIREBASE_PROJECT_ID}.firebasestorage.app`;
+
+// ── Firestore: lê documento ──────────────────────────────
+async function firestoreGet(accessToken, docPath) {
+  const res = await fetch(
+    `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents/${docPath}`,
+    { headers: { 'Authorization': `Bearer ${accessToken}` } }
+  );
+  if (!res.ok) throw new Error(`Firestore GET falhou (${res.status}): ${await res.text()}`);
+  return res.json();
 }
 
-// ── SALVA IMAGEM NO FIREBASE STORAGE E RETORNA URL ──────
-async function salvarImagem(jobId, photoNum, b64) {
-  const projectId = process.env.FIREBASE_PROJECT_ID;
-  const fileName = `jobs/${jobId}/photo_${photoNum}.jpg`;
-  // URL correta para projetos novos do Firebase (.firebasestorage.app)
-  const bucket = `${projectId}.firebasestorage.app`;
-  const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(fileName)}?uploadType=media`;
-
-  // Comprime para 300-500KB antes de salvar
-  const b64Comprimido = await comprimirImagem(b64);
-  const buffer = Buffer.from(b64Comprimido, 'base64');
-
-  const res = await fetch(uploadUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'image/jpeg' },
-    body: buffer
-  });
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Storage upload falhou: ${err}`);
-  }
-
-  const url = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(fileName)}?alt=media`;
-  return url;
-}
-
-// ── ATUALIZA CAMPOS ESPECÍFICOS SEM SOBRESCREVER ─────────
-async function updateJob(jobId, updates) {
+// ── Firestore: atualiza campos específicos ───────────────
+async function updateJob(accessToken, jobId, updates) {
   const fields = {};
   const fieldPaths = [];
 
   Object.entries(updates).forEach(([k, v]) => {
     const fieldName = (k === 'status' || k === 'updatedAt') ? k : `photo_${k}`;
     fieldPaths.push(fieldName);
-    if (k === 'status') fields[fieldName] = { stringValue: v };
+    if (k === 'status')    fields[fieldName] = { stringValue: v };
     else if (k === 'updatedAt') fields[fieldName] = { integerValue: v.toString() };
-    else fields[fieldName] = { stringValue: v };
+    else                   fields[fieldName] = { stringValue: v };
   });
 
   const maskParams = fieldPaths.map(f => `updateMask.fieldPaths=${encodeURIComponent(f)}`).join('&');
@@ -58,29 +38,65 @@ async function updateJob(jobId, updates) {
     `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents/jobs/${jobId}?${maskParams}`,
     {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      },
       body: JSON.stringify({ fields })
     }
   );
 
-  if (!res.ok) {
-    const err = await res.text();
-    console.error('updateJob erro:', res.status, err);
-  }
+  if (!res.ok) console.error('updateJob erro:', res.status, await res.text());
 }
 
+// ── Storage: baixa imagem → base64 ──────────────────────
+async function downloadFromStorage(accessToken, filePath) {
+  const encoded = encodeURIComponent(filePath);
+  const url     = `https://storage.googleapis.com/storage/v1/b/${BUCKET}/o/${encoded}?alt=media`;
+
+  const res = await fetch(url, {
+    headers: { 'Authorization': `Bearer ${accessToken}` }
+  });
+  if (!res.ok) throw new Error(`Storage download falhou (${res.status}): ${filePath}`);
+
+  const buffer = await res.arrayBuffer();
+  return Buffer.from(buffer).toString('base64');
+}
+
+// ── Storage: salva base64 → URL ──────────────────────────
+async function salvarImagem(accessToken, jobId, photoNum, b64) {
+  const filePath = `jobs/${jobId}/photo_${photoNum}.jpg`;
+  const encoded  = encodeURIComponent(filePath);
+  const url      = `https://storage.googleapis.com/upload/storage/v1/b/${BUCKET}/o?uploadType=media&name=${encoded}`;
+  const buffer   = Buffer.from(b64, 'base64');
+
+  const res = await fetch(url, {
+    method:  'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type':  'image/jpeg',
+    },
+    body: buffer
+  });
+
+  if (!res.ok) throw new Error(`Storage upload falhou (${res.status}): ${await res.text()}`);
+
+  return `https://firebasestorage.googleapis.com/v0/b/${BUCKET}/o/${encoded}?alt=media`;
+}
+
+// ── Análise técnica da peça ──────────────────────────────
 async function analisarPeca(imageBase64) {
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type':  'application/json',
       'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
+      model:      'gpt-4o',
       max_tokens: 400,
       messages: [{
-        role: 'user',
+        role:    'user',
         content: [
           { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${imageBase64}` } },
           { type: 'text', text: `Analise esta joia e retorne APENAS JSON:
@@ -109,24 +125,24 @@ function montarDescricao(analise) {
   return p.length > 0 ? `\nCaracterísticas: ${p.join(', ')}.` : '';
 }
 
-// ── FALLBACK: FLUX Redux Dev via Replicate ───────────────
+// ── Fallback FLUX ────────────────────────────────────────
 async function gerarFLUX(prompt, imageBase64) {
   if (!process.env.REPLICATE_API_KEY) throw new Error('REPLICATE_API_KEY não configurada.');
 
   const startRes = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-redux-dev/predictions', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type':  'application/json',
       'Authorization': `Bearer ${process.env.REPLICATE_API_KEY}`,
-      'Prefer': 'wait'
+      'Prefer':        'wait'
     },
     body: JSON.stringify({
       input: {
-        redux_image: `data:image/jpeg;base64,${imageBase64}`,
-        prompt: prompt,
-        num_outputs: 1,
-        aspect_ratio: '1:1',
-        output_format: 'webp',
+        redux_image:    `data:image/jpeg;base64,${imageBase64}`,
+        prompt,
+        num_outputs:    1,
+        aspect_ratio:   '1:1',
+        output_format:  'webp',
         output_quality: 90
       }
     })
@@ -135,7 +151,7 @@ async function gerarFLUX(prompt, imageBase64) {
   if (!startRes.ok) throw new Error(`FLUX erro: ${startRes.status}`);
   const prediction = await startRes.json();
 
-  if (prediction.output && prediction.output[0]) {
+  if (prediction.output?.[0]) {
     const res = await fetch(prediction.output[0]);
     const buffer = await res.arrayBuffer();
     return Buffer.from(buffer).toString('base64');
@@ -160,18 +176,19 @@ async function gerarFLUX(prompt, imageBase64) {
   throw new Error('FLUX: timeout no polling.');
 }
 
+// ── Geração de foto (OpenAI + fallback FLUX) ─────────────
 async function gerarFoto(prompt, imageBase64, descricao = '', retries = 3) {
   try {
     const response = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type':  'application/json',
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
         model: 'gpt-4o',
         input: [{
-          role: 'user',
+          role:    'user',
           content: [
             { type: 'input_image', image_url: `data:image/png;base64,${imageBase64}` },
             { type: 'input_text', text: `Reproduza EXATAMENTE este produto. Aplique: ${prompt + descricao}` }
@@ -188,7 +205,7 @@ async function gerarFoto(prompt, imageBase64, descricao = '', retries = 3) {
 
     if (!response.ok) throw new Error(`OpenAI ${response.status}`);
     const data = await response.json();
-    const img = data.output?.find(o => o.type === 'image_generation_call');
+    const img  = data.output?.find(o => o.type === 'image_generation_call');
     if (!img) throw new Error('Imagem não gerada');
     return img.result;
 
@@ -198,26 +215,26 @@ async function gerarFoto(prompt, imageBase64, descricao = '', retries = 3) {
   }
 }
 
-// ── LIMPEZA AUTOMÁTICA DE JOBS ANTIGOS (24H) ─────────────
-async function limparJobsAntigos() {
+// ── Limpeza automática de jobs antigos (24h) ─────────────
+async function limparJobsAntigos(accessToken) {
   try {
-    const projectId = process.env.FIREBASE_PROJECT_ID;
-    const bucket = `${projectId}.firebasestorage.app`;
     const vinte4h = Date.now() - (24 * 60 * 60 * 1000);
 
-    // Busca jobs com mais de 24h no Firestore
     const res = await fetch(
-      `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:runQuery`,
+      `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents:runQuery`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
         body: JSON.stringify({
           structuredQuery: {
             from: [{ collectionId: 'jobs' }],
             where: {
               fieldFilter: {
                 field: { fieldPath: 'createdAt' },
-                op: 'LESS_THAN',
+                op:    'LESS_THAN',
                 value: { integerValue: vinte4h.toString() }
               }
             },
@@ -232,7 +249,7 @@ async function limparJobsAntigos() {
 
     for (const item of data) {
       if (!item.document) continue;
-      const jobId = item.document.name.split('/').pop();
+      const jobId  = item.document.name.split('/').pop();
       const fields = item.document.fields || {};
 
       // Deleta fotos do Storage
@@ -240,16 +257,32 @@ async function limparJobsAntigos() {
         if (fields[`photo_${n}`]?.stringValue) {
           const fileName = encodeURIComponent(`jobs/${jobId}/photo_${n}.jpg`);
           await fetch(
-            `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${fileName}`,
-            { method: 'DELETE' }
+            `https://storage.googleapis.com/storage/v1/b/${BUCKET}/o/${fileName}`,
+            {
+              method:  'DELETE',
+              headers: { 'Authorization': `Bearer ${accessToken}` }
+            }
           ).catch(() => {});
         }
       }
 
+      // Deleta imagem original do Storage
+      const origFileName = encodeURIComponent(`jobs/${jobId}/original.jpg`);
+      await fetch(
+        `https://storage.googleapis.com/storage/v1/b/${BUCKET}/o/${origFileName}`,
+        {
+          method:  'DELETE',
+          headers: { 'Authorization': `Bearer ${accessToken}` }
+        }
+      ).catch(() => {});
+
       // Deleta documento do Firestore
       await fetch(
-        `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/jobs/${jobId}`,
-        { method: 'DELETE' }
+        `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents/jobs/${jobId}`,
+        {
+          method:  'DELETE',
+          headers: { 'Authorization': `Bearer ${accessToken}` }
+        }
       ).catch(() => {});
     }
 
@@ -259,58 +292,93 @@ async function limparJobsAntigos() {
   }
 }
 
-// ── FUNÇÃO INNGEST DE LIMPEZA (roda diariamente) ──────────
+// ── Função Inngest: limpeza diária ───────────────────────
 const limparStorage = inngest.createFunction(
   { id: 'limpar-storage', retries: 1 },
-  { cron: '0 3 * * *' }, // Todo dia às 3h da manhã
+  { cron: '0 3 * * *' },
   async () => {
-    await limparJobsAntigos();
+    const accessToken = await getServiceAccountToken();
+    await limparJobsAntigos(accessToken);
   }
 );
+
+// ── Função Inngest: geração de fotos ─────────────────────
 const gerarFotos = inngest.createFunction(
   { id: 'gerar-fotos', retries: 2, timeouts: { finish: '10m' } },
   { event: 'vitrio/gerar' },
   async ({ event, step }) => {
-    const { jobId, imageBase64, prompts, selectedPhotos } = event.data;
-    await updateJob(jobId, { status: 'processing', updatedAt: Date.now() });
+    // ── Recebe APENAS jobId ──────────────────────────────
+    const { jobId } = event.data;
+    if (!jobId) throw new Error('jobId não fornecido');
 
+    const accessToken = await getServiceAccountToken();
+
+    // ── Busca job completo no Firestore ──────────────────
+    const jobDoc = await step.run('buscar-job', async () => {
+      const doc    = await firestoreGet(accessToken, `jobs/${jobId}`);
+      const fields = doc.fields || {};
+      return {
+        imageFilePath:  fields.imageFilePath?.stringValue,
+        selectedPhotos: (fields.selectedPhotos?.arrayValue?.values || [])
+                          .map(v => parseInt(v.integerValue)),
+        prompts:        Object.fromEntries(
+                          Object.entries(fields.prompts?.mapValue?.fields || {})
+                            .map(([k, v]) => [k, v.stringValue])
+                        )
+      };
+    });
+
+    await updateJob(accessToken, jobId, { status: 'processing', updatedAt: Date.now() });
+
+    // ── Baixa imagem original do Storage ─────────────────
+    const imageBase64 = await step.run('baixar-imagem', async () => {
+      return await downloadFromStorage(accessToken, jobDoc.imageFilePath);
+    });
+
+    // ── Análise técnica ──────────────────────────────────
     const analise = await step.run('analisar', async () => {
       try { return await analisarPeca(imageBase64); } catch { return {}; }
     });
     const descricao = montarDescricao(analise);
 
+    const { selectedPhotos, prompts } = jobDoc;
+
+    // ── Foto 1 ───────────────────────────────────────────
     let photo1B64 = null;
     if (selectedPhotos.includes(1)) {
       photo1B64 = await step.run('foto-1', async () => {
-        const b64 = await gerarFoto(prompts[1], imageBase64, descricao);
-        const url = await salvarImagem(jobId, 1, b64);
-        await updateJob(jobId, { 1: url, updatedAt: Date.now() });
+        const b64 = await gerarFoto(prompts['1'], imageBase64, descricao);
+        const url = await salvarImagem(accessToken, jobId, 1, b64);
+        await updateJob(accessToken, jobId, { 1: url, updatedAt: Date.now() });
         return b64;
       });
     }
 
+    // ── Foto 2 (referência: Foto 1) ──────────────────────
     const ref = photo1B64 || imageBase64;
     if (selectedPhotos.includes(2)) {
       await step.run('foto-2', async () => {
-        const b64 = await gerarFoto(prompts[2], ref, descricao);
-        const url = await salvarImagem(jobId, 2, b64);
-        await updateJob(jobId, { 2: url, updatedAt: Date.now() });
-      });
-    }
-    if (selectedPhotos.includes(3)) {
-      await step.run('foto-3', async () => {
-        const b64 = await gerarFoto(prompts[3], ref, descricao);
-        const url = await salvarImagem(jobId, 3, b64);
-        await updateJob(jobId, { 3: url, updatedAt: Date.now() });
+        const b64 = await gerarFoto(prompts['2'], ref, descricao);
+        const url = await salvarImagem(accessToken, jobId, 2, b64);
+        await updateJob(accessToken, jobId, { 2: url, updatedAt: Date.now() });
       });
     }
 
-    await updateJob(jobId, { status: 'completed', updatedAt: Date.now() });
+    // ── Foto 3 (referência: Foto 1) ──────────────────────
+    if (selectedPhotos.includes(3)) {
+      await step.run('foto-3', async () => {
+        const b64 = await gerarFoto(prompts['3'], ref, descricao);
+        const url = await salvarImagem(accessToken, jobId, 3, b64);
+        await updateJob(accessToken, jobId, { 3: url, updatedAt: Date.now() });
+      });
+    }
+
+    await updateJob(accessToken, jobId, { status: 'completed', updatedAt: Date.now() });
   }
 );
 
 module.exports = serve({
-  client: inngest,
-  functions: [gerarFotos, limparStorage],
+  client:     inngest,
+  functions:  [gerarFotos, limparStorage],
   signingKey: process.env.INNGEST_SIGNING_KEY,
 });
