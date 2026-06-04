@@ -69,7 +69,7 @@ async function comprimirParaJpeg(b64) {
   try {
     const buffer = Buffer.from(b64, 'base64');
     const compressed = await sharp(buffer)
-      .jpeg({ quality: 85, progressive: true })
+      .jpeg({ quality: 93, progressive: true })
       .toBuffer();
     return compressed.toString('base64');
   } catch (e) {
