@@ -332,8 +332,6 @@ button,input,textarea{font-family:inherit}
   .form-group .check-all-wrap{margin-bottom:4px!important}
   .form-group .photo-selector{margin-top:12px}
   /* obs e fotos controlados via JS no init */
-  .form-group .photos-body{max-height:400px!important;opacity:1!important}
-  .form-group .photos-toggle .photos-arrow{transform:rotate(180deg)!important}
   .form-group .upload{min-height:160px!important;padding:18px!important}
   .form-group .camera-dot{width:52px!important;height:52px!important;margin-bottom:8px!important}
   .form-group .upload strong{font-size:14px!important}
@@ -790,7 +788,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.5.8';
+const APP_VERSION = '1.5.9';
 
 async function checkAppVersion(){
   try{
@@ -1276,7 +1274,12 @@ async function init(){
   render();
   applyCodeConfig();
   updatePhotosCount();
-  // Ambos começam recolhidos — usuário abre quando quiser
+  // No desktop abre o seletor de fotos por padrão
+  if(window.innerWidth >= 900){
+    const pb = document.getElementById('photosBody');
+    const pa = document.querySelector('#photosToggle .photos-arrow');
+    if(pb){ pb.classList.add('open'); if(pa) pa.style.transform='rotate(180deg)'; }
+  }
   if(resultsPlaceholder && window.innerWidth<900) resultsPlaceholder.classList.add('mobile-show');
 }
 
