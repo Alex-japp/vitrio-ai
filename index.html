@@ -2241,7 +2241,7 @@ function buyPlan(name, fotos, preco){
         <div style="font-size:22px;font-weight:900;margin-bottom:8px">Bem-vindo ao Vitrio AI!</div>
         <div style="font-size:14px;color:#888;line-height:1.6">Você ganhou <strong style="color:var(--purple)">15 fotos grátis</strong>.<br>Envie a foto — a IA faz o resto.</div>
       </div>
-      <button class="btn btn-main" onclick="closeOnboarding()">✦ Quero testar agora!</button>
+      <button class="btn btn-main" onclick="if(currentUser){db.collection('users').doc(currentUser.uid).update({onboardingDone:true}).catch(()=>{});if(currentUserData)currentUserData.onboardingDone=true;}closeOnboarding()">✦ Quero testar agora!</button>
     </div>
     <div id="ob1" class="ob-screen" style="display:none">
       <div class="ob-step">1 de 7 · Ajuste fino</div>
