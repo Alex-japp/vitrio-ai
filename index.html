@@ -788,7 +788,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.6.1';
+const APP_VERSION = '1.6.2';
 
 async function checkAppVersion(){
   try{
@@ -926,6 +926,9 @@ async function loadUserData(uid){
       await db.collection('users').doc(uid).set(currentUserData);
     }
     
+    // Carrega contadores pessoais do usuário
+    if(currentUserData?.cntP !== undefined) localStorage.setItem('cntP', currentUserData.cntP);
+    if(currentUserData?.cntI !== undefined) localStorage.setItem('cntI', currentUserData.cntI);
     applyAdminVisibility(currentUserData?.isAdmin === true);
     updateCreditsUI();
     return currentUserData;
@@ -1071,7 +1074,9 @@ auth.onAuthStateChanged(async (user) => {
     if(!currentUserData?.isAdmin){
       if(!currentUserData?.tourDone){
         // Usuário existente (já fez onboarding ou já tem fotos geradas) → pula tour
-        const isExisting = currentUserData?.onboardingDone || (localStorage.getItem('cntI') && parseInt(localStorage.getItem('cntI')) > 0);
+        const createdAt = currentUserData?.createdAt?.toDate ? currentUserData.createdAt.toDate() : null;
+        const isNew = createdAt && (Date.now() - createdAt.getTime()) < 5 * 60 * 1000; // menos de 5 min
+        const isExisting = currentUserData?.onboardingDone || (!isNew && (currentUserData?.cntI || 0) > 0);
         if(isExisting){
           db.collection('users').doc(currentUser.uid).update({tourDone:true}).catch(()=>{});
           if(currentUserData) currentUserData.tourDone = true;
@@ -1104,8 +1109,6 @@ async function loadFromFirebase(){
     if(snap.exists){
       const data = snap.data();
       if(data.cats && data.cats.length > 0) cats = data.cats;
-      if(data.cntP !== undefined) localStorage.setItem('cntP', data.cntP);
-      if(data.cntI !== undefined) localStorage.setItem('cntI', data.cntI);
       if(data.appConfig) appConfig = {...appConfig, ...data.appConfig};
     }
     applyCodeConfig();
@@ -1223,9 +1226,10 @@ async function saveCatsToFirebase(){
 
 async function saveCountToFirebase(){
   try{
+    if(!currentUser) return;
     const p=Number(localStorage.getItem('cntP')||0);
     const i=Number(localStorage.getItem('cntI')||0);
-    await CONFIG_REF.set({cntP:p,cntI:i},{merge:true});
+    await db.collection('users').doc(currentUser.uid).update({cntP:p,cntI:i});
   }catch(e){console.log('Erro contador:',e);}
 }
 
