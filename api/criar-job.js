@@ -66,7 +66,7 @@ async function checkRateLimit(uid, accessToken) {
 
 // ── Upload para Firebase Storage via REST ────────────────
 async function uploadToStorage(accessToken, filePath, base64Data, contentType = 'image/jpeg') {
-  const bucket   = `${process.env.FIREBASE_PROJECT_ID}.appspot.com`;
+  const bucket   = `${process.env.FIREBASE_PROJECT_ID}.firebasestorage.app`;
   const encoded  = encodeURIComponent(filePath);
   const url      = `https://storage.googleapis.com/upload/storage/v1/b/${bucket}/o?uploadType=media&name=${encoded}`;
 
