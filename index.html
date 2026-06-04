@@ -790,7 +790,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.5.7';
+const APP_VERSION = '1.5.8';
 
 async function checkAppVersion(){
   try{
@@ -1851,34 +1851,16 @@ function scrollChips(dir){document.getElementById('chips').scrollBy({left:dir*26
 function toggleObs(){
   const body = document.getElementById('obsBody');
   const arrow = document.querySelector('#obsToggle .obs-arrow');
-  const isOpen = body.getAttribute('data-open') === '1';
-  if(isOpen){
-    body.style.maxHeight = '0px';
-    body.style.opacity = '0';
-    body.setAttribute('data-open','0');
-    if(arrow) arrow.style.transform = '';
-  } else {
-    body.style.maxHeight = '200px';
-    body.style.opacity = '1';
-    body.setAttribute('data-open','1');
-    if(arrow) arrow.style.transform = 'rotate(180deg)';
-  }
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  if(arrow) arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
 }
 function togglePhotos(){
   const body = document.getElementById('photosBody');
   const arrow = document.querySelector('#photosToggle .photos-arrow');
-  const isOpen = body.getAttribute('data-open') === '1';
-  if(isOpen){
-    body.style.maxHeight = '0px';
-    body.style.opacity = '0';
-    body.setAttribute('data-open','0');
-    if(arrow) arrow.style.transform = '';
-  } else {
-    body.style.maxHeight = '500px';
-    body.style.opacity = '1';
-    body.setAttribute('data-open','1');
-    if(arrow) arrow.style.transform = 'rotate(180deg)';
-  }
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  if(arrow) arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
 }
 function updatePhotosCount(){
   const count = state.selectedPhotos.length;
