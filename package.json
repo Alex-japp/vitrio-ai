@@ -6,6 +6,7 @@
     "node": "20.x"
   },
   "dependencies": {
-    "inngest": "^3.0.0"
+    "inngest": "^3.0.0",
+    "sharp": "^0.33.0"
   }
 }
