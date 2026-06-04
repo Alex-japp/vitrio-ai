@@ -105,7 +105,7 @@ button,input,textarea{font-family:inherit}
 .progress-icon{width:64px;height:64px;border-radius:50%;background:rgba(123,97,255,.08);border:2px solid rgba(123,97,255,.15);display:grid;place-items:center;margin:0 auto 16px;font-size:28px;animation:pulseIcon 2s ease-in-out infinite}
 @keyframes pulseIcon{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(123,97,255,.2)}50%{transform:scale(1.06);box-shadow:0 0 0 8px rgba(123,97,255,.0)}}
 .bar{height:5px;background:#EAEAF2;border-radius:9px;overflow:hidden;margin-top:16px}.bar span{display:block;height:100%;width:0;background:var(--grad);transition:.5s ease;border-radius:9px}
-.ptext{font-size:13px;color:var(--muted);margin-top:10px;font-weight:500}.results{display:none;margin-top:22px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.ptext{font-size:13px;color:var(--muted);margin-top:10px;font-weight:500}.results{display:none;margin-top:22px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 @keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .res-animate{animation:fadeInUp .35s ease forwards;opacity:0}
 .res-animate:nth-child(1){animation-delay:.05s}
@@ -216,9 +216,7 @@ button,input,textarea{font-family:inherit}
 .check-label.checked{border-color:var(--purple);color:var(--purple);background:rgba(123,97,255,.06)}
 .individual-checks{padding-left:8px}
 .individual-checks .check-label{font-weight:600;font-size:13px;padding:8px 14px}
-#grid[data-qty="1"]{grid-template-columns:1fr;max-width:280px}
-#grid[data-qty="2"]{grid-template-columns:1fr 1fr}
-#grid[data-qty="3"]{grid-template-columns:repeat(3,1fr)}
+/* grid sempre 2 colunas — escalável até 6 fotos */
 .reorder-btns{display:flex;flex-direction:column;gap:2px}
 .reorder-btns .icon-btn{padding:4px 6px;font-size:14px;line-height:1}
 .reorder-btns .icon-btn:disabled{opacity:.25;cursor:not-allowed}
@@ -337,9 +335,7 @@ button,input,textarea{font-family:inherit}
   .results-group .results .card{box-shadow:none;border:none;padding:0;margin-top:0;background:transparent;}
   .results-group .grid{grid-template-columns:1fr 1fr;gap:8px;width:100%;}
   .results-group .res .img-wrap{min-height:140px!important;}
-  .results-group .grid[data-qty="3"] .res:nth-child(3){grid-column:1/3;margin-right:0;padding-right:0;}
-  .results-group .grid[data-qty="3"] .res:nth-child(3) .img-wrap{aspect-ratio:1/1!important;border-radius:18px 18px 0 0!important;}
-  .results-group .grid[data-qty="3"] .res:nth-child(3) img{aspect-ratio:1/1!important;object-fit:cover!important;width:100%!important;}
+  /* sem CSS especial por posição — todos os cards iguais */
   .results-group{max-height:none!important;overflow-y:visible!important;position:sticky;top:88px;}
   .results-group .res-num{position:absolute;top:8px;left:8px;width:24px;height:24px;border-radius:50%;background:rgba(17,18,39,.7);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2}
   .results-group .res-actions{display:flex;gap:6px;padding:8px 6px 4px}
@@ -675,24 +671,30 @@ button,input,textarea{font-family:inherit}
     <!-- SELETOR DE FOTOS -->
     <div class="photo-selector">
       <label class="label">Selecionar fotos</label>
-      <div class="check-all-wrap">
-        <label class="check-label checked" id="labelAll">
-          <input type="checkbox" id="checkAll" checked onchange="toggleAll(this)">
-          <span>Gerar todas as fotos</span>
-        </label>
-      </div>
-      <div id="individualChecks" class="individual-checks hidden">
+      <div id="individualChecks" class="individual-checks">
         <label class="check-label checked" id="label1">
           <input type="checkbox" id="check1" checked onchange="updateSelection()">
-          <span>Foto 1 — Fundo branco</span>
+          <span>Catálogo — Fundo branco</span>
         </label>
         <label class="check-label checked" id="label2">
           <input type="checkbox" id="check2" checked onchange="updateSelection()">
-          <span>Foto 2 — No modelo</span>
+          <span>Modelo — Usando a peça</span>
         </label>
         <label class="check-label checked" id="label3">
           <input type="checkbox" id="check3" checked onchange="updateSelection()">
-          <span>Foto 3 — Close detalhe</span>
+          <span>Close — Detalhe da peça</span>
+        </label>
+        <label class="check-label" id="label4">
+          <input type="checkbox" id="check4" onchange="updateSelection()">
+          <span>Lifestyle — Composição elegante</span>
+        </label>
+        <label class="check-label" id="label5">
+          <input type="checkbox" id="check5" onchange="updateSelection()">
+          <span>Embalagem — Com a caixinha</span>
+        </label>
+        <label class="check-label" id="label6">
+          <input type="checkbox" id="check6" onchange="updateSelection()">
+          <span>Instagram — Feed e stories</span>
         </label>
       </div>
     </div>
@@ -740,7 +742,7 @@ button,input,textarea{font-family:inherit}
 </section>
 <section id="usersTab" class="hidden"><div id="userList"><p style="color:var(--muted);font-size:13px">Carregando usuários...</p></div></section><section id="termsTab" class="hidden"><div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between"><div><p class="cfg-sub" style="margin:0">Edite o texto dos Termos de Uso exibido no app.</p></div><button onclick="saveTerms()" style="height:38px;padding:0 18px;border-radius:12px;background:var(--grad);color:#fff;border:none;font-weight:700;font-size:13px;cursor:pointer">💾 Salvar</button></div><textarea id="termsEditor" style="width:100%;min-height:500px;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:16px;font-size:13px;color:var(--ink);resize:vertical;outline:none;font-family:inherit;line-height:1.7"></textarea><div id="termsSaveMsg" style="font-size:12px;color:#1A6B3A;margin-top:8px;display:none">✅ Termos salvos com sucesso!</div></section></main><nav class="bottom" style="background:#0f1027;border-color:rgba(255,255,255,.08)"><button class="nav" onclick="tab('cats',document.querySelectorAll('.tab')[0])"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.04.04a2 2 0 1 1-2.83 2.83l-.04-.04A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 1 1-4 0v-.06A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H3a2 2 0 1 1 0-4h.06A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.04-.04A2 2 0 1 1 7.05 3.85l.04.04A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.08V3a2 2 0 1 1 4 0v.06A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04A1.7 1.7 0 0 0 19.4 9c.2.35.52.62.9.75.28.1.58.15.88.15H21a2 2 0 1 1 0 4h-.06c-.3 0-.6.05-.88.15-.38.13-.7.4-.9.75z"></path></svg>Configurações</button><button class="nav" onclick="feedback()"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>Feedback</button><button class="nav logout" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sair</button></nav></div>
 <div id="admin" class="modal"><div class="sheet"><h3>Área restrita</h3><input id="adminPass" type="password" class="input" placeholder="Senha admin"><div class="sheet-actions"><button onclick="closeModal('admin')">Cancelar</button><button class="save" onclick="checkAdmin()">Entrar</button></div><div id="adminErr" class="err"></div></div></div>
-<div id="catModal" class="modal"><div class="sheet"><h3 id="catTitle">Categoria</h3><input id="catName" class="input" placeholder="Nome da categoria"><input id="catIcon" class="input" placeholder="Ícone / emoji. Ex: 💍"><div id="promptFields"><span class="prompt-mini">Foto 1</span><textarea id="p1" class="textarea" placeholder="Prompt da foto 1"></textarea><span class="prompt-mini">Foto 2</span><textarea id="p2" class="textarea" placeholder="Prompt da foto 2"></textarea><span class="prompt-mini">Foto 3</span><textarea id="p3" class="textarea" placeholder="Prompt da foto 3"></textarea></div><div class="sheet-actions"><button onclick="closeModal('catModal')">Cancelar</button><button class="save" onclick="saveCat()">Salvar</button></div></div></div>
+<div id="catModal" class="modal"><div class="sheet"><h3 id="catTitle">Categoria</h3><input id="catName" class="input" placeholder="Nome da categoria"><input id="catIcon" class="input" placeholder="Ícone / emoji. Ex: 💍"><div id="promptFields"><span class="prompt-mini">Catálogo — Fundo branco</span><textarea id="p1" class="textarea" placeholder="Prompt catálogo fundo branco"></textarea><span class="prompt-mini">Modelo — Usando a peça</span><textarea id="p2" class="textarea" placeholder="Prompt modelo usando a peça"></textarea><span class="prompt-mini">Close — Detalhe da peça</span><textarea id="p3" class="textarea" placeholder="Prompt close detalhe"></textarea><span class="prompt-mini">Lifestyle — Composição elegante</span><textarea id="p4" class="textarea" placeholder="Prompt lifestyle composição elegante"></textarea><span class="prompt-mini">Embalagem — Com a caixinha</span><textarea id="p5" class="textarea" placeholder="Prompt embalagem com caixinha"></textarea><span class="prompt-mini">Instagram — Feed e stories</span><textarea id="p6" class="textarea" placeholder="Prompt instagram feed e stories"></textarea></div><div class="sheet-actions"><button onclick="closeModal('catModal')">Cancelar</button><button class="save" onclick="saveCat()">Salvar</button></div></div></div>
 <!-- Firebase SDK - carregado antes do app -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -772,7 +774,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.5.0';
+const APP_VERSION = '1.5.1';
 
 async function checkAppVersion(){
   try{
@@ -912,6 +914,15 @@ async function loadUserData(uid){
     
     applyAdminVisibility(currentUserData?.isAdmin === true);
     updateCreditsUI();
+    // Carrega preferências de fotos salvas
+    if(currentUserData?.photoPreferences && Array.isArray(currentUserData.photoPreferences)){
+      state.selectedPhotos = [...currentUserData.photoPreferences];
+      [1,2,3,4,5,6].forEach(n=>{
+        const c=document.getElementById('check'+n);
+        const l=document.getElementById('label'+n);
+        if(c){ c.checked=state.selectedPhotos.includes(n); l?.classList.toggle('checked',state.selectedPhotos.includes(n)); }
+      });
+    }
     return currentUserData;
   }catch(e){
     console.error('❌ Erro loadUserData:', e.code, e.message);
@@ -1290,7 +1301,7 @@ function getCatIcon(cat){
 function render(){
   chips.innerHTML=cats.map(c=>`<button class="chip ${state.cat?.id===c.id?'active':''}" onclick="selectCat('${c.id}')"><div class="ico">${getCatIcon(c)}</div><span class="chip-name">${c.name}</span></button>`).join('');
   catList.innerHTML=cats.map((c,idx)=>`<div class="cat-row"><div class="cat-badge">${c.icon||'◇'}</div><div class="cat-info"><strong>${c.name}</strong><small>Categoria cadastrada</small></div><div class="reorder-btns"><button class="icon-btn" onclick="moveCat('${c.id}',-1)" ${idx===0?'disabled':''}>↑</button><button class="icon-btn" onclick="moveCat('${c.id}',1)" ${idx===cats.length-1?'disabled':''}>↓</button></div><button class="icon-btn" onclick="editCatInfo('${c.id}')">✎</button><button class="icon-btn" onclick="delCat('${c.id}')">🗑</button></div>`).join('');
-  promptList.innerHTML=cats.map(c=>`<div class="cat-row"><div class="cat-badge">${c.icon||'◇'}</div><div class="cat-info"><strong>${c.name}</strong><div class="prm-preview"><div class="prm-line"><b>Foto 1:</b> ${(c.p1||'').slice(0,54)}...</div><div class="prm-line"><b>Foto 2:</b> ${(c.p2||'').slice(0,54)}...</div><div class="prm-line"><b>Foto 3:</b> ${(c.p3||'').slice(0,54)}...</div></div></div><button class="icon-btn" onclick="editPrompt('${c.id}')">✎</button></div>`).join('');
+  promptList.innerHTML=cats.map(c=>`<div class="cat-row"><div class="cat-badge">${c.icon||'◇'}</div><div class="cat-info"><strong>${c.name}</strong><div class="prm-preview"><div class="prm-line"><b>Catálogo:</b> ${(c.p1||'').slice(0,54)}...</div><div class="prm-line"><b>Modelo:</b> ${(c.p2||'').slice(0,54)}...</div><div class="prm-line"><b>Close:</b> ${(c.p3||'').slice(0,54)}...</div>${c.p4?`<div class="prm-line"><b>Lifestyle:</b> ${(c.p4||'').slice(0,54)}...</div>`:''}${c.p5?`<div class="prm-line"><b>Embalagem:</b> ${(c.p5||'').slice(0,54)}...</div>`:''}${c.p6?`<div class="prm-line"><b>Instagram:</b> ${(c.p6||'').slice(0,54)}...</div>`:''}</div></div><button class="icon-btn" onclick="editPrompt('${c.id}')">✎</button></div>`).join('');
   const p=localStorage.getItem('cntP')||0, im=localStorage.getItem('cntI')||0;
   if(typeof cntP !== "undefined" && cntP) cntP.textContent=p;
   if(typeof cntI !== "undefined" && cntI) cntI.textContent=im;
@@ -1356,14 +1367,7 @@ async function generate(){
   if(window.innerWidth<900){ bar.style.width='5%'; ptext.textContent='Enviando para processamento...'; }
   const skeletonCount = state.selectedPhotos.length;
   grid.setAttribute('data-qty', skeletonCount);
-  if(skeletonCount === 3 && window.innerWidth >= 900){
-    grid.innerHTML =
-      '<div class=\"skeleton-card\"><div class=\"skeleton\"></div><div class=\"skeleton-btn\"></div></div>' +
-      '<div class=\"skeleton-card\"><div class=\"skeleton\"></div><div class=\"skeleton-btn\"></div></div>' +
-      '<div class=\"skeleton-card\" style=\"grid-column:1/3\"><div class=\"skeleton\" style=\"aspect-ratio:1/1;border-radius:18px 18px 0 0\"></div><div class=\"skeleton-btn\"></div></div>';
-  } else {
-    grid.innerHTML = Array(skeletonCount).fill('<div class=\"skeleton-card\"><div class=\"skeleton\"></div><div class=\"skeleton-btn\"></div></div>').join('');
-  }
+  grid.innerHTML = Array(skeletonCount).fill('<div class=\"skeleton-card\"><div class=\"skeleton\"></div><div class=\"skeleton-btn\"></div></div>').join('');
   results.style.display='block';
   if(resultsPlaceholder) resultsPlaceholder.style.display='none';
 
@@ -1371,6 +1375,11 @@ async function generate(){
     const pngB64 = await compressImage(state.b64, state.mime, 1024, 0.85);
     const photos = state.selectedPhotos;
     const prompts = {};
+    const defaultPrompts = {
+      4: 'Composição elegante de semijoia em ambiente sofisticado com elementos naturais como mármore, flores ou tecido de seda. Iluminação suave e difusa, atmosfera premium e refinada, produto em destaque com contexto visual harmonioso. Metal polido com reflexos naturais, sem distorções.',
+      5: 'Semijoia apresentada ao lado ou dentro de uma caixinha de embalagem premium. Fundo neutro claro ou texturizado, iluminação de estúdio suave, composição elegante valorizando tanto o produto quanto a embalagem. Acabamento impecável, sem sombras duras.',
+      6: 'Foto de semijoia otimizada para feed do Instagram e stories. Composição quadrada 1:1, visual clean e moderno, cores harmoniosas, fundo neutro premium. Produto centralizado com iluminação impecável, brilho controlado, apelo visual imediato para redes sociais.'
+    };
     photos.forEach(photoNum => {
       const customPrompts = currentUserData?.customPrompts;
       const customApproved = currentUserData?.customPromptsApproved;
@@ -1378,7 +1387,7 @@ async function generate(){
       if(customApproved && customPrompts?.['p'+photoNum]){
         catPrompt = customPrompts['p'+photoNum];
       } else {
-        catPrompt = state.cat['p'+photoNum] || 'Foto profissional de semijoia';
+        catPrompt = state.cat['p'+photoNum] || defaultPrompts[photoNum] || 'Foto profissional de semijoia';
       }
       prompts[photoNum] = catPrompt + (state.obs ? '\nObservações: '+state.obs : '');
     });
@@ -1404,7 +1413,7 @@ async function generate(){
 
     state.imgs = [];
     const fotosMostradas = new Set();
-    const nomes = {1:'Analisando e gerando foto 1...', 2:'Gerando foto com modelo...', 3:'Gerando close detalhe...'};
+    const nomes = {1:'Gerando catálogo — fundo branco...', 2:'Gerando foto com modelo...', 3:'Gerando close de detalhe...', 4:'Gerando lifestyle...', 5:'Gerando foto com embalagem...', 6:'Gerando versão Instagram...'};
 
     await new Promise((resolve, reject) => {
       let tentativas = 0;
@@ -1510,39 +1519,34 @@ async function regenerate(i){
   const photoNum=i+1;
   error.textContent='';
 
-  // Substitui só o card correto dentro do #grid
+  // Busca só dentro do #grid — corrigido
   const gridCards = grid.querySelectorAll('.res, .skeleton-card');
   const targetCard = gridCards[i];
   if(targetCard){
     const skeleton = document.createElement('div');
     skeleton.className = 'skeleton-card';
     skeleton.innerHTML = '<div class="skeleton"></div><div class="skeleton-btn"></div>';
-    // Preserva grid-column do card original (foto 3 ocupa 2 colunas)
-    if(targetCard.style.gridColumn) skeleton.style.gridColumn = targetCard.style.gridColumn;
     grid.replaceChild(skeleton, targetCard);
   }
-
-  // Atualiza botão principal
-  const regenBtn = document.getElementById('genBtn');
-  const regenTxt = document.getElementById('genBtnText');
-  const regenProg = document.getElementById('btnProgress');
-  if(regenBtn) regenBtn.disabled = true;
-  if(regenTxt) regenTxt.textContent = `Gerando foto ${photoNum}/1...`;
-  if(regenProg) regenProg.style.width = '10%';
 
   try{
     const pngB64=await compressImage(state.b64,state.mime,1024,0.85);
     const customPrompts = currentUserData?.customPrompts;
     const customApproved = currentUserData?.customPromptsApproved;
+    const defaultPromptsRegen = {
+      4: 'Composição elegante de semijoia em ambiente sofisticado com elementos naturais como mármore, flores ou tecido de seda. Iluminação suave e difusa, atmosfera premium e refinada, produto em destaque com contexto visual harmonioso. Metal polido com reflexos naturais, sem distorções.',
+      5: 'Semijoia apresentada ao lado ou dentro de uma caixinha de embalagem premium. Fundo neutro claro ou texturizado, iluminação de estúdio suave, composição elegante valorizando tanto o produto quanto a embalagem. Acabamento impecável, sem sombras duras.',
+      6: 'Foto de semijoia otimizada para feed do Instagram e stories. Composição quadrada 1:1, visual clean e moderno, cores harmoniosas, fundo neutro premium. Produto centralizado com iluminação impecável, brilho controlado, apelo visual imediato para redes sociais.'
+    };
     let catPrompt;
     if(customApproved && customPrompts?.['p'+photoNum]){
       catPrompt = customPrompts['p'+photoNum];
     } else {
-      catPrompt = state.cat['p'+photoNum] || 'Foto profissional de semijoia';
+      catPrompt = state.cat['p'+photoNum] || defaultPromptsRegen[photoNum] || 'Foto profissional de semijoia';
     }
     let prompt = catPrompt + (state.obs ? '\nObservações: '+state.obs : '');
 
-    if(regenProg) regenProg.style.width = '20%';
+    bar.style.width='20%';ptext.textContent='Enviando para processamento...';
     const prompts = { [photoNum]: prompt };
     const _regenToken = await getIdToken();
     const jobRes = await fetch('/api/criar-job', {
@@ -1574,8 +1578,7 @@ async function regenerate(i){
             const url = status.photos[photoNum];
             state.imgs[i] = {url, name:`${state.code}-foto${photoNum}.jpg`};
             showPhotoImediata(i, url, photoNum, 1);
-            if(regenProg) regenProg.style.width = '100%';
-            if(regenTxt) regenTxt.textContent = 'Foto gerada!';
+            bar.style.width='100%';ptext.textContent='Pronto!';
             resolve();
           }
           if(status.status === 'failed'){ clearInterval(poll); reject(new Error('Erro no processamento.')); }
@@ -1586,23 +1589,15 @@ async function regenerate(i){
     await decrementCredits(1);
   }catch(e){
     error.textContent='Não foi possível gerar as fotos. Tente novamente em alguns instantes.';
-    // Restaura o card com mensagem de erro — só o slot correto
-    const errorSlots = grid.querySelectorAll('.skeleton-card');
-    errorSlots.forEach(s => {
+    const skeletons = grid.querySelectorAll('.skeleton-card, .skeleton');
+    skeletons.forEach(s => {
       const card = document.createElement('div');
       card.className = 'res res-animate';
-      if(s.style.gridColumn) card.style.gridColumn = s.style.gridColumn;
       card.innerHTML = `<div style="width:100%;aspect-ratio:1;background:var(--line);border-radius:18px;display:grid;place-items:center;color:var(--muted);font-size:12px">Erro ao gerar</div>`;
       grid.replaceChild(card, s);
     });
   }
-  finally{
-    setTimeout(()=>{
-      if(regenBtn) regenBtn.disabled = false;
-      if(regenProg) regenProg.style.width = '0%';
-      if(regenTxt) regenTxt.textContent = '✦ Gerar fotos profissionais';
-    }, 1500);
-  }
+  finally{}
 }
 
 const regenSvg=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>`;
@@ -1686,15 +1681,20 @@ function downloadUrl(url, name){
 }
 
 function resetForm(){
-  state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],selectedPhotos:[1,2,3]};
+  // Preserva preferências do usuário ao resetar
+  const savedPrefs = currentUserData?.photoPreferences || [1,2,3];
+  state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],selectedPhotos:[...savedPrefs]};
   code.value='';obs.value='';file.value='';
   preview.style.display='none';uEmpty.style.display='block';
   upload.classList.remove('has-img');
   results.style.display='none';
   if(resultsPlaceholder){ resultsPlaceholder.style.display=''; if(window.innerWidth<900) resultsPlaceholder.classList.add('mobile-show'); }
-  const ca=document.getElementById('checkAll');if(ca){ca.checked=true;document.getElementById('labelAll')?.classList.add('checked');}
-  document.getElementById('individualChecks')?.classList.add('hidden');
-  [1,2,3].forEach(n=>{const c=document.getElementById('check'+n);if(c){c.checked=true;document.getElementById('label'+n)?.classList.add('checked');}});
+  // Aplica preferências nos checkboxes
+  [1,2,3,4,5,6].forEach(n=>{
+    const c=document.getElementById('check'+n);
+    const l=document.getElementById('label'+n);
+    if(c){ c.checked=savedPrefs.includes(n); l?.classList.toggle('checked',savedPrefs.includes(n)); }
+  });
   render();
 }
 
@@ -1765,13 +1765,17 @@ async function saveTerms(){
 
 function editCat(id){editCatInfo(id)}
 function editCatInfo(id){editMode='cat';editId=id||null;let c=cats.find(x=>x.id===id)||{name:'',icon:'',p1:'Foto profissional em fundo branco, estilo catálogo premium.',p2:'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:'Close detalhado mostrando brilho, textura e acabamento da peça.'};catTitle.textContent=editId?'Editar categoria':'Nova categoria';catName.value=c.name;catIcon.value=c.icon;p1.value=c.p1;p2.value=c.p2;p3.value=c.p3;promptFields.style.display='none';catModal.style.display='flex'}
-function editPrompt(id){editMode='prompt';editId=id;let c=cats.find(x=>x.id===id);if(!c)return;catTitle.textContent='Prompts — '+c.name;catName.value=c.name;catIcon.value=c.icon;catName.style.display='none';catIcon.style.display='none';p1.value=c.p1||'';p2.value=c.p2||'';p3.value=c.p3||'';promptFields.style.display='block';catModal.style.display='flex'}
+function editPrompt(id){editMode='prompt';editId=id;let c=cats.find(x=>x.id===id);if(!c)return;catTitle.textContent='Prompts — '+c.name;catName.value=c.name;catIcon.value=c.icon;catName.style.display='none';catIcon.style.display='none';p1.value=c.p1||'';p2.value=c.p2||'';p3.value=c.p3||'';const p4el=document.getElementById('p4');const p5el=document.getElementById('p5');const p6el=document.getElementById('p6');if(p4el)p4el.value=c.p4||'';if(p5el)p5el.value=c.p5||'';if(p6el)p6el.value=c.p6||'';promptFields.style.display='block';catModal.style.display='flex'}
 function saveCat(){
   let current=cats.find(c=>c.id===editId);
   if(editMode==='prompt'){
     if(!current)return;
     current.p1=p1.value.trim();current.p2=p2.value.trim();current.p3=p3.value.trim();
-    if(!current.p1||!current.p2||!current.p3)return alert('Preencha os 3 prompts antes de salvar.');
+    const p4el=document.getElementById('p4');const p5el=document.getElementById('p5');const p6el=document.getElementById('p6');
+    if(p4el&&p4el.value.trim()) current.p4=p4el.value.trim();
+    if(p5el&&p5el.value.trim()) current.p5=p5el.value.trim();
+    if(p6el&&p6el.value.trim()) current.p6=p6el.value.trim();
+    if(!current.p1||!current.p2||!current.p3)return alert('Preencha os 3 prompts principais antes de salvar.');
   }else{
     let obj={id:editId||Date.now().toString(),name:catName.value.trim(),icon:catIcon.value.trim()||'◇',p1:current?.p1||p1.value.trim()||'Foto profissional em fundo branco, estilo catálogo premium.',p2:current?.p2||p2.value.trim()||'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:current?.p3||p3.value.trim()||'Close detalhado mostrando brilho, textura e acabamento da peça.'};
     if(!obj.name)return alert('Digite o nome.');
@@ -1791,33 +1795,22 @@ function moveCat(id,dir){
 }
 
 function toggleAll(cb){
-  const individual=document.getElementById('individualChecks');
-  document.getElementById('labelAll')?.classList.toggle('checked',cb.checked);
-  if(cb.checked){
-    individual.classList.add('hidden');
-    state.selectedPhotos=[1,2,3];
-    [1,2,3].forEach(n=>{const c=document.getElementById('check'+n);if(c){c.checked=true;document.getElementById('label'+n)?.classList.add('checked');}});
-  } else {
-    individual.classList.remove('hidden');
-    state.selectedPhotos=[1,2,3];
-  }
+  // mantido para compatibilidade — não usado mais
   ready();
 }
 
 function updateSelection(){
-  state.selectedPhotos=[1,2,3].filter(n=>{
+  state.selectedPhotos=[1,2,3,4,5,6].filter(n=>{
     const c=document.getElementById('check'+n);
     document.getElementById('label'+n)?.classList.toggle('checked',c&&c.checked);
     return c&&c.checked;
   });
-  const ca=document.getElementById('checkAll');
-  const individual=document.getElementById('individualChecks');
-  if(ca){
-    const allChecked=state.selectedPhotos.length===3;
-    ca.checked=allChecked;
-    document.getElementById('labelAll')?.classList.toggle('checked',allChecked);
-    if(allChecked && individual) individual.classList.add('hidden');
-  }
+  // Salva preferência no Firestore (debounce)
+  if(currentUser && window._prefSaveTimer) clearTimeout(window._prefSaveTimer);
+  window._prefSaveTimer = setTimeout(()=>{
+    if(currentUser) db.collection('users').doc(currentUser.uid)
+      .update({photoPreferences: state.selectedPhotos}).catch(()=>{});
+  }, 1000);
   ready();
 }
 
