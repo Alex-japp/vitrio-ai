@@ -1,6 +1,7 @@
 const { Inngest } = require('inngest');
 const { serve } = require('inngest/express');
 const { getServiceAccountToken } = require('./auth-helper');
+const sharp = require('sharp');
 
 const inngest = new Inngest({
   id: 'vitrio-ai',
@@ -63,12 +64,29 @@ async function downloadFromStorage(accessToken, filePath) {
   return Buffer.from(buffer).toString('base64');
 }
 
+// ── Comprime PNG/qualquer formato → JPEG 0.85 via sharp ──
+async function comprimirParaJpeg(b64) {
+  try {
+    const buffer = Buffer.from(b64, 'base64');
+    const compressed = await sharp(buffer)
+      .jpeg({ quality: 85, progressive: true })
+      .toBuffer();
+    return compressed.toString('base64');
+  } catch (e) {
+    console.warn('Compressão sharp falhou, usando original:', e.message);
+    return b64; // fallback sem compressão
+  }
+}
+
 // ── Storage: salva base64 → URL ──────────────────────────
 async function salvarImagem(accessToken, jobId, photoNum, b64) {
   const filePath = `jobs/${jobId}/photo_${photoNum}.jpg`;
   const encoded  = encodeURIComponent(filePath);
   const url      = `https://storage.googleapis.com/upload/storage/v1/b/${BUCKET}/o?uploadType=media&name=${encoded}`;
-  const buffer   = Buffer.from(b64, 'base64');
+
+  // Comprime antes de salvar — PNG 1.5MB → JPEG ~300-500KB
+  const b64Comprimido = await comprimirParaJpeg(b64);
+  const buffer = Buffer.from(b64Comprimido, 'base64');
 
   const res = await fetch(url, {
     method:  'POST',
