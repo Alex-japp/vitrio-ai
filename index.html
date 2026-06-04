@@ -338,8 +338,9 @@ button,input,textarea{font-family:inherit}
   .results-group .grid{grid-template-columns:1fr 1fr;gap:8px;width:100%;}
   .results-group .res .img-wrap{min-height:140px!important;}
   .results-group .grid[data-qty="3"] .res:nth-child(3){grid-column:1/3;margin-right:0;padding-right:0;}
-  .results-group .grid[data-qty="3"] .res:nth-child(3) .img-wrap{aspect-ratio:1/1!important;border-radius:18px 0 0 18px!important;}
+  .results-group .grid[data-qty="3"] .res:nth-child(3) .img-wrap{aspect-ratio:1/1!important;border-radius:18px 18px 0 0!important;}
   .results-group .grid[data-qty="3"] .res:nth-child(3) img{aspect-ratio:1/1!important;object-fit:cover!important;width:100%!important;}
+  .results-group{max-height:none!important;overflow-y:visible!important;position:sticky;top:88px;}
   .results-group .res-num{position:absolute;top:8px;left:8px;width:24px;height:24px;border-radius:50%;background:rgba(17,18,39,.7);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2}
   .results-group .res-actions{display:flex;gap:6px;padding:8px 6px 4px}
   .results-group .res-actions button{flex:1;height:34px;border-radius:10px;border:1px solid var(--line);background:#fff;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:.15s}
@@ -771,7 +772,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.4.5';
+const APP_VERSION = '1.4.6';
 
 async function checkAppVersion(){
   try{
