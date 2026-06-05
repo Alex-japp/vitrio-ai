@@ -1728,7 +1728,7 @@ function addCount(){
 
 function toggleMenu(e){e.stopPropagation();menuDropdown.classList.toggle('hidden')}
 function closeMenu(){menuDropdown.classList.add('hidden')}
-document.addEventListener('click',function(){closeMenu()});
+document.addEventListener('click',function(e){if(!e.target.closest('#codeToggleMenuBtn'))closeMenu()});
 
 async function openAdmin(){
   // Segurança dupla: verifica isAdmin no Firestore antes de abrir
