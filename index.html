@@ -604,6 +604,10 @@ button,input,textarea{font-family:inherit}
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.04.04a2 2 0 1 1-2.83 2.83l-.04-.04A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 1 1-4 0v-.06A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H3a2 2 0 1 1 0-4h.06A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.04-.04A2 2 0 1 1 7.05 3.85l.04.04A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.08V3a2 2 0 1 1 4 0v.06A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04A1.7 1.7 0 0 0 19.4 9c.2.35.52.62.9.75.28.1.58.15.88.15H21a2 2 0 1 1 0 4h-.06c-.3 0-.6.05-.88.15-.38.13-.7.4-.9.75z"/></svg>
     Configurações
   </button>
+  <button id="codeToggleMenuBtn" onclick="closeMenu();toggleCodeRequired(!appConfig.codeRequired)" style="display:none">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <span id="codeToggleMenuLabel">Código: obrigatório</span>
+  </button>
   <button onclick="closeMenu();feedback()">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
     Feedback
@@ -634,7 +638,7 @@ button,input,textarea{font-family:inherit}
   <div class="form-group">
     <section class="card">
       <div class="field">
-        <label class="label" style="margin-top:-10px">Código do produto</label>
+        <label class="label" style="margin-top:-8px">Código do produto</label>
         <div class="inp-wrap"><span class="inp-ico">⌑</span><input id="code" class="input with-ico" placeholder="Ex: 000012" oninput="state.code=this.value.trim();ready()"></div>
       </div>
       <div class="field">
@@ -788,7 +792,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.6.2';
+const APP_VERSION = '1.6.4';
 
 async function checkAppVersion(){
   try{
@@ -1157,6 +1161,8 @@ async function updateAllIcons(){
 async function toggleCodeRequired(val){
   appConfig.codeRequired = val;
   applyCodeConfig();
+  const label = document.getElementById('codeToggleMenuLabel');
+  if(label) label.textContent = val ? 'Código: obrigatório' : 'Código: opcional';
   try{await CONFIG_REF.set({appConfig},{merge:true});}catch(e){console.log('Erro salvar config:',e);}
 }
 
@@ -1258,18 +1264,18 @@ async function getIdToken() {
 function applyAdminVisibility(isAdmin) {
   const btn = document.getElementById('adminMenuBtn');
   if(!btn) return;
-  
+  const codeBtn = document.getElementById('codeToggleMenuBtn');
   if(isAdmin === true){
     btn.style.setProperty('display', 'flex', 'important');
     btn.removeAttribute('hidden');
     btn.classList.remove('admin-only');
-    
   } else {
     btn.style.setProperty('display', 'none', 'important');
     btn.setAttribute('hidden', '');
     btn.classList.add('admin-only');
-    
   }
+  // Toggle código visível para todos os usuários autenticados
+  if(codeBtn) codeBtn.style.setProperty('display', 'flex', 'important');
 }
 
 async function init(){
