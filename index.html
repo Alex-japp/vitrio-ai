@@ -792,7 +792,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.6.4';
+const APP_VERSION = '1.6.5';
 
 async function checkAppVersion(){
   try{
@@ -1163,6 +1163,7 @@ async function toggleCodeRequired(val){
   applyCodeConfig();
   const label = document.getElementById('codeToggleMenuLabel');
   if(label) label.textContent = val ? 'Código: obrigatório' : 'Código: opcional';
+  showToast(val ? '🔒 Código obrigatório ativado' : '🔓 Código opcional ativado');
   try{await CONFIG_REF.set({appConfig},{merge:true});}catch(e){console.log('Erro salvar config:',e);}
 }
 
@@ -2145,7 +2146,7 @@ init();
       <div style="font-size:17px;font-weight:900">◇ Termos de Uso e Privacidade</div>
       <button onclick="closeTerms()" style="width:38px;height:38px;border-radius:12px;border:1px solid #E8E2D6;background:#fff;font-size:20px;cursor:pointer;display:grid;place-items:center">×</button>
     </div>
-    <div style="font-size:12px;color:#444;line-height:1.9">
+    <div id="termsContent" style="font-size:12px;color:#444;line-height:1.9">
       <div style="background:#F0EDFF;border-radius:12px;padding:14px 16px;margin-bottom:20px;font-size:12px;color:#3C2C8A;font-weight:600">
         ⚠️ Pontos mais importantes: fotos disponíveis por 24h — baixe na hora. Créditos utilizados não são reembolsáveis. Você é responsável pelo uso das imagens geradas.
       </div>
@@ -2180,7 +2181,17 @@ init();
 </div>
 
 <script>
-function openTerms(){document.getElementById('termsModal').style.display='flex';}
+async function openTerms(){
+  document.getElementById('termsModal').style.display='flex';
+  const content = document.getElementById('termsContent');
+  if(!content) return;
+  try{
+    const snap = await db.collection('app').doc('terms').get({source:'server'});
+    if(snap.exists && snap.data()?.content){
+      content.innerHTML = snap.data().content.replace(/\n/g,'<br>');
+    }
+  }catch(e){ console.log('Erro ao carregar termos:', e.message); }
+}
 function closeTerms(){document.getElementById('termsModal').style.display='none';}
 </script>
 
@@ -2580,7 +2591,10 @@ async function openUserPrompts(uid){
     upPrompts[cat.id] = {
       p1: saved.p1 || cat.p1 || '',
       p2: saved.p2 || cat.p2 || '',
-      p3: saved.p3 || cat.p3 || ''
+      p3: saved.p3 || cat.p3 || '',
+      p4: saved.p4 || cat.p4 || '',
+      p5: saved.p5 || cat.p5 || '',
+      p6: saved.p6 || cat.p6 || ''
     };
     return `
     <div style="background:#FAFAF8;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px">
@@ -2593,9 +2607,21 @@ async function openUserPrompts(uid){
         <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">👤 Foto 2 — Modelo</div>
         <textarea id="up_${cat.id}_p2" style="width:100%;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12px;color:#111;resize:vertical;min-height:80px;outline:none;font-family:inherit;line-height:1.5" oninput="upPrompts['${cat.id}'].p2=this.value" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--line)'">${upPrompts[cat.id].p2}</textarea>
       </div>
-      <div>
+      <div style="margin-bottom:8px">
         <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">🔍 Foto 3 — Close detalhe</div>
         <textarea id="up_${cat.id}_p3" style="width:100%;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12px;color:#111;resize:vertical;min-height:80px;outline:none;font-family:inherit;line-height:1.5" oninput="upPrompts['${cat.id}'].p3=this.value" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--line)'">${upPrompts[cat.id].p3}</textarea>
+      </div>
+      <div style="margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:#E67E00;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">🌿 Foto 4 — Lifestyle (opcional)</div>
+        <textarea id="up_${cat.id}_p4" style="width:100%;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12px;color:#111;resize:vertical;min-height:80px;outline:none;font-family:inherit;line-height:1.5" oninput="upPrompts['${cat.id}'].p4=this.value" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--line)'" placeholder="Deixe vazio para usar o prompt padrão">${upPrompts[cat.id].p4}</textarea>
+      </div>
+      <div style="margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:#E67E00;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">📦 Foto 5 — Embalagem (opcional)</div>
+        <textarea id="up_${cat.id}_p5" style="width:100%;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12px;color:#111;resize:vertical;min-height:80px;outline:none;font-family:inherit;line-height:1.5" oninput="upPrompts['${cat.id}'].p5=this.value" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--line)'" placeholder="Deixe vazio para usar o prompt padrão">${upPrompts[cat.id].p5}</textarea>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#E67E00;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">📱 Foto 6 — Instagram (opcional)</div>
+        <textarea id="up_${cat.id}_p6" style="width:100%;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12px;color:#111;resize:vertical;min-height:80px;outline:none;font-family:inherit;line-height:1.5" oninput="upPrompts['${cat.id}'].p6=this.value" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--line)'" placeholder="Deixe vazio para usar o prompt padrão">${upPrompts[cat.id].p6}</textarea>
       </div>
     </div>`;
   }).join('');
