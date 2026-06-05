@@ -57,7 +57,7 @@ module.exports = async function handler(req, res) {
       photos: {}
     };
 
-    [1, 2, 3].forEach(n => {
+    [1, 2, 3, 4, 5, 6].forEach(n => {
       if (fields[`photo_${n}`]?.stringValue) {
         result.photos[n] = fields[`photo_${n}`].stringValue;
       }
