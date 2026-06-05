@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html 001, 002, 003. lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -793,7 +793,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.6.8';
+const APP_VERSION = '1.6.9';
 
 async function checkAppVersion(){
   try{
@@ -1134,12 +1134,24 @@ async function loadFromFirebase(){
   }
 }
 
+function getNextCode(){
+  const last = parseInt(localStorage.getItem('vitrio_seq_code')||'0');
+  const next = last + 1;
+  return String(next).padStart(3, '0');
+}
+
 function applyCodeConfig(){
   const codeInput = document.getElementById('code');
   if(codeInput){
     const field = codeInput.closest('.field');
     const optTag = field?.querySelector('.opt-tag');
     if(optTag) optTag.style.display = appConfig.codeRequired ? 'none' : 'inline';
+    // Sequencial automático só quando opcional
+    if(!appConfig.codeRequired && !codeInput.value.trim()){
+      const nextCode = getNextCode();
+      codeInput.value = nextCode;
+      state.code = nextCode;
+    }
   }
   const toggle = document.getElementById('codeRequiredToggle');
   const slider = document.getElementById('codeRequiredSlider');
@@ -1719,7 +1731,15 @@ function downloadUrl(url, name){
 
 function resetForm(){
   state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],selectedPhotos:[1,2,3]};
-  code.value='';obs.value='';file.value='';
+  // Preenche próximo código sequencial se opcional
+  if(!appConfig.codeRequired){
+    const nextCode = getNextCode();
+    code.value = nextCode;
+    state.code = nextCode;
+  } else {
+    code.value='';
+  }
+  obs.value='';file.value='';
   preview.style.display='none';uEmpty.style.display='block';
   upload.classList.remove('has-img');
   results.style.display='none';
@@ -1734,6 +1754,11 @@ function resetForm(){
 function addCount(){
   localStorage.setItem('cntP',Number(localStorage.getItem('cntP')||0)+1);
   localStorage.setItem('cntI',Number(localStorage.getItem('cntI')||0)+state.selectedPhotos.length);
+  // Incrementa código sequencial
+  if(!appConfig.codeRequired){
+    const current = parseInt(localStorage.getItem('vitrio_seq_code')||'0');
+    localStorage.setItem('vitrio_seq_code', current + 1);
+  }
   render();
   saveCountToFirebase();
 }
