@@ -793,7 +793,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.6.7';
+const APP_VERSION = '1.6.8';
 
 async function checkAppVersion(){
   try{
@@ -934,6 +934,16 @@ async function loadUserData(uid){
     // Carrega contadores pessoais do usuário
     if(currentUserData?.cntP !== undefined) localStorage.setItem('cntP', currentUserData.cntP);
     if(currentUserData?.cntI !== undefined) localStorage.setItem('cntI', currentUserData.cntI);
+    // Carrega preferências de fotos salvas
+    if(currentUserData?.photoPreferences && currentUserData.photoPreferences.length > 0){
+      state.selectedPhotos = currentUserData.photoPreferences;
+      [1,2,3,4,5,6].forEach(n=>{
+        const c = document.getElementById('check'+n);
+        const l = document.getElementById('label'+n);
+        if(c){ c.checked = state.selectedPhotos.includes(n); l?.classList.toggle('checked', c.checked); }
+      });
+      updatePhotosCount();
+    }
     applyAdminVisibility(currentUserData?.isAdmin === true);
     updateCreditsUI();
     return currentUserData;
@@ -1838,6 +1848,22 @@ function updateSelection(){
     return c&&c.checked;
   });
   updatePhotosCount();
+  // Validação visual
+  const photosToggle = document.getElementById('photosToggle');
+  const noPhotoMsg = document.getElementById('noPhotoMsg');
+  if(state.selectedPhotos.length === 0){
+    if(photosToggle) photosToggle.style.color = '#c23';
+    if(!noPhotoMsg){
+      const msg = document.createElement('div');
+      msg.id = 'noPhotoMsg';
+      msg.style.cssText = 'color:#c23;font-size:11px;font-weight:700;margin-top:6px;text-align:center';
+      msg.textContent = '⚠️ Selecione pelo menos 1 foto';
+      document.getElementById('photosBody')?.after(msg);
+    }
+  } else {
+    if(photosToggle) photosToggle.style.color = '';
+    noPhotoMsg?.remove();
+  }
   if(currentUser && window._prefSaveTimer) clearTimeout(window._prefSaveTimer);
   window._prefSaveTimer = setTimeout(()=>{
     if(currentUser) db.collection('users').doc(currentUser.uid)
