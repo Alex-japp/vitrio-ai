@@ -792,7 +792,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.6.5';
+const APP_VERSION = '1.6.6';
 
 async function checkAppVersion(){
   try{
@@ -1445,7 +1445,7 @@ async function generate(){
 
     state.imgs = [];
     const fotosMostradas = new Set();
-    const nomes = {1:'Analisando e gerando foto 1...', 2:'Gerando foto com modelo...', 3:'Gerando close detalhe...'};
+    const nomes = {1:'Analisando e gerando foto 1...', 2:'Gerando foto com modelo...', 3:'Gerando close detalhe...', 4:'Gerando lifestyle...', 5:'Gerando embalagem...', 6:'Gerando Instagram...'};
 
     await new Promise((resolve, reject) => {
       let tentativas = 0;
