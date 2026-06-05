@@ -271,7 +271,7 @@ async function limparJobsAntigos(accessToken) {
       const fields = item.document.fields || {};
 
       // Deleta fotos do Storage
-      for (let n = 1; n <= 3; n++) {
+      for (let n = 1; n <= 6; n++) {
         if (fields[`photo_${n}`]?.stringValue) {
           const fileName = encodeURIComponent(`jobs/${jobId}/photo_${n}.jpg`);
           await fetch(
@@ -388,6 +388,33 @@ const gerarFotos = inngest.createFunction(
         const b64 = await gerarFoto(prompts['3'], ref, descricao);
         const url = await salvarImagem(accessToken, jobId, 3, b64);
         await updateJob(accessToken, jobId, { 3: url, updatedAt: Date.now() });
+      });
+    }
+
+    // ── Foto 4 (referência: Foto 1) ──────────────────────
+    if (selectedPhotos.includes(4)) {
+      await step.run('foto-4', async () => {
+        const b64 = await gerarFoto(prompts['4'], ref, descricao);
+        const url = await salvarImagem(accessToken, jobId, 4, b64);
+        await updateJob(accessToken, jobId, { 4: url, updatedAt: Date.now() });
+      });
+    }
+
+    // ── Foto 5 (referência: Foto 1) ──────────────────────
+    if (selectedPhotos.includes(5)) {
+      await step.run('foto-5', async () => {
+        const b64 = await gerarFoto(prompts['5'], ref, descricao);
+        const url = await salvarImagem(accessToken, jobId, 5, b64);
+        await updateJob(accessToken, jobId, { 5: url, updatedAt: Date.now() });
+      });
+    }
+
+    // ── Foto 6 (referência: Foto 1) ──────────────────────
+    if (selectedPhotos.includes(6)) {
+      await step.run('foto-6', async () => {
+        const b64 = await gerarFoto(prompts['6'], ref, descricao);
+        const url = await salvarImagem(accessToken, jobId, 6, b64);
+        await updateJob(accessToken, jobId, { 6: url, updatedAt: Date.now() });
       });
     }
 
