@@ -1,6 +1,7 @@
 const { validateFirebaseToken, getServiceAccountToken } = require('./auth-helper');
 
 const ALLOWED_ORIGINS = [
+  'https://vitrioai.com.br',
   'https://vitrio-ai.vercel.app',
   'https://vitrio-ai-git-main-alex-vitrio.vercel.app',
   'http://localhost:3000',
