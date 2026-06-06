@@ -597,7 +597,7 @@ button,input,textarea{font-family:inherit}
     Trocar foto de perfil
   </label>
   <input type="file" id="avatarUpload" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
-  <button onclick="closeMenu();openGallery24h()">
+  <button id="galleryMenuBtn" onclick="event.stopPropagation();closeMenu();openGallery24h()">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
     <span>Histórico de gerações</span>
     <span id="galleryBadge" style="display:none;margin-left:auto;font-size:10px;font-weight:700;color:var(--purple);background:rgba(123,97,255,.1);border-radius:10px;padding:2px 8px;white-space:nowrap"></span>
@@ -1777,7 +1777,7 @@ function addCount(){
 
 function toggleMenu(e){e.stopPropagation();menuDropdown.classList.toggle('hidden')}
 function closeMenu(){menuDropdown.classList.add('hidden')}
-document.addEventListener('click',function(e){if(!e.target.closest('#codeToggleMenuBtn'))closeMenu()});
+document.addEventListener('click',function(e){if(!e.target.closest('#codeToggleMenuBtn')&&!e.target.closest('#galleryMenuBtn'))closeMenu()});
 
 async function openAdmin(){
   // Segurança dupla: verifica isAdmin no Firestore antes de abrir
@@ -2261,7 +2261,7 @@ init();
 </div>
 
 <script>
-async async function openGallery24h(){
+async function openGallery24h(){
   document.getElementById('gallery24hModal').style.display='flex';
   const content = document.getElementById('gallery24hContent');
   content.innerHTML = '<div style="text-align:center;padding:40px;color:#888;font-size:14px">Carregando...</div>';
