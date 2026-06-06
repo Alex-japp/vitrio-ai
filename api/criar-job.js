@@ -7,6 +7,7 @@ const inngest = new Inngest({
 });
 
 const ALLOWED_ORIGINS = [
+  'https://vitrioai.com.br',
   'https://vitrio-ai.vercel.app',
   'https://vitrio-ai-git-main-alex-vitrio.vercel.app',
   'http://localhost:3000',
@@ -123,7 +124,7 @@ module.exports = async function handler(req, res) {
   }
 
   const isAdmin = userData.isAdmin?.booleanValue === true;
-  const { imageBase64, prompts, selectedPhotos, code } = req.body;
+  const { imageBase64, prompts, selectedPhotos, code, category } = req.body;
 
   if (!imageBase64 || !prompts || !selectedPhotos) {
     return res.status(400).json({ error: 'Dados incompletos' });
@@ -189,6 +190,7 @@ module.exports = async function handler(req, res) {
           status:           { stringValue: 'pending' },
           userId:           { stringValue: uid },
           code:             { stringValue: code || '' },
+          category:         { stringValue: category || '' },
           imageOriginalUrl: { stringValue: imageOriginalUrl },
           imageFilePath:    { stringValue: filePath },
           selectedPhotos:   {
