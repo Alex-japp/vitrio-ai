@@ -597,6 +597,11 @@ button,input,textarea{font-family:inherit}
     Trocar foto de perfil
   </label>
   <input type="file" id="avatarUpload" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
+  <button onclick="closeMenu();openGallery24h()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+    <span>Histórico de gerações</span>
+    <span id="galleryBadge" style="display:none;margin-left:auto;font-size:10px;font-weight:700;color:var(--purple);background:rgba(123,97,255,.1);border-radius:10px;padding:2px 8px;white-space:nowrap"></span>
+  </button>
   <button onclick="closeMenu();openPlans()" style="color:var(--purple);font-weight:900">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l-3 7h18l-3-7z"/><path d="M3 10l9 11 9-11"/><line x1="12" y1="10" x2="12" y2="21"/></svg>
     Comprar fotos
@@ -793,7 +798,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.7.0';
+const APP_VERSION = '1.7.1';
 
 async function checkAppVersion(){
   try{
@@ -1079,6 +1084,7 @@ auth.onAuthStateChanged(async (user) => {
     await loadFromFirebase();
     render();
     checkAppVersion();
+    updateGalleryBadge();
     if(currentUserData?.isAdmin){
       if(promptsTabBtn) promptsTabBtn.style.display='';
       if(usersTabBtn) usersTabBtn.classList.remove('hidden');
@@ -1299,7 +1305,11 @@ function applyAdminVisibility(isAdmin) {
     btn.classList.add('admin-only');
   }
   // Toggle código visível para todos os usuários autenticados
-  if(codeBtn) codeBtn.style.setProperty('display', 'flex', 'important');
+  if(codeBtn){
+    codeBtn.style.setProperty('display', 'flex', 'important');
+    const label = document.getElementById('codeToggleMenuLabel');
+    if(label) label.textContent = appConfig.codeRequired ? 'Código: obrigatório' : 'Código: opcional';
+  }
 }
 
 async function init(){
@@ -1459,7 +1469,8 @@ async function generate(){
         imageBase64: pngB64,
         prompts,
         selectedPhotos: photos,
-        code: state.code
+        code: state.code,
+        category: state.cat?.name || ''
       })
     });
 
@@ -1608,7 +1619,8 @@ async function regenerate(i){
         imageBase64: pngB64,
         prompts,
         selectedPhotos: [photoNum],
-        code: state.code
+        code: state.code,
+        category: state.cat?.name || ''
       })
     });
     if(!jobRes.ok) throw new Error('Falha ao criar job');
@@ -2191,6 +2203,22 @@ async function addCredits(uid){
 
 init();
 </script>
+<!-- MODAL GALERIA 24H -->
+<div id="gallery24hModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closeGallery24h()">
+  <div style="width:min(100%,820px);background:#fff;border-radius:28px 28px 0 0;padding:24px 24px 40px;max-height:90vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <div style="font-size:17px;font-weight:900">📷 Histórico de gerações</div>
+        <div style="font-size:12px;color:#888;margin-top:2px">Fotos disponíveis por 24h · apagadas automaticamente</div>
+      </div>
+      <button onclick="closeGallery24h()" style="width:38px;height:38px;border-radius:12px;border:1px solid #E8E2D6;background:#fff;font-size:20px;cursor:pointer;display:grid;place-items:center">×</button>
+    </div>
+    <div id="gallery24hContent">
+      <div style="text-align:center;padding:40px;color:#888;font-size:14px">Carregando...</div>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL TERMOS DE USO -->
 <div id="termsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:flex-end;justify-content:center">
   <div style="width:min(100%,820px);background:#fff;border-radius:28px 28px 0 0;padding:28px 28px 40px;max-height:90vh;overflow-y:auto">
@@ -2233,7 +2261,106 @@ init();
 </div>
 
 <script>
-async function openTerms(){
+async async function openGallery24h(){
+  document.getElementById('gallery24hModal').style.display='flex';
+  const content = document.getElementById('gallery24hContent');
+  content.innerHTML = '<div style="text-align:center;padding:40px;color:#888;font-size:14px">Carregando...</div>';
+  try{
+    const now = Date.now();
+    const since = now - 24*60*60*1000;
+    const snap = await db.collection('jobs')
+      .where('userId','==',currentUser.uid)
+      .orderBy('createdAt','desc')
+      .limit(50)
+      .get({source:'server'});
+    let docs24h = [];
+    snap.forEach(doc=>{
+      const d = doc.data();
+      const ts = parseInt(d.createdAt) || 0;
+      if(ts > since) docs24h.push({doc, d, ts});
+    });
+    if(!docs24h.length){
+      content.innerHTML = '<div style="text-align:center;padding:40px;color:#888;font-size:14px">Nenhuma geração nas últimas 24h.</div>';
+      return;
+    }
+    let html = '';
+    docs24h.forEach(({doc, d})=>{
+      const jobId = doc.id;
+      const cat = d.category || '';
+      const code = d.code || '—';
+      const ts = parseInt(d.createdAt) || now;
+      const diff = now - ts;
+      const horasRestantes = Math.max(0, Math.ceil((24*60*60*1000 - diff) / (60*60*1000)));
+      const hora = new Date(ts).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+      const photos = [];
+      const nomesFoto = {1:'Catálogo',2:'Modelo',3:'Close',4:'Lifestyle',5:'Embalagem',6:'Instagram'};
+      for(let n=1;n<=6;n++){
+        if(d['photo_'+n]) photos.push({n, url: d['photo_'+n], nome: nomesFoto[n]});
+      }
+      if(!photos.length) return;
+      const titulo = cat ? `${cat} — ${code}` : code;
+      const downloadAll = photos.map(p=>`downloadUrl('${p.url}','${code}-foto${p.n}.jpg')`).join(';');
+      html += `<div style="border:1px solid #EAEAF2;border-radius:18px;overflow:hidden;margin-bottom:14px">
+        <div style="padding:12px 16px;background:#F8F7FF;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="font-size:13px;font-weight:800;color:#1C1C1C">${titulo}</div>
+            <div style="font-size:11px;color:#888">hoje ${hora} · ${photos.length} foto${photos.length>1?'s':''} · apagadas em ${horasRestantes}h</div>
+          </div>
+          <button onclick="${downloadAll}" style="background:linear-gradient(135deg,#7B61FF,#5F3DFF);color:#fff;border:none;border-radius:10px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">⬇ Baixar todas</button>
+        </div>
+        <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          ${photos.map(p=>`<div style="position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;cursor:pointer" onclick="openImgPreview('${p.url}',0,'url')">
+            <img src="${p.url}" style="width:100%;height:100%;object-fit:cover">
+            <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.5);color:#fff;font-size:10px;font-weight:700;padding:4px;text-align:center">${p.nome}</div>
+            <button onclick="event.stopPropagation();downloadUrl('${p.url}','${code}-foto${p.n}.jpg')" style="position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.6);border:none;color:#fff;font-size:14px;cursor:pointer;display:grid;place-items:center">⬇</button>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    });
+    content.innerHTML = html || '<div style="text-align:center;padding:40px;color:#888;font-size:14px">Nenhuma geração nas últimas 24h.</div>';
+    updateGalleryBadge(docs24h.length);
+  }catch(e){
+    console.error('Galeria erro:',e);
+    content.innerHTML = '<div style="text-align:center;padding:40px;color:#c23;font-size:14px">Erro ao carregar. Tente novamente.</div>';
+  }
+}
+
+function closeGallery24h(){
+  document.getElementById('gallery24hModal').style.display='none';
+}
+
+async function updateGalleryBadge(count){
+  const badge = document.getElementById('galleryBadge');
+  if(!badge) return;
+  if(!currentUser){ badge.style.display='none'; return; }
+  try{
+    const now = Date.now();
+    const since = now - 24*60*60*1000;
+    let total = count;
+    if(total === undefined){
+      const snap = await db.collection('jobs')
+        .where('userId','==',currentUser.uid)
+        .orderBy('createdAt','desc')
+        .limit(50)
+        .get();
+      let count24h = 0;
+      snap.forEach(doc=>{
+        const d = doc.data();
+        const ts = parseInt(d.createdAt) || 0;
+        if(ts > since) count24h++;
+      });
+      total = count24h;
+    }
+    if(total > 0){
+      badge.textContent = total + ' produto' + (total>1?'s':'') + ' · apagados em 24h';
+      badge.style.display='inline';
+    } else {
+      badge.style.display='none';
+    }
+  }catch(e){ badge.style.display='none'; }
+}
+
+function openTerms(){
   document.getElementById('termsModal').style.display='flex';
   const content = document.getElementById('termsContent');
   if(!content) return;
