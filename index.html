@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html 001, 002, 003. lang="pt-BR">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -793,7 +793,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.6.9';
+const APP_VERSION = '1.7.0';
 
 async function checkAppVersion(){
   try{
@@ -2254,24 +2254,27 @@ function closeTerms(){document.getElementById('termsModal').style.display='none'
       <div style="font-size:17px;font-weight:900">◇ Escolha seu plano</div>
       <button onclick="closePlans()" style="width:38px;height:38px;border-radius:12px;border:1px solid #E8E2D6;background:#fff;font-size:20px;cursor:pointer;display:grid;place-items:center">×</button>
     </div>
-    <div style="font-size:13px;color:#888;margin-bottom:20px">Créditos não expiram · Sem mensalidade · Sem cartão</div>
+    <div style="background:linear-gradient(135deg,rgba(123,97,255,.08),rgba(77,123,255,.06));border:1px solid rgba(123,97,255,.2);border-radius:14px;padding:12px 16px;margin-bottom:16px;text-align:center">
+      <div style="font-size:13px;font-weight:700;color:var(--purple)">🎁 Comece grátis com 15 fotos — sem cartão de crédito</div>
+    </div>
+    <div style="font-size:13px;color:#888;margin-bottom:16px">Pacotes sem mensalidade · Sem assinatura · Sem cartão</div>
     <div style="display:flex;flex-direction:column;gap:10px">
-      <div class="plan-card" onclick="buyPlan('Starter','30 fotos','R$19')">
-        <div class="plan-info"><div class="plan-name">Starter</div><div class="plan-desc">30 fotos · 90 dias</div></div>
-        <div style="display:flex;align-items:center;gap:12px"><div class="plan-price">R$19</div><div class="plan-btn">Quero este</div></div>
+      <div class="plan-card" onclick="buyPlan('Starter','30 fotos','R$29')">
+        <div class="plan-info"><div class="plan-name">Starter</div><div class="plan-desc">30 fotos · Ideal para começar</div></div>
+        <div style="display:flex;align-items:center;gap:12px"><div class="plan-price">R$29</div><div class="plan-btn">Quero este</div></div>
       </div>
-      <div class="plan-card plan-featured" onclick="buyPlan('Pro','100 fotos','R$39')">
-        <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--grad);color:#fff;font-size:10px;font-weight:800;padding:3px 14px;border-radius:20px;white-space:nowrap;letter-spacing:.05em">⭐ MAIS POPULAR</div>
-        <div class="plan-info"><div class="plan-name" style="color:var(--purple)">Pro</div><div class="plan-desc">100 fotos · 90 dias</div></div>
-        <div style="display:flex;align-items:center;gap:12px"><div class="plan-price" style="color:var(--purple)">R$39</div><div class="plan-btn plan-btn-featured">Quero este</div></div>
+      <div class="plan-card plan-featured" onclick="buyPlan('Pro','100 fotos','R$79')">
+        <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--grad);color:#fff;font-size:10px;font-weight:800;padding:3px 14px;border-radius:20px;white-space:nowrap;letter-spacing:.05em">⭐ MAIS VENDIDO</div>
+        <div class="plan-info"><div class="plan-name" style="color:var(--purple)">Pro</div><div class="plan-desc">100 fotos · Mais velocidade para anunciar</div></div>
+        <div style="display:flex;align-items:center;gap:12px"><div class="plan-price" style="color:var(--purple)">R$79</div><div class="plan-btn plan-btn-featured">Quero este</div></div>
       </div>
-      <div class="plan-card" onclick="buyPlan('Business','200 fotos','R$69')">
-        <div class="plan-info"><div class="plan-name">Business</div><div class="plan-desc">200 fotos · 90 dias</div></div>
-        <div style="display:flex;align-items:center;gap:12px"><div class="plan-price">R$69</div><div class="plan-btn">Quero este</div></div>
+      <div class="plan-card" onclick="buyPlan('Business','200 fotos','R$149')">
+        <div class="plan-info"><div class="plan-name">Business</div><div class="plan-desc">200 fotos · Para quem vende muito</div></div>
+        <div style="display:flex;align-items:center;gap:12px"><div class="plan-price">R$149</div><div class="plan-btn">Quero este</div></div>
       </div>
-      <div class="plan-card" onclick="buyPlan('Premium','300 fotos','R$89')">
-        <div class="plan-info"><div class="plan-name">Premium</div><div class="plan-desc">300 fotos · 90 dias</div></div>
-        <div style="display:flex;align-items:center;gap:12px"><div class="plan-price">R$89</div><div class="plan-btn">Quero este</div></div>
+      <div class="plan-card" onclick="buyPlan('Premium','300 fotos','R$199')">
+        <div class="plan-info"><div class="plan-name">Premium</div><div class="plan-desc">300 fotos · Máximo poder</div></div>
+        <div style="display:flex;align-items:center;gap:12px"><div class="plan-price">R$199</div><div class="plan-btn">Quero este</div></div>
       </div>
     </div>
     <div style="background:#F3F0FF;border-radius:14px;padding:12px 16px;margin-top:16px;text-align:center">
@@ -2455,10 +2458,10 @@ function buyPlan(name, fotos, preco){
 <!-- POPUP CRÉDITOS ZERADOS -->
 <div id="zeroCreditsPopup" style="display:none;position:fixed;inset:0;background:rgba(17,18,39,.7);z-index:250;align-items:center;justify-content:center;padding:20px">
   <div style="width:min(100%,380px);background:#fff;border-radius:24px;padding:28px 24px;text-align:center;box-shadow:0 30px 80px rgba(17,18,39,.2)">
-    <div style="font-size:40px;margin-bottom:12px">😕</div>
-    <div style="font-size:18px;font-weight:900;margin-bottom:8px">Suas fotos acabaram!</div>
-    <div style="font-size:13px;color:#888;margin-bottom:24px;line-height:1.6">Para continuar gerando fotos profissionais escolha um plano e continue crescendo suas vendas.</div>
-    <button class="btn btn-main" onclick="closeZeroCredits();openPlans()" style="margin-bottom:10px">✦ Ver planos</button>
+    <div class="zero-emoji" style="font-size:40px;margin-bottom:12px">😕</div>
+    <div class="zero-title" style="font-size:18px;font-weight:900;margin-bottom:8px">Suas fotos acabaram!</div>
+    <div class="zero-desc" style="font-size:13px;color:#888;margin-bottom:24px;line-height:1.6">Para continuar gerando fotos profissionais escolha um plano e continue crescendo suas vendas.</div>
+    <button class="btn btn-main zero-btn" onclick="closeZeroCredits();openPlans()" style="margin-bottom:10px">✦ Ver planos</button>
     <button onclick="closeZeroCredits()" style="width:100%;height:44px;border-radius:14px;border:1px solid #E8E2D6;background:#fff;color:#888;font-size:13px;cursor:pointer">Agora não</button>
   </div>
 </div>
@@ -2571,7 +2574,57 @@ function showAjusteFino(){
     });
   }
 }
-function showZeroCreditsPopup(){document.getElementById('zeroCreditsPopup').style.display='flex';}
+function showZeroCreditsPopup(){
+  const plan = currentUserData?.plan || 'teste';
+  const msgs = {
+    teste: {
+      emoji: '🎉',
+      title: 'Suas 15 fotos grátis acabaram!',
+      desc: 'Gostou do resultado? Compre o pacote Starter com 30 fotos por R$29 e continue vendendo mais.',
+      btn: 'Quero o Starter — R$29',
+      plan: 'Starter', fotos: '30 fotos', preco: 'R$29'
+    },
+    starter: {
+      emoji: '🚀',
+      title: 'Seu pacote acabou!',
+      desc: 'Faça upgrade para o Pro — 100 fotos por R$79 e mais velocidade para anunciar seus produtos.',
+      btn: 'Upgrade para Pro — R$79',
+      plan: 'Pro', fotos: '100 fotos', preco: 'R$79'
+    },
+    pro: {
+      emoji: '💼',
+      title: 'Seu pacote acabou!',
+      desc: 'Recarregue com o Business — 200 fotos por R$149 para quem vende muito.',
+      btn: 'Quero o Business — R$149',
+      plan: 'Business', fotos: '200 fotos', preco: 'R$149'
+    },
+    business: {
+      emoji: '👑',
+      title: 'Seu pacote acabou!',
+      desc: 'O Premium tem 300 fotos por R$199 — máximo poder para sua loja.',
+      btn: 'Quero o Premium — R$199',
+      plan: 'Premium', fotos: '300 fotos', preco: 'R$199'
+    },
+    premium: {
+      emoji: '⭐',
+      title: 'Seu pacote acabou!',
+      desc: 'Entre em contato pelo WhatsApp para recarregar seu pacote.',
+      btn: 'Falar com suporte',
+      plan: 'Premium', fotos: '300 fotos', preco: 'R$199'
+    }
+  };
+  const m = msgs[plan] || msgs.teste;
+  const popup = document.getElementById('zeroCreditsPopup');
+  const emoji = popup.querySelector('.zero-emoji');
+  const title = popup.querySelector('.zero-title');
+  const desc = popup.querySelector('.zero-desc');
+  const btn = popup.querySelector('.zero-btn');
+  if(emoji) emoji.textContent = m.emoji;
+  if(title) title.textContent = m.title;
+  if(desc) desc.textContent = m.desc;
+  if(btn){ btn.textContent = '✦ ' + m.btn; btn.onclick = ()=>{ closeZeroCredits(); buyPlan(m.plan, m.fotos, m.preco); }; }
+  popup.style.display='flex';
+}
 function closeZeroCredits(){document.getElementById('zeroCreditsPopup').style.display='none';}
 </script>
 
