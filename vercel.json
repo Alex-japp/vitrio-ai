@@ -9,5 +9,18 @@
     "api/status.js": {
       "maxDuration": 30
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "vitrio-ai.vercel.app"
+        }
+      ],
+      "destination": "https://vitrioai.com.br/$1",
+      "permanent": true
+    }
+  ]
 }
