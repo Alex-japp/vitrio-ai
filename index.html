@@ -798,7 +798,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.7.1';
+const APP_VERSION = '1.7.4';
 
 async function checkAppVersion(){
   try{
@@ -2360,7 +2360,7 @@ async function updateGalleryBadge(count){
   }catch(e){ badge.style.display='none'; }
 }
 
-function openTerms(){
+async function openTerms(){
   document.getElementById('termsModal').style.display='flex';
   const content = document.getElementById('termsContent');
   if(!content) return;
