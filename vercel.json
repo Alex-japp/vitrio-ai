@@ -21,6 +21,17 @@
       ],
       "destination": "https://vitrioai.com.br/$1",
       "permanent": true
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.vitrioai.com.br"
+        }
+      ],
+      "destination": "https://vitrioai.com.br/$1",
+      "permanent": true
     }
   ]
 }
