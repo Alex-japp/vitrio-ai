@@ -798,7 +798,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.7.6';
+const APP_VERSION = '1.7.7';
 
 async function checkAppVersion(){
   try{
@@ -2296,7 +2296,8 @@ async function openGallery24h(){
       }
       if(!photos.length) return;
       const titulo = cat ? `${cat} — ${code}` : code;
-      const downloadAll = photos.map(p=>`downloadUrl('${p.url}','${code}-foto${p.n}.jpg')`).join(';');
+      const photosData = JSON.stringify(photos.map(p=>({url:p.url, name:`${code}-foto${p.n}.jpg`})));
+      const downloadAll = `downloadAllPhotos(${photosData})`;
       html += `<div style="border:1px solid #EAEAF2;border-radius:18px;overflow:hidden;margin-bottom:14px">
         <div style="padding:12px 16px;background:#F8F7FF;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
           <div>
@@ -2355,6 +2356,12 @@ async function updateGalleryBadge(count){
       badge.style.display='none';
     }
   }catch(e){ badge.style.display='none'; }
+}
+
+function downloadAllPhotos(photos){
+  photos.forEach((p, i) => {
+    setTimeout(() => downloadUrl(p.url, p.name), i * 800);
+  });
 }
 
 async function openTerms(){
