@@ -798,7 +798,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.7.4';
+const APP_VERSION = '1.7.5';
 
 async function checkAppVersion(){
   try{
@@ -1573,8 +1573,7 @@ const LOADING_MSGS = [
 let msgSet = LOADING_MSGS[Math.floor(Math.random()*LOADING_MSGS.length)];
 let msgIdx = 0;
 let msgInterval = null;
-function startMotivMsg(){msgSet=LOADING_MSGS[Math.floor(Math.random()*LOADING_MSGS.length)];msgIdx=0;msgInterval=setInterval(()=>{msgIdx=(msgIdx+1)%msgSet.length;ptext.textContent=msgSet[msgIdx];},2200);}
-function stopMotivMsg(){if(msgInterval){clearInterval(msgInterval);msgInterval=null;}}
+
 
 async function api(type,data){const res=await fetch('/api/gerar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,...data})});if(!res.ok)throw new Error('Falha na função');const j=await res.json();if(j.error)throw new Error(j.error);return j}
 
@@ -1654,7 +1653,7 @@ async function regenerate(i){
     skeletons.forEach(s => {
       const card = document.createElement('div');
       card.className = 'res res-animate';
-      card.innerHTML = `<div style="width:100%;aspect-ratio:1;background:var(--line);border-radius:18px;display:grid;place-items:center;color:var(--muted);font-size:12px">Erro ao gerar</div>`;
+      card.innerHTML = `<div style="width:100%;aspect-ratio:1;background:var(--line);border-radius:18px;display:grid;place-items:center;flex-direction:column;gap:8px;color:var(--muted);font-size:12px;flex-direction:column"><div>Erro ao gerar</div><button onclick="regenerate(${i})" style="background:var(--grad);color:#fff;border:none;border-radius:10px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer">Tentar novamente</button></div>`;
       grid.replaceChild(card, s);
     });
   }
@@ -1733,7 +1732,6 @@ function downloadUrl(url, name){
       const a = document.createElement('a');
       a.href = url;
       a.download = fileName;
-      a.target = '_blank';
       a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
