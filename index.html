@@ -1432,14 +1432,14 @@ async function generate(){
   _generateCancelled = false;
   genBtn.disabled=false;
   genBtn.onclick = cancelGenerate;
-  genBtn.style.background = 'linear-gradient(135deg,#c23,#e44)';
+ genBtn.style.background = 'linear-gradient(135deg,#3A3A4A,#2A2A3A)';
   const _qty = state.selectedPhotos.length;
   showToast(`Gerando ${_qty} foto${_qty>1?'s':''}...`, '#5B3FE8');
   // Barra de progresso no botão
   const btnProg = document.getElementById('btnProgress');
   const genTxt = document.getElementById('genBtnText');
-  if(btnProg) btnProg.style.width = '5%';
-  if(genTxt) genTxt.textContent = '✖ Cancelar';
+ if(btnProg) btnProg.style.width = '20%';
+  if(genTxt) genTxt.textContent = '✖ Cancelar geração';
   // Mantém progress card só no mobile
   if(window.innerWidth<900){ bar.style.width='5%'; ptext.textContent='Enviando para processamento...'; }
   const skeletonCount = state.selectedPhotos.length;
