@@ -1432,7 +1432,7 @@ async function generate(){
   _generateCancelled = false;
   genBtn.disabled=false;
   genBtn.onclick = cancelGenerate;
- genBtn.style.background = 'linear-gradient(135deg,#3A3A4A,#2A2A3A)';
+ genBtn.style.background = '';
   const _qty = state.selectedPhotos.length;
   showToast(`Gerando ${_qty} foto${_qty>1?'s':''}...`, '#5B3FE8');
   // Barra de progresso no botão
