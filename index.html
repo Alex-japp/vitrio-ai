@@ -798,7 +798,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.7.8';
+const APP_VERSION = '1.7.9';
 
 async function checkAppVersion(){
   try{
@@ -1293,6 +1293,7 @@ const defaults=[['Anéis'],['Brincos'],['Colares'],['Pulseiras'],['Pingentes']].
 let cats=defaults, editId=null, editMode='cat';
 let state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],selectedPhotos:[1,2,3]};
 let appConfig={codeRequired:true};
+let _generateCancelled = false;
 
 // ── FIREBASE ID TOKEN ────────────────────────────────
 async function getIdToken() {
@@ -1428,14 +1429,17 @@ async function generate(){
   }
   error.textContent='';
   if(window.innerWidth<900)results.style.display='none';
-  genBtn.disabled=true;
+  _generateCancelled = false;
+  genBtn.disabled=false;
+  genBtn.onclick = cancelGenerate;
+  genBtn.style.background = 'linear-gradient(135deg,#c23,#e44)';
   const _qty = state.selectedPhotos.length;
   showToast(`Gerando ${_qty} foto${_qty>1?'s':''}...`, '#5B3FE8');
   // Barra de progresso no botão
   const btnProg = document.getElementById('btnProgress');
   const genTxt = document.getElementById('genBtnText');
   if(btnProg) btnProg.style.width = '5%';
-  if(genTxt) genTxt.textContent = 'Enviando...';
+  if(genTxt) genTxt.textContent = '✖ Cancelar';
   // Mantém progress card só no mobile
   if(window.innerWidth<900){ bar.style.width='5%'; ptext.textContent='Enviando para processamento...'; }
   const skeletonCount = state.selectedPhotos.length;
@@ -1533,6 +1537,11 @@ async function generate(){
             }
           });
 
+          if(_generateCancelled){
+            clearInterval(poll);
+            reject(new Error('CANCELLED'));
+            return;
+          }
           if(status.status === 'completed' || fotosMostradas.size === photos.length){
             clearInterval(poll);
             resolve();
@@ -1557,25 +1566,47 @@ async function generate(){
     await decrementCredits(photos.length);
     addCount();
     showToast('✓ Fotos geradas com sucesso!');
+    // Botão desabilitado após sucesso — usuário deve clicar "+ Novo produto"
+    genBtn.onclick = generate;
+    genBtn.style.background = '';
+    genBtn.disabled = true;
     scrollToResults();
     if((currentUserData?.credits||0) === 0) setTimeout(()=>showZeroCreditsPopup(), 1500);
     else setTimeout(()=>showAjusteFino(), 1000);
   }catch(e){
-    const msg = e.message.includes('Falha na função') || e.message.includes('timeout') || e.message.includes('504')
-      ? '⚠️ Nossos servidores estão sobrecarregados no momento. Aguarde alguns minutos e tente novamente.'
-      : 'Erro: '+e.message;
-    error.textContent=msg;
+    if(e.message === 'CANCELLED'){
+      // Cancelado pelo usuário — não mostra erro
+    } else {
+      const msg = e.message.includes('Falha na função') || e.message.includes('timeout') || e.message.includes('504')
+        ? '⚠️ Nossos servidores estão sobrecarregados no momento. Aguarde alguns minutos e tente novamente.'
+        : 'Erro: '+e.message;
+      error.textContent=msg;
+    }
+    genBtn.onclick = generate;
+    genBtn.style.background = '';
     genBtn.disabled=false;
   }
   finally{
     setTimeout(()=>{
-      // progress removido — barra no botão
       const bp2 = document.getElementById('btnProgress');
       const gt2 = document.getElementById('genBtnText');
       if(bp2) bp2.style.width = '0%';
-      if(gt2) gt2.textContent = '✦ Gerar fotos profissionais';
+      if(!_generateCancelled && !genBtn.disabled) return;
+      if(genBtn.disabled && gt2) gt2.textContent = '✦ Gerar fotos profissionais';
     }, 1500);
   }
+}
+
+function cancelGenerate(){
+  _generateCancelled = true;
+  genBtn.onclick = generate;
+  genBtn.style.background = '';
+  genBtn.disabled = false;
+  const gt = document.getElementById('genBtnText');
+  const bp = document.getElementById('btnProgress');
+  if(gt) gt.textContent = '✦ Gerar fotos profissionais';
+  if(bp) bp.style.width = '0%';
+  showToast('Geração cancelada', '#888');
 }
 
 const LOADING_MSGS = [
@@ -1754,6 +1785,9 @@ function downloadUrl(url, name){
 }
 
 function resetForm(){
+  genBtn.onclick = generate;
+  genBtn.style.background = '';
+  _generateCancelled = false;
   state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],selectedPhotos:[1,2,3]};
   // Preenche próximo código sequencial se opcional
   if(!appConfig.codeRequired){
