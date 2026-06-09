@@ -798,7 +798,7 @@ const auth = firebase.auth();
 const CONFIG_REF = db.collection('app').doc('config');
 
 // ── VERSÃO DO APP ────────────────────────────────────────
-const APP_VERSION = '1.7.7';
+const APP_VERSION = '1.7.8';
 
 async function checkAppVersion(){
   try{
@@ -951,6 +951,10 @@ async function loadUserData(uid){
     }
     applyAdminVisibility(currentUserData?.isAdmin === true);
     updateCreditsUI();
+    // Sincroniza contador sequencial do Firestore
+    if(currentUserData?.seqCode !== undefined){
+      localStorage.setItem('vitrio_seq_code', currentUserData.seqCode);
+    }
     return currentUserData;
   }catch(e){
     console.error('❌ Erro loadUserData:', e.code, e.message);
@@ -1144,6 +1148,17 @@ function getNextCode(){
   const last = parseInt(localStorage.getItem('vitrio_seq_code')||'0');
   const next = last + 1;
   return String(next).padStart(3, '0');
+}
+
+async function syncSeqCode(){
+  // Sincroniza contador do Firestore para localStorage
+  try{
+    if(!currentUser) return;
+    const snap = await db.collection('users').doc(currentUser.uid).get({source:'server'});
+    if(snap.exists && snap.data()?.seqCode !== undefined){
+      localStorage.setItem('vitrio_seq_code', snap.data().seqCode);
+    }
+  }catch(e){ console.log('Erro syncSeqCode:', e.message); }
 }
 
 function applyCodeConfig(){
@@ -1763,10 +1778,12 @@ function resetForm(){
 function addCount(){
   localStorage.setItem('cntP',Number(localStorage.getItem('cntP')||0)+1);
   localStorage.setItem('cntI',Number(localStorage.getItem('cntI')||0)+state.selectedPhotos.length);
-  // Incrementa código sequencial
+  // Incrementa código sequencial e sincroniza no Firestore
   if(!appConfig.codeRequired){
     const current = parseInt(localStorage.getItem('vitrio_seq_code')||'0');
-    localStorage.setItem('vitrio_seq_code', current + 1);
+    const next = current + 1;
+    localStorage.setItem('vitrio_seq_code', next);
+    if(currentUser) db.collection('users').doc(currentUser.uid).update({seqCode: next}).catch(()=>{});
   }
   render();
   saveCountToFirebase();
