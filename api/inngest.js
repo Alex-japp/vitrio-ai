@@ -373,7 +373,9 @@ const gerarFotos = inngest.createFunction(
     }
 
     // ── Foto 2 (referência: Foto 1) ──────────────────────
-    const ref = photo1B64 || imageBase64;
+    const ref = (typeof photo1B64 === 'string' && photo1B64.length > 0) 
+  ? photo1B64 
+  : imageBase64;
     if (selectedPhotos.includes(2)) {
       await step.run('foto-2', async () => {
         const b64 = await gerarFoto(prompts['2'], ref, descricao);
