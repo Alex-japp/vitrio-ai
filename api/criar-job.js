@@ -14,7 +14,7 @@ const ALLOWED_ORIGINS = [
   'http://localhost:5500'
 ];
 
-const RATE_LIMIT     = 20;
+const RATE_LIMIT     = 100;
 const RATE_WINDOW_MS = 60 * 60 * 1000;
 
 // ── Rate limiting via Firestore ──────────────────────────
