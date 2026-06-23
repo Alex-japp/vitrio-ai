@@ -212,7 +212,7 @@ async function gerarFoto(prompt, imageBase64, descricao = '', retries = 3) {
             { type: 'input_text', text: `Reproduza EXATAMENTE este produto. Aplique: ${prompt + descricao}` }
           ]
         }],
-        tools: [{ type: 'image_generation', size: '1024x1024' }]
+        tools: [{ type: 'image_generation', size: '1024x1024', quality: 'medium' }]
       })
     });
 
