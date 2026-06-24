@@ -361,21 +361,21 @@ const gerarFotos = inngest.createFunction(
 
     const { selectedPhotos, prompts } = jobDoc;
 
-    // ── Foto 1 ───────────────────────────────────────────
-    let photo1B64 = null;
-    if (selectedPhotos.includes(1)) {
-      photo1B64 = await step.run('foto-1', async () => {
-        const b64 = await gerarFoto(prompts['1'], imageBase64, descricao);
-        const url = await salvarImagem(accessToken, jobId, 1, b64);
-        await updateJob(accessToken, jobId, { 1: url, updatedAt: Date.now() });
-        return b64;
-      });
-    }
+   // ── Foto 1 — sempre gerada como referência mestre ────
+const photo1B64 = await step.run('foto-1', async () => {
+  const b64 = await gerarFoto(prompts['1'], imageBase64, descricao);
+  
+  // Só salva no Storage se o usuário selecionou
+  if (selectedPhotos.includes(1)) {
+    const url = await salvarImagem(accessToken, jobId, 1, b64);
+    await updateJob(accessToken, jobId, { 1: url, updatedAt: Date.now() });
+  }
+  
+  return b64;
+});
 
-    // ── Foto 2 (referência: Foto 1) ──────────────────────
-    const ref = (typeof photo1B64 === 'string' && photo1B64.length > 0) 
-  ? photo1B64 
-  : imageBase64;
+// Foto 1 sempre usada como referência para as demais
+const ref = photo1B64 || imageBase64;
     if (selectedPhotos.includes(2)) {
       await step.run('foto-2', async () => {
         const b64 = await gerarFoto(prompts['2'], ref, descricao);
