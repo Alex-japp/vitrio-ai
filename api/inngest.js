@@ -1,5 +1,5 @@
 const { Inngest } = require('inngest');
-const { serve } = require('inngest/express');
+const { serve } = require('inngest/node');
 const { getServiceAccountToken } = require('./auth-helper');
 const sharp = require('sharp');
 
