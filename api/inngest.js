@@ -361,16 +361,25 @@ const gerarFotos = inngest.createFunction(
 
     const { selectedPhotos, prompts } = jobDoc;
 
-   // ── Foto 1 — sempre gerada como referência mestre ────
+  // ── Foto 1 — usa existente ou gera nova ──────────────
 const photo1B64 = await step.run('foto-1', async () => {
+  // Verifica se Foto 1 já existe no Firestore
+  const jobAtual = await firestoreGet(accessToken, `jobs/${jobId}`);
+  const foto1Existe = jobAtual.fields?.photo_1?.stringValue;
+
+  if (foto1Existe) {
+    // Já existe — baixa do Storage sem gerar novamente
+    return await downloadFromStorage(accessToken, `jobs/${jobId}/photo_1.jpg`);
+  }
+
+  // Não existe — gera agora
   const b64 = await gerarFoto(prompts['1'], imageBase64, descricao);
-  
-  // Só salva no Storage se o usuário selecionou
+
   if (selectedPhotos.includes(1)) {
     const url = await salvarImagem(accessToken, jobId, 1, b64);
     await updateJob(accessToken, jobId, { 1: url, updatedAt: Date.now() });
   }
-  
+
   return b64;
 });
 
