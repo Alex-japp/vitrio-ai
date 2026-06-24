@@ -434,7 +434,6 @@ const ref = photo1B64 || imageBase64;
 );
 
 module.exports = serve({
-  client:     inngest,
-  functions:  [gerarFotos, limparStorage],
-  signingKey: process.env.INNGEST_SIGNING_KEY,
+  client:    inngest,
+  functions: [gerarFotos, limparStorage],
 });
