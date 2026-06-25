@@ -24,17 +24,14 @@ async function firestoreGet(accessToken, docPath) {
 async function updateJob(accessToken, jobId, updates) {
   const fields = {};
   const fieldPaths = [];
-
   Object.entries(updates).forEach(([k, v]) => {
     const fieldName = (k === 'status' || k === 'updatedAt') ? k : `photo_${k}`;
     fieldPaths.push(fieldName);
-    if (k === 'status')    fields[fieldName] = { stringValue: v };
+    if (k === 'status')         fields[fieldName] = { stringValue: v };
     else if (k === 'updatedAt') fields[fieldName] = { integerValue: v.toString() };
-    else                   fields[fieldName] = { stringValue: v };
+    else                        fields[fieldName] = { stringValue: v };
   });
-
   const maskParams = fieldPaths.map(f => `updateMask.fieldPaths=${encodeURIComponent(f)}`).join('&');
-
   const res = await fetch(
     `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents/jobs/${jobId}?${maskParams}`,
     {
@@ -46,7 +43,6 @@ async function updateJob(accessToken, jobId, updates) {
       body: JSON.stringify({ fields })
     }
   );
-
   if (!res.ok) console.error('updateJob erro:', res.status, await res.text());
 }
 
@@ -54,17 +50,15 @@ async function updateJob(accessToken, jobId, updates) {
 async function downloadFromStorage(accessToken, filePath) {
   const encoded = encodeURIComponent(filePath);
   const url     = `https://storage.googleapis.com/storage/v1/b/${BUCKET}/o/${encoded}?alt=media`;
-
   const res = await fetch(url, {
     headers: { 'Authorization': `Bearer ${accessToken}` }
   });
   if (!res.ok) throw new Error(`Storage download falhou (${res.status}): ${filePath}`);
-
   const buffer = await res.arrayBuffer();
   return Buffer.from(buffer).toString('base64');
 }
 
-// ── Comprime PNG/qualquer formato → JPEG 0.85 via sharp ──
+// ── Comprime para JPEG via sharp ─────────────────────────
 async function comprimirParaJpeg(b64) {
   try {
     const buffer = Buffer.from(b64, 'base64');
@@ -74,31 +68,31 @@ async function comprimirParaJpeg(b64) {
     return compressed.toString('base64');
   } catch (e) {
     console.warn('Compressão sharp falhou, usando original:', e.message);
-    return b64; // fallback sem compressão
+    return b64;
   }
 }
 
-// ── Storage: salva base64 → URL ──────────────────────────
+// ── Storage: salva por número (photo_1, photo_2...) ──────
 async function salvarImagem(accessToken, jobId, photoNum, b64) {
   const filePath = `jobs/${jobId}/photo_${photoNum}.jpg`;
-  const encoded  = encodeURIComponent(filePath);
-  const url      = `https://storage.googleapis.com/upload/storage/v1/b/${BUCKET}/o?uploadType=media&name=${encoded}`;
+  return await salvarImagemDireto(accessToken, filePath, b64);
+}
 
-  // Comprime antes de salvar — PNG 1.5MB → JPEG ~300-500KB
+// ── Storage: salva em path específico ───────────────────
+async function salvarImagemDireto(accessToken, filePath, b64) {
+  const encoded = encodeURIComponent(filePath);
+  const url     = `https://storage.googleapis.com/upload/storage/v1/b/${BUCKET}/o?uploadType=media&name=${encoded}`;
   const b64Comprimido = await comprimirParaJpeg(b64);
   const buffer = Buffer.from(b64Comprimido, 'base64');
-
   const res = await fetch(url, {
-    method:  'POST',
+    method: 'POST',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Content-Type':  'image/jpeg',
     },
     body: buffer
   });
-
   if (!res.ok) throw new Error(`Storage upload falhou (${res.status}): ${await res.text()}`);
-
   return `https://firebasestorage.googleapis.com/v0/b/${BUCKET}/o/${encoded}?alt=media`;
 }
 
@@ -111,7 +105,7 @@ async function analisarPeca(imageBase64) {
       'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
     },
     body: JSON.stringify({
-     model: 'gpt-4.1',
+      model: 'gpt-4.1',
       max_tokens: 400,
       messages: [{
         role:    'user',
@@ -146,7 +140,6 @@ function montarDescricao(analise) {
 // ── Fallback FLUX ────────────────────────────────────────
 async function gerarFLUX(prompt, imageBase64) {
   if (!process.env.REPLICATE_API_KEY) throw new Error('REPLICATE_API_KEY não configurada.');
-
   const startRes = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-redux-dev/predictions', {
     method: 'POST',
     headers: {
@@ -165,19 +158,15 @@ async function gerarFLUX(prompt, imageBase64) {
       }
     })
   });
-
   if (!startRes.ok) throw new Error(`FLUX erro: ${startRes.status}`);
   const prediction = await startRes.json();
-
   if (prediction.output?.[0]) {
     const res = await fetch(prediction.output[0]);
     const buffer = await res.arrayBuffer();
     return Buffer.from(buffer).toString('base64');
   }
-
   const pollUrl = prediction.urls?.get;
   if (!pollUrl) throw new Error('FLUX: URL de polling não encontrada.');
-
   for (let i = 0; i < 30; i++) {
     await new Promise(r => setTimeout(r, 3000));
     const pollRes = await fetch(pollUrl, {
@@ -215,18 +204,15 @@ async function gerarFoto(prompt, imageBase64, descricao = '', retries = 3) {
         tools: [{ type: 'image_generation', size: '1024x1024' }]
       })
     });
-
     if (response.status === 429 && retries > 0) {
       await new Promise(r => setTimeout(r, 15000));
       return gerarFoto(prompt, imageBase64, descricao, retries - 1);
     }
-
     if (!response.ok) throw new Error(`OpenAI ${response.status}`);
     const data = await response.json();
     const img  = data.output?.find(o => o.type === 'image_generation_call');
     if (!img) throw new Error('Imagem não gerada');
     return img.result;
-
   } catch (openaiError) {
     console.warn('OpenAI falhou, tentando FLUX:', openaiError.message);
     return gerarFLUX(prompt, imageBase64);
@@ -237,7 +223,6 @@ async function gerarFoto(prompt, imageBase64, descricao = '', retries = 3) {
 async function limparJobsAntigos(accessToken) {
   try {
     const vinte4h = Date.now() - (24 * 60 * 60 * 1000);
-
     const res = await fetch(
       `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents:runQuery`,
       {
@@ -261,49 +246,37 @@ async function limparJobsAntigos(accessToken) {
         })
       }
     );
-
     const data = await res.json();
     if (!Array.isArray(data)) return;
-
     for (const item of data) {
       if (!item.document) continue;
       const jobId  = item.document.name.split('/').pop();
       const fields = item.document.fields || {};
-
-      // Deleta fotos do Storage
       for (let n = 1; n <= 6; n++) {
         if (fields[`photo_${n}`]?.stringValue) {
           const fileName = encodeURIComponent(`jobs/${jobId}/photo_${n}.jpg`);
           await fetch(
             `https://storage.googleapis.com/storage/v1/b/${BUCKET}/o/${fileName}`,
-            {
-              method:  'DELETE',
-              headers: { 'Authorization': `Bearer ${accessToken}` }
-            }
+            { method: 'DELETE', headers: { 'Authorization': `Bearer ${accessToken}` } }
           ).catch(() => {});
         }
       }
-
-      // Deleta imagem original do Storage
+      // Deleta photo_ref.jpg também
+      const refFileName = encodeURIComponent(`jobs/${jobId}/photo_ref.jpg`);
+      await fetch(
+        `https://storage.googleapis.com/storage/v1/b/${BUCKET}/o/${refFileName}`,
+        { method: 'DELETE', headers: { 'Authorization': `Bearer ${accessToken}` } }
+      ).catch(() => {});
       const origFileName = encodeURIComponent(`jobs/${jobId}/original.jpg`);
       await fetch(
         `https://storage.googleapis.com/storage/v1/b/${BUCKET}/o/${origFileName}`,
-        {
-          method:  'DELETE',
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        }
+        { method: 'DELETE', headers: { 'Authorization': `Bearer ${accessToken}` } }
       ).catch(() => {});
-
-      // Deleta documento do Firestore
       await fetch(
         `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents/jobs/${jobId}`,
-        {
-          method:  'DELETE',
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        }
+        { method: 'DELETE', headers: { 'Authorization': `Bearer ${accessToken}` } }
       ).catch(() => {});
     }
-
     console.log(`Limpeza: ${data.filter(i => i.document).length} jobs removidos`);
   } catch (e) {
     console.error('Erro na limpeza:', e.message);
@@ -325,13 +298,11 @@ const gerarFotos = inngest.createFunction(
   { id: 'gerar-fotos', retries: 2, timeouts: { finish: '10m' } },
   { event: 'vitrio/gerar' },
   async ({ event, step }) => {
-    // ── Recebe APENAS jobId ──────────────────────────────
     const { jobId } = event.data;
     if (!jobId) throw new Error('jobId não fornecido');
-
     const accessToken = await getServiceAccountToken();
 
-    // ── Busca job completo no Firestore ──────────────────
+    // ── Step 1: Busca job no Firestore ───────────────────
     const jobDoc = await step.run('buscar-job', async () => {
       const doc    = await firestoreGet(accessToken, `jobs/${jobId}`);
       const fields = doc.fields || {};
@@ -348,80 +319,76 @@ const gerarFotos = inngest.createFunction(
 
     await updateJob(accessToken, jobId, { status: 'processing', updatedAt: Date.now() });
 
-    // ── Baixa imagem original do Storage ─────────────────
+    // ── Step 2: Baixa imagem original do Storage ─────────
     const imageBase64 = await step.run('baixar-imagem', async () => {
       return await downloadFromStorage(accessToken, jobDoc.imageFilePath);
     });
 
-    // ── Análise técnica ──────────────────────────────────
+    // ── Step 3: Análise técnica da peça ──────────────────
     const analise = await step.run('analisar', async () => {
       try { return await analisarPeca(imageBase64); } catch { return {}; }
     });
-    const descricao = montarDescricao(analise);
 
+    const descricao = montarDescricao(analise);
     const { selectedPhotos, prompts } = jobDoc;
 
-// ── Foto 1 — usa existente ou gera nova ──────────────
-await step.run('foto-1', async () => {
-  const jobAtual = await firestoreGet(accessToken, `jobs/${jobId}`);
-  const foto1Existe = jobAtual.fields?.photo_1?.stringValue;
+    // ── Step 4: Gerar Foto 1 e salvar como referência ────
+    // photo_ref.jpg é SEMPRE gerado — é a referência oficial
+    await step.run('foto-1', async () => {
+      const b64 = await gerarFoto(prompts['1'], imageBase64, descricao);
 
-  let b64;
-  if (foto1Existe) {
-    b64 = await downloadFromStorage(accessToken, `jobs/${jobId}/photo_1.jpg`);
-  } else {
-    b64 = await gerarFoto(prompts['1'], imageBase64, descricao);
-    if (selectedPhotos.includes(1)) {
-      const url = await salvarImagem(accessToken, jobId, 1, b64);
-      await updateJob(accessToken, jobId, { 1: url, updatedAt: Date.now() });
-    }
-  }
-  await updateJob(accessToken, jobId, { ref_path: `jobs/${jobId}/photo_1.jpg`, updatedAt: Date.now() });
-});
+      // Salva SEMPRE como photo_ref.jpg — referência interna obrigatória
+      await salvarImagemDireto(accessToken, `jobs/${jobId}/photo_ref.jpg`, b64);
 
-// Busca path da foto 1 e baixa para usar como referência
-const jobComRef = await firestoreGet(accessToken, `jobs/${jobId}`);
-const refPath = jobComRef.fields?.photo_ref_path?.stringValue;
-const ref = refPath ? await downloadFromStorage(accessToken, refPath) : imageBase64;
+      // Salva como photo_1.jpg APENAS se usuário selecionou catálogo
+      if (selectedPhotos.includes(1)) {
+        const url = await salvarImagem(accessToken, jobId, 1, b64);
+        await updateJob(accessToken, jobId, { 1: url, updatedAt: Date.now() });
+      }
+    });
+
+    // ── Baixa photo_ref.jpg — referência oficial ─────────
+    const refB64 = await downloadFromStorage(
+      accessToken,
+      `jobs/${jobId}/photo_ref.jpg`
+    );
+
+    // ── Fotos 2-6 usam exclusivamente photo_ref.jpg ──────
     if (selectedPhotos.includes(2)) {
       await step.run('foto-2', async () => {
-        const b64 = await gerarFoto(prompts['2'], ref, descricao);
+        const b64 = await gerarFoto(prompts['2'], refB64, descricao);
         const url = await salvarImagem(accessToken, jobId, 2, b64);
         await updateJob(accessToken, jobId, { 2: url, updatedAt: Date.now() });
       });
     }
 
-    // ── Foto 3 (referência: Foto 1) ──────────────────────
     if (selectedPhotos.includes(3)) {
       await step.run('foto-3', async () => {
-        const b64 = await gerarFoto(prompts['3'], ref, descricao);
+        const b64 = await gerarFoto(prompts['3'], refB64, descricao);
         const url = await salvarImagem(accessToken, jobId, 3, b64);
         await updateJob(accessToken, jobId, { 3: url, updatedAt: Date.now() });
       });
     }
 
-    // ── Foto 4 (referência: Foto 1) ──────────────────────
     if (selectedPhotos.includes(4)) {
       await step.run('foto-4', async () => {
-        const b64 = await gerarFoto(prompts['4'], ref, descricao);
+        const b64 = await gerarFoto(prompts['4'], refB64, descricao);
         const url = await salvarImagem(accessToken, jobId, 4, b64);
         await updateJob(accessToken, jobId, { 4: url, updatedAt: Date.now() });
       });
     }
 
-    // ── Foto 5 (referência: Foto 1) ──────────────────────
     if (selectedPhotos.includes(5)) {
       await step.run('foto-5', async () => {
-        const b64 = await gerarFoto(prompts['5'], ref, descricao);
+        const b64 = await gerarFoto(prompts['5'], refB64, descricao);
         const url = await salvarImagem(accessToken, jobId, 5, b64);
         await updateJob(accessToken, jobId, { 5: url, updatedAt: Date.now() });
       });
     }
 
-    // ── Foto 6 (referência: Foto 1) ──────────────────────
     if (selectedPhotos.includes(6)) {
       await step.run('foto-6', async () => {
-        const b64 = await gerarFoto(prompts['6'], ref, descricao);
+        const b64 = await gerarFoto(prompts['6'], refB64, descricao);
         const url = await salvarImagem(accessToken, jobId, 6, b64);
         await updateJob(accessToken, jobId, { 6: url, updatedAt: Date.now() });
       });
