@@ -361,30 +361,28 @@ const gerarFotos = inngest.createFunction(
 
     const { selectedPhotos, prompts } = jobDoc;
 
-  // ── Foto 1 — usa existente ou gera nova ──────────────
-const photo1B64 = await step.run('foto-1', async () => {
-  // Verifica se Foto 1 já existe no Firestore
+// ── Foto 1 — usa existente ou gera nova ──────────────
+await step.run('foto-1', async () => {
   const jobAtual = await firestoreGet(accessToken, `jobs/${jobId}`);
   const foto1Existe = jobAtual.fields?.photo_1?.stringValue;
 
+  let b64;
   if (foto1Existe) {
-    // Já existe — baixa do Storage sem gerar novamente
-    return await downloadFromStorage(accessToken, `jobs/${jobId}/photo_1.jpg`);
+    b64 = await downloadFromStorage(accessToken, `jobs/${jobId}/photo_1.jpg`);
+  } else {
+    b64 = await gerarFoto(prompts['1'], imageBase64, descricao);
+    if (selectedPhotos.includes(1)) {
+      const url = await salvarImagem(accessToken, jobId, 1, b64);
+      await updateJob(accessToken, jobId, { 1: url, updatedAt: Date.now() });
+    }
   }
-
-  // Não existe — gera agora
-  const b64 = await gerarFoto(prompts['1'], imageBase64, descricao);
-
-  if (selectedPhotos.includes(1)) {
-    const url = await salvarImagem(accessToken, jobId, 1, b64);
-    await updateJob(accessToken, jobId, { 1: url, updatedAt: Date.now() });
-  }
-
-  return b64;
+  await updateJob(accessToken, jobId, { ref_path: `jobs/${jobId}/photo_1.jpg`, updatedAt: Date.now() });
 });
 
-// Foto 1 sempre usada como referência para as demais
-const ref = photo1B64 || imageBase64;
+// Busca path da foto 1 e baixa para usar como referência
+const jobComRef = await firestoreGet(accessToken, `jobs/${jobId}`);
+const refPath = jobComRef.fields?.ref_path?.stringValue;
+const ref = refPath ? await downloadFromStorage(accessToken, refPath) : imageBase64;
     if (selectedPhotos.includes(2)) {
       await step.run('foto-2', async () => {
         const b64 = await gerarFoto(prompts['2'], ref, descricao);
