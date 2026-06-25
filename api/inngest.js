@@ -138,6 +138,7 @@ async function analisarPeca(imageBase64) {
   "detalhes_extras": ""
 }
 Seja preciso. importantDetails deve listar características visuais únicas da peça. forbiddenChanges deve listar o que não pode ser alterado na geração.
+Atenção especial para contagem de elementos estruturais: conte com cuidado os fios, aros, correntes ou elementos da peça. Um reflexo, sombra ou brilho lateral no mesmo elemento NÃO é um segundo fio ou aro separado. Só conte como elemento separado se houver um espaço visível e claro entre dois elementos distintos de metal. Em caso de dúvida, prefira o número menor.
 Adicione também:
   "complexity": "simple|medium|complex",
   "fidelityMode": "normal|strict"
