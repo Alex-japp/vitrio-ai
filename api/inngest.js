@@ -347,11 +347,13 @@ const gerarFotos = inngest.createFunction(
       }
     });
 
-    // ── Baixa photo_ref.jpg — referência oficial ─────────
-    const refB64 = await downloadFromStorage(
-      accessToken,
-      `jobs/${jobId}/photo_ref.jpg`
-    );
+   // ── Step 5: Baixa photo_ref.jpg — referência oficial ─
+    const refB64 = await step.run('baixar-ref', async () => {
+      return await downloadFromStorage(
+        accessToken,
+        `jobs/${jobId}/photo_ref.jpg`
+      );
+    });
 
     // ── Fotos 2-6 usam exclusivamente photo_ref.jpg ──────
     if (selectedPhotos.includes(2)) {
