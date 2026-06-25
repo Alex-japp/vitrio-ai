@@ -137,7 +137,12 @@ async function analisarPeca(imageBase64) {
   "technicalDescription": "descrição curta e precisa da peça em 1 frase",
   "detalhes_extras": ""
 }
-Seja preciso. importantDetails deve listar características visuais únicas da peça. forbiddenChanges deve listar o que não pode ser alterado na geração.` }
+Seja preciso. importantDetails deve listar características visuais únicas da peça. forbiddenChanges deve listar o que não pode ser alterado na geração.
+Adicione também:
+  "complexity": "simple|medium|complex",
+  "fidelityMode": "normal|strict"
+complexity = simple: peça lisa sem símbolos ou pedras. medium: algumas pedras ou textura. complex: símbolo específico, múltiplos aros, muitas pedras, letras, formatos geométricos únicos.
+fidelityMode = strict quando complexity = complex ou quando há símbolo, gravação, formato específico ou estrutura incomum. normal nos demais casos.` }
         ]
       }]
     })
@@ -214,6 +219,16 @@ function montarFichaTecnica(analise, corFinal) {
     analise.forbiddenChanges.forEach(r => linhas.push(`- ${r}`));
   }
 
+  // Modo strict: instruções adicionais para peças complexas
+  if (analise.fidelityMode === 'strict' || analise.complexity === 'complex') {
+    linhas.push('\nMODO FIDELIDADE ESTRITA — REGRAS ADICIONAIS:');
+    linhas.push('- Não redesenhar a peça. Não simplificar estrutura.');
+    linhas.push('- A peça deve ser tratada como objeto físico idêntico à imagem-mestre.');
+    linhas.push('- Não alterar quantidade de elementos, símbolos ou aros.');
+    linhas.push('- Não substituir por modelo parecido. Reproduzir esta peça específica.');
+    linhas.push('- Se a peça tem símbolo ou formato específico, mantê-lo exatamente.');
+  }
+
   linhas.push('=== FIM DA FICHA TÉCNICA ===');
 
   return linhas.join('\n');
@@ -232,6 +247,55 @@ function montarDescricao(analise) {
   if (analise.gravacao) p.push('com gravação');
   if (analise.detalhes_extras) p.push(analise.detalhes_extras);
   return p.length > 0 ? `\nCaracterísticas: ${p.join(', ')}.` : '';
+}
+
+// ── IA 2: Engenheira de prompt personalizado por produto ──
+async function gerarPromptPersonalizado(analise, corFinal, promptBase) {
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4.1-mini',
+        max_tokens: 600,
+        messages: [{
+          role: 'system',
+          content: 'Você é um especialista em prompts para geração de imagens de joias. Sua tarefa é criar um prompt personalizado e preciso com base na ficha técnica da peça. Retorne APENAS o prompt final, sem explicações.'
+        }, {
+          role: 'user',
+          content: `Com base na ficha técnica abaixo e no prompt base fornecido, crie um prompt personalizado que preserve com fidelidade absoluta as características únicas desta peça específica.
+
+FICHA TÉCNICA:
+- Tipo: ${analise.productType || 'joia'}
+- Descrição: ${analise.technicalDescription || ''}
+- Cor do metal: ${corFinal}
+- Formato principal: ${analise.mainShape || ''}
+- Estrutura: ${analise.structure || ''}
+- Pedras: ${analise.pedras ? `${analise.quantidade_pedras} ${analise.tipo_pedra} — ${analise.stonePlacement || ''}` : 'sem pedras'}
+- Detalhes únicos: ${(analise.importantDetails || []).join(', ')}
+- Complexidade: ${analise.complexity || 'medium'}
+- Modo: ${analise.fidelityMode || 'normal'}
+
+PROIBIÇÕES ABSOLUTAS:
+${(analise.forbiddenChanges || []).map(r => `- ${r}`).join('
+')}
+
+PROMPT BASE (contexto da cena):
+${promptBase}
+
+Crie o prompt final incorporando a ficha técnica ao prompt base. O prompt deve ser claro, direto e em português. Mantenha as instruções de cena do prompt base mas adicione as restrições específicas desta peça.`
+        }]
+      })
+    });
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content?.trim() || promptBase;
+  } catch (e) {
+    console.warn('IA 2 falhou, usando prompt base:', e.message);
+    return promptBase;
+  }
 }
 
 // ── Fallback FLUX ────────────────────────────────────────
@@ -281,7 +345,7 @@ async function gerarFLUX(prompt, imageBase64) {
 }
 
 // ── Geração de foto (OpenAI + fallback FLUX) ─────────────
-async function gerarFoto(prompt, imageBase64, descricao = '', retries = 3) {
+async function gerarFoto(prompt, imageBase64, descricao = '', retries = 3, quality = 'medium') {
   try {
     const response = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
@@ -298,12 +362,12 @@ async function gerarFoto(prompt, imageBase64, descricao = '', retries = 3) {
             { type: 'input_text', text: `Reproduza EXATAMENTE este produto. Aplique: ${prompt + descricao}` }
           ]
         }],
-        tools: [{ type: 'image_generation', size: '1024x1024' }]
+        tools: [{ type: 'image_generation', size: '1024x1024', quality }]
       })
     });
     if (response.status === 429 && retries > 0) {
       await new Promise(r => setTimeout(r, 15000));
-      return gerarFoto(prompt, imageBase64, descricao, retries - 1);
+      return gerarFoto(prompt, imageBase64, descricao, retries - 1, quality);
     }
     if (!response.ok) throw new Error(`OpenAI ${response.status}`);
     const data = await response.json();
@@ -430,14 +494,34 @@ const gerarFotos = inngest.createFunction(
     const { selectedPhotos, prompts, metalColor } = jobDoc;
     const corFinal = resolverCorFinal(metalColor, analise);
     const fichaTecnica = montarFichaTecnica(analise, corFinal);
+    const isComplexo = analise.fidelityMode === 'strict' || analise.complexity === 'complex';
 
     // ── Salva ficha técnica no Firestore ─────────────────
     await updateJob(accessToken, jobId, { fichaTecnica: analise, updatedAt: Date.now() });
 
-    // ── Step 4: Gerar Foto 1 e salvar como referência ────
+    // ── Step 4: IA 2 — apenas para peças complexas/strict ─
+    // Peças simples/médias usam prompt base direto (economiza custo)
+    const promptsPersonalizados = await step.run('personalizar-prompts', async () => {
+      if (!isComplexo) return {};
+      const resultado = {};
+      for (const num of selectedPhotos) {
+        const base = prompts[String(num)];
+        if (!base) continue;
+        resultado[num] = await gerarPromptPersonalizado(analise, corFinal, base);
+      }
+      // Sempre personaliza o prompt 1 mesmo se não selecionado (é a referência)
+      if (!resultado[1] && prompts['1']) {
+        resultado[1] = await gerarPromptPersonalizado(analise, corFinal, prompts['1']);
+      }
+      return resultado;
+    });
+
+    // ── Step 5: Gerar Foto 1 — high se complexo, medium se simples ──
     // photo_ref.jpg é SEMPRE gerado — é a referência oficial
     await step.run('foto-1', async () => {
-      const b64 = await gerarFoto(injetarCorMetal(prompts['1'], corFinal), imageBase64, fichaTecnica);
+      const promptFinal = injetarCorMetal(promptsPersonalizados[1] || prompts['1'], corFinal);
+      const qualidadeFoto1 = isComplexo ? 'high' : 'medium';
+      const b64 = await gerarFoto(promptFinal, imageBase64, fichaTecnica, 3, qualidadeFoto1);
 
       // Salva SEMPRE como photo_ref.jpg — referência interna obrigatória
       await salvarImagemDireto(accessToken, `jobs/${jobId}/photo_ref.jpg`, b64);
@@ -449,7 +533,7 @@ const gerarFotos = inngest.createFunction(
       }
     });
 
-   // ── Step 5: Baixa photo_ref.jpg — referência oficial ─
+   // ── Step 6: Baixa photo_ref.jpg — referência oficial ─
     const refB64 = await step.run('baixar-ref', async () => {
       return await downloadFromStorage(
         accessToken,
@@ -460,7 +544,8 @@ const gerarFotos = inngest.createFunction(
     // ── Fotos 2-6 usam exclusivamente photo_ref.jpg ──────
     if (selectedPhotos.includes(2)) {
       await step.run('foto-2', async () => {
-        const b64 = await gerarFoto(injetarCorMetal(prompts['2'], corFinal), refB64, fichaTecnica);
+        const promptFinal = injetarCorMetal(promptsPersonalizados[2] || prompts['2'], corFinal);
+        const b64 = await gerarFoto(promptFinal, refB64, fichaTecnica, 3, 'medium');
         const url = await salvarImagem(accessToken, jobId, 2, b64);
         await updateJob(accessToken, jobId, { 2: url, updatedAt: Date.now() });
       });
@@ -468,7 +553,8 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(3)) {
       await step.run('foto-3', async () => {
-        const b64 = await gerarFoto(injetarCorMetal(prompts['3'], corFinal), refB64, fichaTecnica);
+        const promptFinal = injetarCorMetal(promptsPersonalizados[3] || prompts['3'], corFinal);
+        const b64 = await gerarFoto(promptFinal, refB64, fichaTecnica, 3, 'medium');
         const url = await salvarImagem(accessToken, jobId, 3, b64);
         await updateJob(accessToken, jobId, { 3: url, updatedAt: Date.now() });
       });
@@ -476,7 +562,8 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(4)) {
       await step.run('foto-4', async () => {
-        const b64 = await gerarFoto(injetarCorMetal(prompts['4'], corFinal), refB64, fichaTecnica);
+        const promptFinal = injetarCorMetal(promptsPersonalizados[4] || prompts['4'], corFinal);
+        const b64 = await gerarFoto(promptFinal, refB64, fichaTecnica, 3, 'medium');
         const url = await salvarImagem(accessToken, jobId, 4, b64);
         await updateJob(accessToken, jobId, { 4: url, updatedAt: Date.now() });
       });
@@ -484,7 +571,8 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(5)) {
       await step.run('foto-5', async () => {
-        const b64 = await gerarFoto(injetarCorMetal(prompts['5'], corFinal), refB64, fichaTecnica);
+        const promptFinal = injetarCorMetal(promptsPersonalizados[5] || prompts['5'], corFinal);
+        const b64 = await gerarFoto(promptFinal, refB64, fichaTecnica, 3, 'medium');
         const url = await salvarImagem(accessToken, jobId, 5, b64);
         await updateJob(accessToken, jobId, { 5: url, updatedAt: Date.now() });
       });
@@ -492,7 +580,8 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(6)) {
       await step.run('foto-6', async () => {
-        const b64 = await gerarFoto(injetarCorMetal(prompts['6'], corFinal), refB64, fichaTecnica);
+        const promptFinal = injetarCorMetal(promptsPersonalizados[6] || prompts['6'], corFinal);
+        const b64 = await gerarFoto(promptFinal, refB64, fichaTecnica, 3, 'medium');
         const url = await salvarImagem(accessToken, jobId, 6, b64);
         await updateJob(accessToken, jobId, { 6: url, updatedAt: Date.now() });
       });
