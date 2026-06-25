@@ -24,12 +24,14 @@ async function firestoreGet(accessToken, docPath) {
 async function updateJob(accessToken, jobId, updates) {
   const fields = {};
   const fieldPaths = [];
+  // Campos que usam nome direto (sem prefixo photo_)
+  const directFields = new Set(['status', 'updatedAt', 'fichaTecnica']);
   Object.entries(updates).forEach(([k, v]) => {
-    const fieldName = (k === 'status' || k === 'updatedAt') ? k : `photo_${k}`;
+    const fieldName = directFields.has(k) ? k : `photo_${k}`;
     fieldPaths.push(fieldName);
-    if (k === 'status')         fields[fieldName] = { stringValue: v };
-    else if (k === 'updatedAt') fields[fieldName] = { integerValue: v.toString() };
-    else                        fields[fieldName] = { stringValue: v };
+    if (k === 'updatedAt')        fields[fieldName] = { integerValue: v.toString() };
+    else if (k === 'fichaTecnica') fields[fieldName] = { stringValue: JSON.stringify(v) };
+    else                           fields[fieldName] = { stringValue: v };
   });
   const maskParams = fieldPaths.map(f => `updateMask.fieldPaths=${encodeURIComponent(f)}`).join('&');
   const res = await fetch(
@@ -106,13 +108,36 @@ async function analisarPeca(imageBase64) {
     },
     body: JSON.stringify({
       model: 'gpt-4.1',
-      max_tokens: 400,
+      max_tokens: 900,
       messages: [{
         role:    'user',
         content: [
           { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${imageBase64}` } },
-          { type: 'text', text: `Analise esta joia e retorne APENAS JSON:
-{"metal":"ouro|prata|rose_gold","acabamento":"polido|fosco","pedras":true,"tipo_pedra":"cristal|zirconia|perola|sem_pedra","quantidade_pedras":0,"perolas":false,"quantidade_perolas":0,"tipo_elo":"retangular|oval|figaro|sem_elo","espessura_elo":"fina|media|grossa","fecho":"lagosta|mola|gaveta|sem_fecho","pingente":false,"tipo_pingente":"sem_pingente","gravacao":false,"detalhes_extras":""}` }
+          { type: 'text', text: `Analise esta joia com máxima precisão e retorne APENAS JSON, sem texto antes ou depois:
+{
+  "metal": "ouro|prata|rose_gold",
+  "acabamento": "polido|fosco|texturizado",
+  "productType": "anel|colar|brinco|pulseira|argola|tornozeleira|pingente|conjunto|corrente|berloque|cinto|bolsa|oculos",
+  "mainShape": "formato principal da peça ex: cruz, coração, aro simples, elo, oval, redondo, quadrado, borboleta",
+  "structure": "descrição da estrutura ex: aro duplo aberto, banda larga, corrente singela, elo canalizado",
+  "pedras": true,
+  "tipo_pedra": "cristal|zirconia|perola|sem_pedra",
+  "quantidade_pedras": 0,
+  "stonePlacement": "onde as pedras estão posicionadas ex: toda a extensão, parte frontal, centro, bordas",
+  "perolas": false,
+  "quantidade_perolas": 0,
+  "tipo_elo": "retangular|oval|figaro|sem_elo",
+  "espessura_elo": "fina|media|grossa",
+  "fecho": "lagosta|mola|gaveta|sem_fecho",
+  "pingente": false,
+  "tipo_pingente": "sem_pingente",
+  "gravacao": false,
+  "importantDetails": ["detalhe 1", "detalhe 2"],
+  "forbiddenChanges": ["não alterar a cor do metal", "não mudar quantidade de pedras", "não alterar formato principal"],
+  "technicalDescription": "descrição curta e precisa da peça em 1 frase",
+  "detalhes_extras": ""
+}
+Seja preciso. importantDetails deve listar características visuais únicas da peça. forbiddenChanges deve listar o que não pode ser alterado na geração.` }
         ]
       }]
     })
@@ -139,6 +164,62 @@ function injetarCorMetal(prompt, corFinal) {
 COR DO METAL OBRIGATÓRIA: ${corFinal}. ${corFinal === 'DOURADO' ? 'DOURADO permanece DOURADO.' : corFinal === 'PRATA' ? 'PRATA permanece PRATA.' : 'ROSE GOLD permanece ROSE GOLD.'} Não alterar a cor do metal sob nenhuma circunstância.`;
 }
 
+function montarFichaTecnica(analise, corFinal) {
+  const linhas = [];
+
+  linhas.push('\n\n=== FICHA TÉCNICA OBRIGATÓRIA DA PEÇA ===');
+
+  if (analise.technicalDescription)
+    linhas.push(`Descrição: ${analise.technicalDescription}`);
+
+  linhas.push(`Cor do metal: ${corFinal}`);
+
+  if (analise.acabamento)
+    linhas.push(`Acabamento: ${analise.acabamento}`);
+
+  if (analise.mainShape)
+    linhas.push(`Formato principal: ${analise.mainShape}`);
+
+  if (analise.structure)
+    linhas.push(`Estrutura: ${analise.structure}`);
+
+  if (analise.pedras && analise.tipo_pedra !== 'sem_pedra') {
+    linhas.push(`Pedras: ${analise.quantidade_pedras} ${analise.tipo_pedra}`);
+    if (analise.stonePlacement) linhas.push(`Posição das pedras: ${analise.stonePlacement}`);
+  }
+
+  if (analise.perolas && analise.quantidade_perolas > 0)
+    linhas.push(`Pérolas: ${analise.quantidade_perolas}`);
+
+  if (analise.tipo_elo && analise.tipo_elo !== 'sem_elo')
+    linhas.push(`Elo: ${analise.tipo_elo} ${analise.espessura_elo}`);
+
+  if (analise.fecho && analise.fecho !== 'sem_fecho')
+    linhas.push(`Fecho: ${analise.fecho}`);
+
+  if (analise.pingente && analise.tipo_pingente !== 'sem_pingente')
+    linhas.push(`Pingente: ${analise.tipo_pingente}`);
+
+  if (analise.gravacao)
+    linhas.push('Gravação: sim');
+
+  if (analise.importantDetails?.length > 0)
+    linhas.push(`Detalhes importantes: ${analise.importantDetails.join(', ')}`);
+
+  if (analise.detalhes_extras)
+    linhas.push(`Extras: ${analise.detalhes_extras}`);
+
+  if (analise.forbiddenChanges?.length > 0) {
+    linhas.push('\nRESTRIÇÕES ABSOLUTAS — NÃO ALTERAR:');
+    analise.forbiddenChanges.forEach(r => linhas.push(`- ${r}`));
+  }
+
+  linhas.push('=== FIM DA FICHA TÉCNICA ===');
+
+  return linhas.join('\n');
+}
+
+// Mantido para compatibilidade retroativa
 function montarDescricao(analise) {
   const p = [];
   if (analise.metal) p.push(`metal: ${analise.metal}`);
@@ -346,14 +427,17 @@ const gerarFotos = inngest.createFunction(
       try { return await analisarPeca(imageBase64); } catch { return {}; }
     });
 
-    const descricao = montarDescricao(analise);
     const { selectedPhotos, prompts, metalColor } = jobDoc;
     const corFinal = resolverCorFinal(metalColor, analise);
+    const fichaTecnica = montarFichaTecnica(analise, corFinal);
+
+    // ── Salva ficha técnica no Firestore ─────────────────
+    await updateJob(accessToken, jobId, { fichaTecnica: analise, updatedAt: Date.now() });
 
     // ── Step 4: Gerar Foto 1 e salvar como referência ────
     // photo_ref.jpg é SEMPRE gerado — é a referência oficial
     await step.run('foto-1', async () => {
-      const b64 = await gerarFoto(injetarCorMetal(prompts['1'], corFinal), imageBase64, descricao);
+      const b64 = await gerarFoto(injetarCorMetal(prompts['1'], corFinal), imageBase64, fichaTecnica);
 
       // Salva SEMPRE como photo_ref.jpg — referência interna obrigatória
       await salvarImagemDireto(accessToken, `jobs/${jobId}/photo_ref.jpg`, b64);
@@ -376,7 +460,7 @@ const gerarFotos = inngest.createFunction(
     // ── Fotos 2-6 usam exclusivamente photo_ref.jpg ──────
     if (selectedPhotos.includes(2)) {
       await step.run('foto-2', async () => {
-        const b64 = await gerarFoto(injetarCorMetal(prompts['2'], corFinal), refB64, descricao);
+        const b64 = await gerarFoto(injetarCorMetal(prompts['2'], corFinal), refB64, fichaTecnica);
         const url = await salvarImagem(accessToken, jobId, 2, b64);
         await updateJob(accessToken, jobId, { 2: url, updatedAt: Date.now() });
       });
@@ -384,7 +468,7 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(3)) {
       await step.run('foto-3', async () => {
-        const b64 = await gerarFoto(injetarCorMetal(prompts['3'], corFinal), refB64, descricao);
+        const b64 = await gerarFoto(injetarCorMetal(prompts['3'], corFinal), refB64, fichaTecnica);
         const url = await salvarImagem(accessToken, jobId, 3, b64);
         await updateJob(accessToken, jobId, { 3: url, updatedAt: Date.now() });
       });
@@ -392,7 +476,7 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(4)) {
       await step.run('foto-4', async () => {
-        const b64 = await gerarFoto(injetarCorMetal(prompts['4'], corFinal), refB64, descricao);
+        const b64 = await gerarFoto(injetarCorMetal(prompts['4'], corFinal), refB64, fichaTecnica);
         const url = await salvarImagem(accessToken, jobId, 4, b64);
         await updateJob(accessToken, jobId, { 4: url, updatedAt: Date.now() });
       });
@@ -400,7 +484,7 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(5)) {
       await step.run('foto-5', async () => {
-        const b64 = await gerarFoto(injetarCorMetal(prompts['5'], corFinal), refB64, descricao);
+        const b64 = await gerarFoto(injetarCorMetal(prompts['5'], corFinal), refB64, fichaTecnica);
         const url = await salvarImagem(accessToken, jobId, 5, b64);
         await updateJob(accessToken, jobId, { 5: url, updatedAt: Date.now() });
       });
@@ -408,7 +492,7 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(6)) {
       await step.run('foto-6', async () => {
-        const b64 = await gerarFoto(injetarCorMetal(prompts['6'], corFinal), refB64, descricao);
+        const b64 = await gerarFoto(injetarCorMetal(prompts['6'], corFinal), refB64, fichaTecnica);
         const url = await salvarImagem(accessToken, jobId, 6, b64);
         await updateJob(accessToken, jobId, { 6: url, updatedAt: Date.now() });
       });
