@@ -155,146 +155,36 @@ fidelityMode = strict quando complexity = complex ou quando há símbolo, grava�
 
 // ── Mapeia metalColor → label legível para o prompt ──
 function resolverCorFinal(metalColor, analise) {
-  if (metalColor === 'gold')     return 'DOURADO';
-  if (metalColor === 'silver')   return 'PRATA';
+  if (metalColor === 'gold')      return 'DOURADO';
+  if (metalColor === 'silver')    return 'PRATA';
   if (metalColor === 'rose_gold') return 'ROSE GOLD';
-  // auto: usa detecção da análise
   const map = { ouro: 'DOURADO', prata: 'PRATA', rose_gold: 'ROSE GOLD' };
   return map[analise.metal] || 'DOURADO';
 }
 
-function injetarCorMetal(prompt, corFinal) {
-  return prompt + `
+// ── Monta contexto mínimo e cirúrgico para injetar no prompt ──
+function montarContexto(analise, corFinal) {
+  const partes = [];
 
-COR DO METAL OBRIGATÓRIA: ${corFinal}. ${corFinal === 'DOURADO' ? 'DOURADO permanece DOURADO.' : corFinal === 'PRATA' ? 'PRATA permanece PRATA.' : 'ROSE GOLD permanece ROSE GOLD.'} Não alterar a cor do metal sob nenhuma circunstância.`;
-}
-
-function montarFichaTecnica(analise, corFinal) {
-  const linhas = [];
-
-  linhas.push('\n\n=== FICHA TÉCNICA OBRIGATÓRIA DA PEÇA ===');
-
-  if (analise.technicalDescription)
-    linhas.push(`Descrição: ${analise.technicalDescription}`);
-
-  linhas.push(`Cor do metal: ${corFinal}`);
-
-  if (analise.acabamento)
-    linhas.push(`Acabamento: ${analise.acabamento}`);
-
-  if (analise.mainShape)
-    linhas.push(`Formato principal: ${analise.mainShape}`);
-
-  if (analise.structure)
-    linhas.push(`Estrutura: ${analise.structure}`);
-
-  if (analise.pedras && analise.tipo_pedra !== 'sem_pedra') {
-    linhas.push(`Pedras: ${analise.quantidade_pedras} ${analise.tipo_pedra}`);
-    if (analise.stonePlacement) linhas.push(`Posição das pedras: ${analise.stonePlacement}`);
-  }
-
-  if (analise.perolas && analise.quantidade_perolas > 0)
-    linhas.push(`Pérolas: ${analise.quantidade_perolas}`);
-
-  if (analise.tipo_elo && analise.tipo_elo !== 'sem_elo')
-    linhas.push(`Elo: ${analise.tipo_elo} ${analise.espessura_elo}`);
-
-  if (analise.fecho && analise.fecho !== 'sem_fecho')
-    linhas.push(`Fecho: ${analise.fecho}`);
-
-  if (analise.pingente && analise.tipo_pingente !== 'sem_pingente')
-    linhas.push(`Pingente: ${analise.tipo_pingente}`);
-
-  if (analise.gravacao)
-    linhas.push('Gravação: sim');
-
+  // Bloco 1 — Ficha mínima (máx 6 campos, sem repetição)
+  const ficha = [];
+  if (analise.productType)    ficha.push(`Tipo: ${analise.productType}`);
+  ficha.push(`Cor: ${corFinal}`);
+  if (analise.structure)      ficha.push(`Estrutura: ${analise.structure}`);
+  if (analise.mainShape)      ficha.push(`Elemento principal: ${analise.mainShape}`);
+  if (analise.pedras && analise.tipo_pedra !== 'sem_pedra')
+    ficha.push(`Pedras: ${analise.quantidade_pedras} ${analise.tipo_pedra}${analise.stonePlacement ? ' — ' + analise.stonePlacement : ''}`);
   if (analise.importantDetails?.length > 0)
-    linhas.push(`Detalhes importantes: ${analise.importantDetails.join(', ')}`);
+    ficha.push(`Detalhes críticos: ${analise.importantDetails.slice(0, 3).join(', ')}`);
 
-  if (analise.detalhes_extras)
-    linhas.push(`Extras: ${analise.detalhes_extras}`);
+  partes.push('Peça: ' + ficha.join(' | '));
 
-  if (analise.forbiddenChanges?.length > 0) {
-    linhas.push('\nRESTRIÇÕES ABSOLUTAS — NÃO ALTERAR:');
-    analise.forbiddenChanges.forEach(r => linhas.push(`- ${r}`));
-  }
+  // Bloco 2 — Proibições críticas (máx 4 itens, sem repetir o que já está na ficha)
+  const proibicoes = (analise.forbiddenChanges || []).slice(0, 4);
+  if (proibicoes.length > 0)
+    partes.push('Não alterar: ' + proibicoes.join('. '));
 
-  // Modo strict: instruções adicionais para peças complexas
-  if (analise.fidelityMode === 'strict' || analise.complexity === 'complex') {
-    linhas.push('\nMODO FIDELIDADE ESTRITA — REGRAS ADICIONAIS:');
-    linhas.push('- Não redesenhar a peça. Não simplificar estrutura.');
-    linhas.push('- A peça deve ser tratada como objeto físico idêntico à imagem-mestre.');
-    linhas.push('- Não alterar quantidade de elementos, símbolos ou aros.');
-    linhas.push('- Não substituir por modelo parecido. Reproduzir esta peça específica.');
-    linhas.push('- Se a peça tem símbolo ou formato específico, mantê-lo exatamente.');
-  }
-
-  linhas.push('=== FIM DA FICHA TÉCNICA ===');
-
-  return linhas.join('\n');
-}
-
-// Mantido para compatibilidade retroativa
-function montarDescricao(analise) {
-  const p = [];
-  if (analise.metal) p.push(`metal: ${analise.metal}`);
-  if (analise.acabamento) p.push(`acabamento ${analise.acabamento}`);
-  if (analise.pedras && analise.tipo_pedra !== 'sem_pedra') p.push(`${analise.quantidade_pedras} pedra(s) ${analise.tipo_pedra}`);
-  if (analise.perolas) p.push(`${analise.quantidade_perolas} pérola(s)`);
-  if (analise.tipo_elo && analise.tipo_elo !== 'sem_elo') p.push(`elo ${analise.tipo_elo} ${analise.espessura_elo}`);
-  if (analise.fecho && analise.fecho !== 'sem_fecho') p.push(`fecho ${analise.fecho}`);
-  if (analise.pingente && analise.tipo_pingente !== 'sem_pingente') p.push(`pingente ${analise.tipo_pingente}`);
-  if (analise.gravacao) p.push('com gravação');
-  if (analise.detalhes_extras) p.push(analise.detalhes_extras);
-  return p.length > 0 ? `\nCaracterísticas: ${p.join(', ')}.` : '';
-}
-
-// ── IA 2: Engenheira de prompt personalizado por produto ──
-async function gerarPromptPersonalizado(analise, corFinal, promptBase) {
-  try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4.1-mini',
-        max_tokens: 600,
-        messages: [{
-          role: 'system',
-          content: 'Você é um especialista em prompts para geração de imagens de joias. Sua tarefa é criar um prompt personalizado e preciso com base na ficha técnica da peça. Retorne APENAS o prompt final, sem explicações.'
-        }, {
-          role: 'user',
-          content: `Com base na ficha técnica abaixo e no prompt base fornecido, crie um prompt personalizado que preserve com fidelidade absoluta as características únicas desta peça específica.
-
-FICHA TÉCNICA:
-- Tipo: ${analise.productType || 'joia'}
-- Descrição: ${analise.technicalDescription || ''}
-- Cor do metal: ${corFinal}
-- Formato principal: ${analise.mainShape || ''}
-- Estrutura: ${analise.structure || ''}
-- Pedras: ${analise.pedras ? `${analise.quantidade_pedras} ${analise.tipo_pedra} — ${analise.stonePlacement || ''}` : 'sem pedras'}
-- Detalhes únicos: ${(analise.importantDetails || []).join(', ')}
-- Complexidade: ${analise.complexity || 'medium'}
-- Modo: ${analise.fidelityMode || 'normal'}
-
-PROIBIÇÕES ABSOLUTAS:
-${(analise.forbiddenChanges || []).map(r => `- ${r}`).join('\n')}
-
-PROMPT BASE (contexto da cena):
-${promptBase}
-
-Crie o prompt final incorporando a ficha técnica ao prompt base. O prompt deve ser claro, direto e em português. Mantenha as instruções de cena do prompt base mas adicione as restrições específicas desta peça.`
-        }]
-      })
-    });
-    const data = await response.json();
-    return data.choices?.[0]?.message?.content?.trim() || promptBase;
-  } catch (e) {
-    console.warn('IA 2 falhou, usando prompt base:', e.message);
-    return promptBase;
-  }
+  return '\n' + partes.join('\n');
 }
 
 // ── Fallback FLUX ────────────────────────────────────────
@@ -492,26 +382,18 @@ const gerarFotos = inngest.createFunction(
 
     const { selectedPhotos, prompts, metalColor } = jobDoc;
     const corFinal = resolverCorFinal(metalColor, analise);
-    const fichaTecnica = montarFichaTecnica(analise, corFinal);
+    const contexto = montarContexto(analise, corFinal);
     const isComplexo = analise.fidelityMode === 'strict' || analise.complexity === 'complex';
 
-    // ── Salva ficha técnica no Firestore ─────────────────
+    // ── Salva análise no Firestore (para debug) ───────────
     await updateJob(accessToken, jobId, { fichaTecnica: analise, updatedAt: Date.now() });
 
-    // ── Step 4: IA 2 — personaliza prompt 1 antes da geração ─
-    // Apenas para peças complexas/strict. Só o prompt 1 é personalizado aqui.
-    // Os demais são personalizados dentro de cada step (paralelo ao fluxo).
-    const promptPersonalizado1 = await step.run('personalizar-prompt-1', async () => {
-      if (!isComplexo || !prompts['1']) return prompts['1'] || '';
-      return await gerarPromptPersonalizado(analise, corFinal, prompts['1']);
-    });
-
-    // ── Step 5: Gerar Foto 1 — high se complexo, medium se simples ──
+    // ── Step 4: Gerar Foto 1 — high se complexo, medium se simples ──
     // photo_ref.jpg é SEMPRE gerado — é a referência oficial
     await step.run('foto-1', async () => {
-      const promptFinal = injetarCorMetal(promptPersonalizado1 || prompts['1'], corFinal);
+      const promptFinal = prompts['1'] + contexto;
       const qualidadeFoto1 = isComplexo ? 'high' : 'medium';
-      const b64 = await gerarFoto(promptFinal, imageBase64, fichaTecnica, 3, qualidadeFoto1);
+      const b64 = await gerarFoto(promptFinal, imageBase64, '', 3, qualidadeFoto1);
 
       // Salva SEMPRE como photo_ref.jpg — referência interna obrigatória
       await salvarImagemDireto(accessToken, `jobs/${jobId}/photo_ref.jpg`, b64);
@@ -523,20 +405,15 @@ const gerarFotos = inngest.createFunction(
       }
     });
 
-   // ── Step 6: Baixa photo_ref.jpg — referência oficial ─
+    // ── Step 5: Baixa photo_ref.jpg — referência oficial ─
     const refB64 = await step.run('baixar-ref', async () => {
-      return await downloadFromStorage(
-        accessToken,
-        `jobs/${jobId}/photo_ref.jpg`
-      );
+      return await downloadFromStorage(accessToken, `jobs/${jobId}/photo_ref.jpg`);
     });
 
     // ── Fotos 2-6 usam exclusivamente photo_ref.jpg ──────
     if (selectedPhotos.includes(2)) {
       await step.run('foto-2', async () => {
-        const p2 = isComplexo ? await gerarPromptPersonalizado(analise, corFinal, prompts['2']) : prompts['2'];
-        const promptFinal = injetarCorMetal(p2 || prompts['2'], corFinal);
-        const b64 = await gerarFoto(promptFinal, refB64, fichaTecnica, 3, 'medium');
+        const b64 = await gerarFoto(prompts['2'] + contexto, refB64, '', 3, 'medium');
         const url = await salvarImagem(accessToken, jobId, 2, b64);
         await updateJob(accessToken, jobId, { 2: url, updatedAt: Date.now() });
       });
@@ -544,9 +421,7 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(3)) {
       await step.run('foto-3', async () => {
-        const p3 = isComplexo ? await gerarPromptPersonalizado(analise, corFinal, prompts['3']) : prompts['3'];
-        const promptFinal = injetarCorMetal(p3 || prompts['3'], corFinal);
-        const b64 = await gerarFoto(promptFinal, refB64, fichaTecnica, 3, 'medium');
+        const b64 = await gerarFoto(prompts['3'] + contexto, refB64, '', 3, 'medium');
         const url = await salvarImagem(accessToken, jobId, 3, b64);
         await updateJob(accessToken, jobId, { 3: url, updatedAt: Date.now() });
       });
@@ -554,9 +429,7 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(4)) {
       await step.run('foto-4', async () => {
-        const p4 = isComplexo ? await gerarPromptPersonalizado(analise, corFinal, prompts['4']) : prompts['4'];
-        const promptFinal = injetarCorMetal(p4 || prompts['4'], corFinal);
-        const b64 = await gerarFoto(promptFinal, refB64, fichaTecnica, 3, 'medium');
+        const b64 = await gerarFoto(prompts['4'] + contexto, refB64, '', 3, 'medium');
         const url = await salvarImagem(accessToken, jobId, 4, b64);
         await updateJob(accessToken, jobId, { 4: url, updatedAt: Date.now() });
       });
@@ -564,9 +437,7 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(5)) {
       await step.run('foto-5', async () => {
-        const p5 = isComplexo ? await gerarPromptPersonalizado(analise, corFinal, prompts['5']) : prompts['5'];
-        const promptFinal = injetarCorMetal(p5 || prompts['5'], corFinal);
-        const b64 = await gerarFoto(promptFinal, refB64, fichaTecnica, 3, 'medium');
+        const b64 = await gerarFoto(prompts['5'] + contexto, refB64, '', 3, 'medium');
         const url = await salvarImagem(accessToken, jobId, 5, b64);
         await updateJob(accessToken, jobId, { 5: url, updatedAt: Date.now() });
       });
@@ -574,9 +445,7 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(6)) {
       await step.run('foto-6', async () => {
-        const p6 = isComplexo ? await gerarPromptPersonalizado(analise, corFinal, prompts['6']) : prompts['6'];
-        const promptFinal = injetarCorMetal(p6 || prompts['6'], corFinal);
-        const b64 = await gerarFoto(promptFinal, refB64, fichaTecnica, 3, 'medium');
+        const b64 = await gerarFoto(prompts['6'] + contexto, refB64, '', 3, 'medium');
         const url = await salvarImagem(accessToken, jobId, 6, b64);
         await updateJob(accessToken, jobId, { 6: url, updatedAt: Date.now() });
       });
