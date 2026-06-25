@@ -123,6 +123,22 @@ async function analisarPeca(imageBase64) {
   catch { return {}; }
 }
 
+// ── Mapeia metalColor → label legível para o prompt ──
+function resolverCorFinal(metalColor, analise) {
+  if (metalColor === 'gold')     return 'DOURADO';
+  if (metalColor === 'silver')   return 'PRATA';
+  if (metalColor === 'rose_gold') return 'ROSE GOLD';
+  // auto: usa detecção da análise
+  const map = { ouro: 'DOURADO', prata: 'PRATA', rose_gold: 'ROSE GOLD' };
+  return map[analise.metal] || 'DOURADO';
+}
+
+function injetarCorMetal(prompt, corFinal) {
+  return prompt + `
+
+COR DO METAL OBRIGATÓRIA: ${corFinal}. ${corFinal === 'DOURADO' ? 'DOURADO permanece DOURADO.' : corFinal === 'PRATA' ? 'PRATA permanece PRATA.' : 'ROSE GOLD permanece ROSE GOLD.'} Não alterar a cor do metal sob nenhuma circunstância.`;
+}
+
 function montarDescricao(analise) {
   const p = [];
   if (analise.metal) p.push(`metal: ${analise.metal}`);
@@ -313,7 +329,8 @@ const gerarFotos = inngest.createFunction(
         prompts:        Object.fromEntries(
                           Object.entries(fields.prompts?.mapValue?.fields || {})
                             .map(([k, v]) => [k, v.stringValue])
-                        )
+                        ),
+        metalColor:     fields.metalColor?.stringValue || 'auto'
       };
     });
 
@@ -330,12 +347,13 @@ const gerarFotos = inngest.createFunction(
     });
 
     const descricao = montarDescricao(analise);
-    const { selectedPhotos, prompts } = jobDoc;
+    const { selectedPhotos, prompts, metalColor } = jobDoc;
+    const corFinal = resolverCorFinal(metalColor, analise);
 
     // ── Step 4: Gerar Foto 1 e salvar como referência ────
     // photo_ref.jpg é SEMPRE gerado — é a referência oficial
     await step.run('foto-1', async () => {
-      const b64 = await gerarFoto(prompts['1'], imageBase64, descricao);
+      const b64 = await gerarFoto(injetarCorMetal(prompts['1'], corFinal), imageBase64, descricao);
 
       // Salva SEMPRE como photo_ref.jpg — referência interna obrigatória
       await salvarImagemDireto(accessToken, `jobs/${jobId}/photo_ref.jpg`, b64);
@@ -358,7 +376,7 @@ const gerarFotos = inngest.createFunction(
     // ── Fotos 2-6 usam exclusivamente photo_ref.jpg ──────
     if (selectedPhotos.includes(2)) {
       await step.run('foto-2', async () => {
-        const b64 = await gerarFoto(prompts['2'], refB64, descricao);
+        const b64 = await gerarFoto(injetarCorMetal(prompts['2'], corFinal), refB64, descricao);
         const url = await salvarImagem(accessToken, jobId, 2, b64);
         await updateJob(accessToken, jobId, { 2: url, updatedAt: Date.now() });
       });
@@ -366,7 +384,7 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(3)) {
       await step.run('foto-3', async () => {
-        const b64 = await gerarFoto(prompts['3'], refB64, descricao);
+        const b64 = await gerarFoto(injetarCorMetal(prompts['3'], corFinal), refB64, descricao);
         const url = await salvarImagem(accessToken, jobId, 3, b64);
         await updateJob(accessToken, jobId, { 3: url, updatedAt: Date.now() });
       });
@@ -374,7 +392,7 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(4)) {
       await step.run('foto-4', async () => {
-        const b64 = await gerarFoto(prompts['4'], refB64, descricao);
+        const b64 = await gerarFoto(injetarCorMetal(prompts['4'], corFinal), refB64, descricao);
         const url = await salvarImagem(accessToken, jobId, 4, b64);
         await updateJob(accessToken, jobId, { 4: url, updatedAt: Date.now() });
       });
@@ -382,7 +400,7 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(5)) {
       await step.run('foto-5', async () => {
-        const b64 = await gerarFoto(prompts['5'], refB64, descricao);
+        const b64 = await gerarFoto(injetarCorMetal(prompts['5'], corFinal), refB64, descricao);
         const url = await salvarImagem(accessToken, jobId, 5, b64);
         await updateJob(accessToken, jobId, { 5: url, updatedAt: Date.now() });
       });
@@ -390,7 +408,7 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(6)) {
       await step.run('foto-6', async () => {
-        const b64 = await gerarFoto(prompts['6'], refB64, descricao);
+        const b64 = await gerarFoto(injetarCorMetal(prompts['6'], corFinal), refB64, descricao);
         const url = await salvarImagem(accessToken, jobId, 6, b64);
         await updateJob(accessToken, jobId, { 6: url, updatedAt: Date.now() });
       });
