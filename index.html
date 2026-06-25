@@ -467,15 +467,10 @@ button,input,textarea{font-family:inherit}
 }
 
 /* ── CHIPS COR DO METAL ──────────────────────────── */
-.metal-chips{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 20px}
-.metal-chip{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-size:12px;font-weight:700;color:var(--ink);cursor:pointer;transition:all .2s ease;white-space:nowrap}
+.metal-chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 20px}
+.metal-chip{flex:1;min-width:0;height:38px;display:flex;align-items:center;justify-content:center;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-size:12px;font-weight:700;color:var(--ink);cursor:pointer;transition:all .2s ease;white-space:nowrap;text-align:center}
 .metal-chip:hover:not(.active){border-color:rgba(123,97,255,.35);background:rgba(123,97,255,.04)}
 .metal-chip.active{border-color:var(--purple);background:rgba(123,97,255,.08);color:var(--purple)}
-.metal-chip .metal-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;border:1.5px solid rgba(0,0,0,.12)}
-.metal-dot-auto{background:conic-gradient(#D4AF37 0%,#A8A9AD 33%,#C4737A 66%,#D4AF37 100%)}
-.metal-dot-gold{background:linear-gradient(135deg,#F5D060,#C9920A)}
-.metal-dot-silver{background:linear-gradient(135deg,#E8E8EC,#9E9EA8)}
-.metal-dot-rose{background:linear-gradient(135deg,#F0A8B0,#B8545F)}
 @media(prefers-color-scheme:dark){.metal-chip{background:#1C1C2E!important;border-color:#303045!important;color:#B8B8C7!important}.metal-chip.active{background:rgba(123,97,255,.15)!important;border-color:rgba(123,97,255,.5)!important;color:#A08AFF!important}}
 
 /* ── TOUR ONBOARDING ─────────────────────────────── */
@@ -702,18 +697,10 @@ button,input,textarea{font-family:inherit}
       <div class="field" style="margin-bottom:8px">
         <label class="label" style="margin-top:0">Cor do metal</label>
         <div class="metal-chips" id="metalChips">
-          <button type="button" class="metal-chip active" data-metal="auto" onclick="selectMetal('auto',this)">
-            <span class="metal-dot metal-dot-auto"></span>Automático
-          </button>
-          <button type="button" class="metal-chip" data-metal="gold" onclick="selectMetal('gold',this)">
-            <span class="metal-dot metal-dot-gold"></span>Dourado
-          </button>
-          <button type="button" class="metal-chip" data-metal="silver" onclick="selectMetal('silver',this)">
-            <span class="metal-dot metal-dot-silver"></span>Prata
-          </button>
-          <button type="button" class="metal-chip" data-metal="rose_gold" onclick="selectMetal('rose_gold',this)">
-            <span class="metal-dot metal-dot-rose"></span>Rose Gold
-          </button>
+          <button type="button" class="metal-chip active" data-metal="auto" onclick="selectMetal('auto',this)">Automático</button>
+          <button type="button" class="metal-chip" data-metal="gold" onclick="selectMetal('gold',this)">Dourado</button>
+          <button type="button" class="metal-chip" data-metal="silver" onclick="selectMetal('silver',this)">Prata</button>
+          <button type="button" class="metal-chip" data-metal="rose_gold" onclick="selectMetal('rose_gold',this)">Rosé</button>
         </div>
       </div>
     </section>
