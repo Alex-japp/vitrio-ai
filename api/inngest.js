@@ -280,8 +280,7 @@ FICHA TÉCNICA:
 - Modo: ${analise.fidelityMode || 'normal'}
 
 PROIBIÇÕES ABSOLUTAS:
-${(analise.forbiddenChanges || []).map(r => `- ${r}`).join('
-')}
+${(analise.forbiddenChanges || []).map(r => `- ${r}`).join('\n')}
 
 PROMPT BASE (contexto da cena):
 ${promptBase}
@@ -499,27 +498,18 @@ const gerarFotos = inngest.createFunction(
     // ── Salva ficha técnica no Firestore ─────────────────
     await updateJob(accessToken, jobId, { fichaTecnica: analise, updatedAt: Date.now() });
 
-    // ── Step 4: IA 2 — apenas para peças complexas/strict ─
-    // Peças simples/médias usam prompt base direto (economiza custo)
-    const promptsPersonalizados = await step.run('personalizar-prompts', async () => {
-      if (!isComplexo) return {};
-      const resultado = {};
-      for (const num of selectedPhotos) {
-        const base = prompts[String(num)];
-        if (!base) continue;
-        resultado[num] = await gerarPromptPersonalizado(analise, corFinal, base);
-      }
-      // Sempre personaliza o prompt 1 mesmo se não selecionado (é a referência)
-      if (!resultado[1] && prompts['1']) {
-        resultado[1] = await gerarPromptPersonalizado(analise, corFinal, prompts['1']);
-      }
-      return resultado;
+    // ── Step 4: IA 2 — personaliza prompt 1 antes da geração ─
+    // Apenas para peças complexas/strict. Só o prompt 1 é personalizado aqui.
+    // Os demais são personalizados dentro de cada step (paralelo ao fluxo).
+    const promptPersonalizado1 = await step.run('personalizar-prompt-1', async () => {
+      if (!isComplexo || !prompts['1']) return prompts['1'] || '';
+      return await gerarPromptPersonalizado(analise, corFinal, prompts['1']);
     });
 
     // ── Step 5: Gerar Foto 1 — high se complexo, medium se simples ──
     // photo_ref.jpg é SEMPRE gerado — é a referência oficial
     await step.run('foto-1', async () => {
-      const promptFinal = injetarCorMetal(promptsPersonalizados[1] || prompts['1'], corFinal);
+      const promptFinal = injetarCorMetal(promptPersonalizado1 || prompts['1'], corFinal);
       const qualidadeFoto1 = isComplexo ? 'high' : 'medium';
       const b64 = await gerarFoto(promptFinal, imageBase64, fichaTecnica, 3, qualidadeFoto1);
 
@@ -544,7 +534,8 @@ const gerarFotos = inngest.createFunction(
     // ── Fotos 2-6 usam exclusivamente photo_ref.jpg ──────
     if (selectedPhotos.includes(2)) {
       await step.run('foto-2', async () => {
-        const promptFinal = injetarCorMetal(promptsPersonalizados[2] || prompts['2'], corFinal);
+        const p2 = isComplexo ? await gerarPromptPersonalizado(analise, corFinal, prompts['2']) : prompts['2'];
+        const promptFinal = injetarCorMetal(p2 || prompts['2'], corFinal);
         const b64 = await gerarFoto(promptFinal, refB64, fichaTecnica, 3, 'medium');
         const url = await salvarImagem(accessToken, jobId, 2, b64);
         await updateJob(accessToken, jobId, { 2: url, updatedAt: Date.now() });
@@ -553,7 +544,8 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(3)) {
       await step.run('foto-3', async () => {
-        const promptFinal = injetarCorMetal(promptsPersonalizados[3] || prompts['3'], corFinal);
+        const p3 = isComplexo ? await gerarPromptPersonalizado(analise, corFinal, prompts['3']) : prompts['3'];
+        const promptFinal = injetarCorMetal(p3 || prompts['3'], corFinal);
         const b64 = await gerarFoto(promptFinal, refB64, fichaTecnica, 3, 'medium');
         const url = await salvarImagem(accessToken, jobId, 3, b64);
         await updateJob(accessToken, jobId, { 3: url, updatedAt: Date.now() });
@@ -562,7 +554,8 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(4)) {
       await step.run('foto-4', async () => {
-        const promptFinal = injetarCorMetal(promptsPersonalizados[4] || prompts['4'], corFinal);
+        const p4 = isComplexo ? await gerarPromptPersonalizado(analise, corFinal, prompts['4']) : prompts['4'];
+        const promptFinal = injetarCorMetal(p4 || prompts['4'], corFinal);
         const b64 = await gerarFoto(promptFinal, refB64, fichaTecnica, 3, 'medium');
         const url = await salvarImagem(accessToken, jobId, 4, b64);
         await updateJob(accessToken, jobId, { 4: url, updatedAt: Date.now() });
@@ -571,7 +564,8 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(5)) {
       await step.run('foto-5', async () => {
-        const promptFinal = injetarCorMetal(promptsPersonalizados[5] || prompts['5'], corFinal);
+        const p5 = isComplexo ? await gerarPromptPersonalizado(analise, corFinal, prompts['5']) : prompts['5'];
+        const promptFinal = injetarCorMetal(p5 || prompts['5'], corFinal);
         const b64 = await gerarFoto(promptFinal, refB64, fichaTecnica, 3, 'medium');
         const url = await salvarImagem(accessToken, jobId, 5, b64);
         await updateJob(accessToken, jobId, { 5: url, updatedAt: Date.now() });
@@ -580,7 +574,8 @@ const gerarFotos = inngest.createFunction(
 
     if (selectedPhotos.includes(6)) {
       await step.run('foto-6', async () => {
-        const promptFinal = injetarCorMetal(promptsPersonalizados[6] || prompts['6'], corFinal);
+        const p6 = isComplexo ? await gerarPromptPersonalizado(analise, corFinal, prompts['6']) : prompts['6'];
+        const promptFinal = injetarCorMetal(p6 || prompts['6'], corFinal);
         const b64 = await gerarFoto(promptFinal, refB64, fichaTecnica, 3, 'medium');
         const url = await salvarImagem(accessToken, jobId, 6, b64);
         await updateJob(accessToken, jobId, { 6: url, updatedAt: Date.now() });
