@@ -381,7 +381,7 @@ await step.run('foto-1', async () => {
 
 // Busca path da foto 1 e baixa para usar como referência
 const jobComRef = await firestoreGet(accessToken, `jobs/${jobId}`);
-const refPath = jobComRef.fields?.ref_path?.stringValue;
+const refPath = jobComRef.fields?.photo_ref_path?.stringValue;
 const ref = refPath ? await downloadFromStorage(accessToken, refPath) : imageBase64;
     if (selectedPhotos.includes(2)) {
       await step.run('foto-2', async () => {
