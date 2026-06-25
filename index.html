@@ -466,6 +466,18 @@ button,input,textarea{font-family:inherit}
   .results-badge{background:rgba(123,97,255,.15)!important;border-color:rgba(123,97,255,.3)!important}
 }
 
+/* ── CHIPS COR DO METAL ──────────────────────────── */
+.metal-chips{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 20px}
+.metal-chip{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-size:12px;font-weight:700;color:var(--ink);cursor:pointer;transition:all .2s ease;white-space:nowrap}
+.metal-chip:hover:not(.active){border-color:rgba(123,97,255,.35);background:rgba(123,97,255,.04)}
+.metal-chip.active{border-color:var(--purple);background:rgba(123,97,255,.08);color:var(--purple)}
+.metal-chip .metal-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;border:1.5px solid rgba(0,0,0,.12)}
+.metal-dot-auto{background:conic-gradient(#D4AF37 0%,#A8A9AD 33%,#C4737A 66%,#D4AF37 100%)}
+.metal-dot-gold{background:linear-gradient(135deg,#F5D060,#C9920A)}
+.metal-dot-silver{background:linear-gradient(135deg,#E8E8EC,#9E9EA8)}
+.metal-dot-rose{background:linear-gradient(135deg,#F0A8B0,#B8545F)}
+@media(prefers-color-scheme:dark){.metal-chip{background:#1C1C2E!important;border-color:#303045!important;color:#B8B8C7!important}.metal-chip.active{background:rgba(123,97,255,.15)!important;border-color:rgba(123,97,255,.5)!important;color:#A08AFF!important}}
+
 /* ── TOUR ONBOARDING ─────────────────────────────── */
 #tourOverlay{position:fixed;inset:0;z-index:600;pointer-events:none}
 #tourOverlay.active{pointer-events:all}
@@ -684,6 +696,24 @@ button,input,textarea{font-family:inherit}
         <div class="obs-body" id="obsBody">
           <textarea id="obs" class="textarea" maxlength="100" placeholder="Ex: dourado, destaque as pedras, fundo claro, sem corrente..." oninput="state.obs=this.value.trim();updateObsCounter(this)"></textarea>
           <div style="text-align:right;font-size:11px;color:var(--muted);margin-top:4px"><span id="obsCount">0</span>/100 caracteres</div>
+        </div>
+      </div>
+      <!-- COR DO METAL -->
+      <div class="field" style="margin-bottom:8px">
+        <label class="label" style="margin-top:0">Cor do metal</label>
+        <div class="metal-chips" id="metalChips">
+          <button type="button" class="metal-chip active" data-metal="auto" onclick="selectMetal('auto',this)">
+            <span class="metal-dot metal-dot-auto"></span>Automático
+          </button>
+          <button type="button" class="metal-chip" data-metal="gold" onclick="selectMetal('gold',this)">
+            <span class="metal-dot metal-dot-gold"></span>Dourado
+          </button>
+          <button type="button" class="metal-chip" data-metal="silver" onclick="selectMetal('silver',this)">
+            <span class="metal-dot metal-dot-silver"></span>Prata
+          </button>
+          <button type="button" class="metal-chip" data-metal="rose_gold" onclick="selectMetal('rose_gold',this)">
+            <span class="metal-dot metal-dot-rose"></span>Rose Gold
+          </button>
         </div>
       </div>
     </section>
@@ -1291,9 +1321,25 @@ const FB='https://docs.google.com/forms/d/e/1FAIpQLScwQ1g4VlZUOz0mAQ2OSwRG0lVtxh
 const WHATSAPP_NUMBER = '5537999096812';
 const defaults=[['Anéis'],['Brincos'],['Colares'],['Pulseiras'],['Pingentes']].map((x,i)=>({id:'c'+i,name:x[0],icon:'',p1:'Foto profissional em fundo branco, estilo catálogo premium.',p2:'Foto em modelo ou composição elegante, luz suave, luxo discreto.',p3:'Close detalhado mostrando brilho, textura e acabamento da peça.'}));
 let cats=defaults, editId=null, editMode='cat';
-let state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],selectedPhotos:[1,2,3]};
+let state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],selectedPhotos:[1,2,3],metalColor:localStorage.getItem('vitrio_metal_color')||'auto'};
 let appConfig={codeRequired:true};
 let _generateCancelled = false;
+
+// ── COR DO METAL ─────────────────────────────────────
+function selectMetal(value, el){
+  state.metalColor = value;
+  localStorage.setItem('vitrio_metal_color', value);
+  document.querySelectorAll('.metal-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function initMetalChip(){
+  const saved = localStorage.getItem('vitrio_metal_color') || 'auto';
+  document.querySelectorAll('.metal-chip').forEach(c=>{
+    c.classList.toggle('active', c.dataset.metal === saved);
+  });
+  state.metalColor = saved;
+}
 
 // ── FIREBASE ID TOKEN ────────────────────────────────
 async function getIdToken() {
@@ -1343,6 +1389,7 @@ async function init(){
     localStorage.setItem(photosSeenKey, '1');
   }
   if(resultsPlaceholder && window.innerWidth<900) resultsPlaceholder.classList.add('mobile-show');
+  initMetalChip();
 }
 
 function feedback(){window.open(FB,'_blank')}
@@ -1489,7 +1536,8 @@ async function generate(){
         prompts,
         selectedPhotos: photos,
         code: state.code,
-        category: state.cat?.name || ''
+        category: state.cat?.name || '',
+        metalColor: state.metalColor || 'auto'
       })
     });
 
@@ -1665,7 +1713,8 @@ async function regenerate(i){
         prompts,
         selectedPhotos: [photoNum],
         code: state.code,
-        category: state.cat?.name || ''
+        category: state.cat?.name || '',
+        metalColor: state.metalColor || 'auto'
       })
     });
     if(!jobRes.ok) throw new Error('Falha ao criar job');
@@ -1788,7 +1837,7 @@ function resetForm(){
   genBtn.onclick = generate;
   genBtn.style.background = '';
   _generateCancelled = false;
-  state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],selectedPhotos:[1,2,3]};
+  state={cat:null,code:'',obs:'',b64:'',mime:'image/jpeg',imgs:[],selectedPhotos:[1,2,3],metalColor:localStorage.getItem('vitrio_metal_color')||'auto'};
   // Preenche próximo código sequencial se opcional
   if(!appConfig.codeRequired){
     const nextCode = getNextCode();
