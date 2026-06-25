@@ -124,7 +124,7 @@ module.exports = async function handler(req, res) {
   }
 
   const isAdmin = userData.isAdmin?.booleanValue === true;
-  const { imageBase64, prompts, selectedPhotos, code, category } = req.body;
+  const { imageBase64, prompts, selectedPhotos, code, category, metalColor } = req.body;
 
   if (!imageBase64 || !prompts || !selectedPhotos) {
     return res.status(400).json({ error: 'Dados incompletos' });
@@ -206,6 +206,7 @@ module.exports = async function handler(req, res) {
               )
             }
           },
+          metalColor:       { stringValue: metalColor || 'auto' },
           createdAt: { integerValue: now.toString() },
           updatedAt: { integerValue: now.toString() }
         }
